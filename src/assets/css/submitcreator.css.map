@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,+BAA+B;EAC9B,aAAa,EAAE,GAAG;EACf,UAAU,EAAE,qCAAkC;EAC9C,qCAAK;IACJ,UAAU,EAAC,IAAI",
+"sources": ["submitcreator.scss"],
+"names": [],
+"file": "submitcreator.css"
+}

@@ -1,0 +1,89 @@
+.modal-xl {
+  max-width: 1024px; }
+
+.detailcontent .smallertext {
+  font-size: .85em; }
+.detailcontent .description_block {
+  padding: 10px; }
+  .detailcontent .description_block .single_row {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: dashed 1px #333; }
+.detailcontent label {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  margin-right: 10px; }
+  .detailcontent label::after {
+    content: " :"; }
+.detailcontent h2 {
+  margin-bottom: 1rem; }
+.detailcontent pre {
+  white-space: pre-wrap; }
+.detailcontent .sample_groups a {
+  display: block;
+  width: 200px;
+  height: 200px;
+  overflow: hidden;
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px; }
+  .detailcontent .sample_groups a img {
+    width: 200px;
+    height: 200px; }
+.detailcontent .sample_groups::after {
+  display: block;
+  content: "";
+  clear: both; }
+
+.deliverable_item {
+  border-bottom: solid 1px #CCC;
+  margin-bottom: 10px;
+  padding: 10px; }
+  .deliverable_item .main_block h3 {
+    margin-bottom: 0; }
+  .deliverable_item .main_block .remark {
+    color: #777;
+    margin-bottom: 1rem; }
+  .deliverable_item .input_group {
+    position: relative;
+    margin-bottom: 5px; }
+    .deliverable_item .input_group .label {
+      float: left;
+      width: 100px; }
+    .deliverable_item .input_group input, .deliverable_item .input_group textarea {
+      all: unset;
+      float: left;
+      width: calc(100% - 100px);
+      box-shadow: inset 0 0 0 0.1rem rgba(0, 0, 0, 0.2);
+      padding: .5rem 1rem;
+      box-sizing: border-box; }
+    .deliverable_item .input_group textarea {
+      resize: vertical; }
+    .deliverable_item .input_group .value {
+      float: left;
+      width: calc(100% - 100px);
+      padding: 0 .5rem;
+      box-sizing: border-box;
+      color: #999; }
+    .deliverable_item .input_group .green {
+      color: green; }
+    .deliverable_item .input_group .blue {
+      color: blue; }
+    .deliverable_item .input_group .red {
+      color: red; }
+    .deliverable_item .input_group .reason_value {
+      float: left;
+      width: calc(100% - 100px);
+      padding: 0 .5rem 0 100px;
+      box-sizing: border-box;
+      color: #999; }
+    .deliverable_item .input_group .save-btn {
+      position: absolute;
+      top: 0;
+      right: 0; }
+    .deliverable_item .input_group::after {
+      content: " ";
+      clear: both;
+      display: block; }
+
+/*# sourceMappingURL=temp.css.map */

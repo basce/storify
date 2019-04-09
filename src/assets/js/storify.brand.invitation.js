@@ -1,0 +1,252 @@
+var storify = storify || {};
+storify.brand = storify.brand || {};
+
+storify.brand.invitation = {
+	addElementIfNotExist:function(){
+		if( !$("#single_invitation_dialog").length ){
+			$("body").append(
+				$("<modal>").addClass("modal")
+					.attr({tabindex:"-1", role:"dialog", id:"single_invitation_dialog"})
+					.append(
+						$("<div>").addClass("modal-dialog modal-dialog-centered")
+							.attr({role:"document"})
+							.append(
+								$("<div>").addClass("modal-content")
+									.append(
+										$("<div>").addClass("modal-header")
+											.append(
+												$("<h5>").addClass("modal-title")
+													.text("Manage Invitation")
+											)
+											.append(
+												$("<button>").addClass("close")
+													.attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"})
+													.append(
+														$("<span>").attr({"aria-hidden":true})
+															.html("&times;")
+													)
+											)
+									)
+									.append(
+										$("<div>").addClass("modal-body")
+											.append(
+												$("<div>").addClass("container")
+													.append(
+														$("<div>").addClass("row")
+															.append(
+																$("<div>").addClass("col-3")
+																	.append($("<div>").addClass("profile-image"))
+															)
+															.append(
+																$("<div>").addClass("col-9")
+																	.append(
+																		$("<div>").append($("<strong>"))
+																	)
+																	.append(
+																		$("<div>").append(document.createTextNode("Status : "))
+																			.append(
+																				$("<span>").addClass("status")
+																			)
+																	)
+																	.append(
+																		$("<div>").addClass("remark")
+																	)
+															)
+													)
+											)
+									)
+									.append(
+										$("<div>").addClass("modal-footer")
+											.append(
+												$("<div>").addClass("text-center")
+													.append(
+														$("<button>").addClass("btn btn-primary")
+															.text("invite")
+													)
+											)
+									)
+							)
+					)
+			);
+
+			$("#single_invitation_dialog .modal-footer button").click(storify.brand.invitation.dialog_click);
+		}
+	},
+	_updatingInvitation:false,
+	dialog_click:function(e){
+		// click on dialog button
+		e.preventDefault();
+
+		if( !+storify.project._project_id ){
+			console.log("storify.project._project_id not a number", storify.project._project_id);
+			return;
+		}
+
+		var a = $("#single_invitation_dialog .modal-footer button"),
+			id = $(this).attr("data-id"),
+			command_type = +$(this).attr("data-command_type");
+		
+		if( command_type == 3){
+			alert("the function is not yet open");
+		}else if( command_type ){
+			if( storify.brand.invitation._updatingInvitation ) return;
+			storify.brand.invitation._updatingInvitation = true;
+			$.ajax({
+				type: 	"POST",
+				dataType: "json",
+				data:{
+					project_id: 	storify.project._project_id,
+					command_type: 	command_type,
+					id: 			id,
+					method: 		"editInvitation"
+				},
+				success: function(rs){
+					storify.brand.invitation._updatingInvitation = false;
+					storify.brand.invitation.getList(function(){
+						$("#single_invitation_dialog").modal("hide");
+					});
+				}
+			});
+		}
+	},
+	resetForm:function(){
+		storify.brand.invitation.addElementIfNotExist();
+		if($("#invite").length){
+			$("#invite")[0].selectize.clear(true);
+		}
+		$(".invite-group").empty();
+		$(".invite-summary").empty();
+	},
+	displaySingleInvite:function(data){
+		var a = "#single_invitation_dialog",
+			b = $(a+" .modal-body .status"),
+			c = $(a+" .modal-footer button");
+		$(a+" .profile-image").css({"background-image":"url("+data.profile_image+")"});
+        $(a+" .modal-body strong").text(data.display_name);
+        switch(data.invitation_status){
+        	case "pending":
+        		b.addClass("item-pending").text("Waiting");
+        		c.text("Withdraw Invitation").attr({"data-id":data.invitation_id, "data-command_type":1});
+        	break;
+        	case "rejected":
+        		b.addClass("item-rejected").text("Rejected");
+        		c.text("Resend Invitation").attr({"data-id":data.user_id, "data-command_type":2});
+        	break;
+        	case "accepted":
+        		b.addClass("item-accepted").text("Accepted");
+        		c.text("Remove Creator from Project").attr({"data-id":data.user_id, "data-command_type":3});
+        	break;
+        }
+        if(data.remark){
+        	$(a+" .remark").css({display:"block"}).text(data.remark);
+        }else{
+        	$(a+" .remark").css({display:"none"}).text("");
+        }
+        $(a).modal("show");
+	},
+	createItem:function(data){
+		var a = $("<div>").addClass("invite-item")
+                    .append($("<div>").addClass("profile-image").css({"background-image":"url("+data.profile_image+")"}))
+                    .click(function(e){
+                        e.preventDefault();
+                        storify.brand.invitation.displaySingleInvite(data);
+                    });
+        switch(data.invitation_status){
+            case "pending":
+                a.addClass("item-pending").attr({title:"waiting"});
+            break;
+            case "accepted":
+                a.addClass("item-accepted").attr({title:"accepted"});
+            break;
+            case "rejected":
+                a.addClass("item-rejected").attr({title:"rejected"});
+            break;
+        }
+
+        return a;
+	},
+	display:function(data, callback){
+		storify.brand.invitation.resetForm();
+
+		var accepted_count = 0,
+			rejected_count = 0,
+			waiting_count = 0;
+
+		$.each(data, function(index,value){
+			$(".invite-group").append(storify.brand.invitation.createItem(value));
+			switch(value.invitation_status){
+				case "pending":
+				case "waiting":
+					waiting_count++;
+				break;
+				case "accepted":
+					accepted_count++;
+				break;
+				case "rejected":
+					rejected_count++;
+				break;
+			}
+		});
+
+		if(accepted_count){
+			$(".invite-summary").append($("<span>").addClass("item-accepted").text(accepted_count+" accepted"));
+		}
+		if(waiting_count){
+			$(".invite-summary").append($("<span>").addClass("item-pending").text(waiting_count+" waiting"));
+		}
+		if(rejected_count){
+			$(".invite-summary").append($("<span>").addClass("item-rejected").text(rejected_count+" rejected"));
+		}
+		if( typeof callback === "function" ){
+			callback();
+		}
+	},
+	_gettingInvitation:false,
+	getList:function(callback){
+		if(storify.brand.invitation._gettingInvitation) return;
+		storify.brand.invitation.resetForm();
+		storify.brand.invitation._gettingInvitation = true;
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			data:{
+				project_id:storify.project._project_id,
+				method:"getInvitationList"
+			},
+			success:function(rs){
+				storify.brand.invitation._gettingInvitation = false;
+				if(rs.error){
+					alert(rs.msg);
+				}else{
+					storify.brand.invitation.display(rs.data, callback);
+				}
+			}
+		});
+	},
+	_sendingInvitation:false,
+	invite_click:function(e){
+		e.preventDefault();
+
+		var a = $("#invite").val();
+		if(a && a.length){
+			if(storify.brand.invitation._sendingInvitation) return;
+			storify.brand.invitation._sendingInvitation = true;
+			$.ajax({
+				type: "POST",
+				dataType: "json",
+				data:{
+					project_id:storify.project._project_id,
+					userids:a,
+					method:"sendInvitation"
+				},
+				error:function(request, status, error){
+                    storify.brand.invitation._sendingInvitation = false;
+                },
+                success:function(rs){
+                    storify.brand.invitation._sendingInvitation = false;
+                    storify.brand.invitation.getList();
+                }
+			});
+		}
+	}
+};

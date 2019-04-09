@@ -1,0 +1,52 @@
+.edit_bar .btn{
+	margin-left:10px;
+}
+
+.items.grid.editmode .item .wrapper{
+	cursor: pointer;
+}
+
+.items.grid.editmode .ui-sortable-placeholder{
+	border: dashed 2px #333;
+}
+
+.items.grid .item .wrapper *{
+	cursor: default;
+	pointer-events: none;
+}
+
+.items.grid.editmode .item.selected .wrapper{
+	box-shadow: 0 0 0.2rem 0.2rem #28a745;
+}
+
+.items.grid.editmode .item .wrapper::after{
+	color:#333333;
+	content:"\f096";
+	display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 2rem;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position:absolute;
+    top:0;
+    right:0;
+    background-color: rgba(0,0,0,0);
+    padding: 0.4rem 0.5rem 0.3rem;
+    border-bottom-left-radius: .5rem;
+}
+
+.items.grid.editmode .item.selected .wrapper::after{
+	color:#28a745;
+	background-color: rgba(255,255,255,1);
+	content:"\f046";
+	display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: 2rem;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position:absolute;
+    top:0;
+    right:0;
+}
