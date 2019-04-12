@@ -219,36 +219,52 @@ storify.brand.completion = {
 		storify.brand.completion.addElementIfNotExist();
 
 		$("#final-content").empty();
-		var alldone = true;
+		var alldone = true,
+			widthData = false;
 		$.each(data, function(index,value){
+			widthData = true;
 			$("#final-content").append(storify.brand.completion.createCompletionItem(value));
 			if(value.status != "close"){
 				alldone = false;
 			}
 		});
 
-		if(alldone){
-			$("#final-content").append(
-				$("<div>").addClass("text-right")
-					.append(
-						$("<button>").addClass("btn btn-primary small").text("Close")
-							.click(function(e){
-								/*$("#closeProjectDialog .modal-footer .btn:eq(1)").attr({"data-project_id":data.user_id});*/
-								$("#closeProjectDialog").modal("show");
-							})
-					)
-			);	
+		if(withData){
+			if(alldone){
+				$("#final-content").append(
+					$("<div>").addClass("text-right")
+						.append(
+							$("<button>").addClass("btn btn-primary small").text("Close")
+								.click(function(e){
+									/*$("#closeProjectDialog .modal-footer .btn:eq(1)").attr({"data-project_id":data.user_id});*/
+									$("#closeProjectDialog").modal("show");
+								})
+						)
+				);	
+			}else{
+				$("#final-content").append(
+					$("<div>").addClass("text-right")
+						.append(
+							$("<button>").addClass("btn btn-primary small").text("Pay All")
+								.click(function(e){
+									/*$("#finalizeAllDialog .modal-footer .btn:eq(1)").attr({"data-user_id":data.user_id});*/
+									$("#finalizeAllDialog").modal("show");
+								})
+						)
+				);
+			}
 		}else{
+			$("#final-content").append($("<div>").append($("<p>").text("No Submissions made yet.")));
 			$("#final-content").append(
-				$("<div>").addClass("text-right")
-					.append(
-						$("<button>").addClass("btn btn-primary small").text("Pay All")
-							.click(function(e){
-								/*$("#finalizeAllDialog .modal-footer .btn:eq(1)").attr({"data-user_id":data.user_id});*/
-								$("#finalizeAllDialog").modal("show");
-							})
-					)
-			);
+					$("<div>").addClass("text-right")
+						.append(
+							$("<button>").addClass("btn btn-primary small").text("Close")
+								.click(function(e){
+									/*$("#closeProjectDialog .modal-footer .btn:eq(1)").attr({"data-project_id":data.user_id});*/
+									$("#closeProjectDialog").modal("show");
+								})
+						)
+				);	
 		}
 	},
 	_gettingCompletion:false,

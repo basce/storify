@@ -48,11 +48,11 @@ if($current_user->ID){
             $project_id = $_POST["project_id"];
             if(isset($_POST["data"]["detail"]["closing_date"]) && $_POST["data"]["detail"]["closing_date"]){
                 //mm/dd/yyyy
-                $tempdate = DateTime::createFromFormat('m/d/Y', $_POST["data"]["detail"]["closing_date"]);
+                $tempdate = DateTime::createFromFormat('d/m/y', $_POST["data"]["detail"]["closing_date"]);
                 $_POST["data"]["detail"]["closing_date"] = $tempdate->format('Y-m-d')." 00:00:00";
             }
             if(isset($_POST["data"]["detail"]["invitation_closing_date"]) && $_POST["data"]["detail"]["invitation_closing_date"]){
-                $tempdate = DateTime::createFromFormat('m/d/Y', $_POST["data"]["detail"]["invitation_closing_date"]);
+                $tempdate = DateTime::createFromFormat('d/m/y', $_POST["data"]["detail"]["invitation_closing_date"]);
                 $_POST["data"]["detail"]["invitation_closing_date"] = $tempdate->format('Y-m-d')." 00:00:00";
             }
             $main->getProjectManager()->emptySample($project_id);
@@ -73,11 +73,11 @@ if($current_user->ID){
             //convert date
             if(isset($_POST["data"]["detail"]["closing_date"]) && $_POST["data"]["detail"]["closing_date"]){
                 //mm/dd/yyyy
-                $tempdate = DateTime::createFromFormat('m/d/Y', $_POST["data"]["detail"]["closing_date"]);
+                $tempdate = DateTime::createFromFormat('d/m/y', $_POST["data"]["detail"]["closing_date"]);
                 $_POST["data"]["detail"]["closing_date"] = $tempdate->format('Y-m-d')." 00:00:00";
             }
             if(isset($_POST["data"]["detail"]["invitation_closing_date"]) && $_POST["data"]["detail"]["invitation_closing_date"]){
-                $tempdate = DateTime::createFromFormat('m/d/Y', $_POST["data"]["detail"]["invitation_closing_date"]);
+                $tempdate = DateTime::createFromFormat('d/m/y', $_POST["data"]["detail"]["invitation_closing_date"]);
                 $_POST["data"]["detail"]["invitation_closing_date"] = $tempdate->format('Y-m-d')." 00:00:00";
             }
             $project_id = $main->getProjectManager()->createNewProject($_POST["data"]["detail"]["name"], $current_user->ID);

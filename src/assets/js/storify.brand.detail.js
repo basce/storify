@@ -143,7 +143,7 @@ storify.brand.detail = {
                                             )
                                             .append($("<div>").addClass("form-group")
                                                 .append($("<div>").addClass("input-group mb-3 creator-input")
-                                                    .append($("<select>").addClass("form-control customselect").attr({name:"invite[]", id:"invite", "data-placeholder":"Select the creators that you want to assign this project to", multiple:true}))
+                                                    .append($("<select>").addClass("form-control customselect").attr({name:"invite[]", id:"invite", "data-placeholder":"Select creators for this project.", multiple:true}))
                                                     .append($("<div>").addClass("input-group-append")
                                                         .append($("<button>").addClass("btn btn-outline-secondary sendInviteButton").attr({type:"button"}).text("Add Creator"))
                                                     )

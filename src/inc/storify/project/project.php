@@ -341,7 +341,7 @@ class project{
 		
 		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, action, remark, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g ON f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
 
-		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43, "removed"), ARRAY_A); // field_id 43 is the profile image for instagrammer_fast
+		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43, "removed", "closed"), ARRAY_A); // field_id 43 is the profile image for instagrammer_fast
 
 		foreach($data as $key=>$value){
 			if($value["invitation_status"] == "pending"){
@@ -354,17 +354,31 @@ class project{
 	}
 
 	public function invitation_response($invitation_id, $action,$userid, $remark){
-		//check if user is the one to response
-		$result = $this->invitation_manager->reply($invitation_id, $action, $userid, $remark);
-		if(isset($result["added"]) && $result["added"]){
-			//user added
-			$invitation_detail = $this->invitation_manager->getInvitation($invitation_id);
-			$this->user_manager->addUser($userid, $invitation_detail["project_id"], "creator");
+		global $wpdb;
+		//check if project not yet close
+		$query = "SELECT b.status FROM `".$this->invitation_manager->getInvitationTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE a.id = %d";
+		$project_status = $wpdb->get_var($wpdb->prepare($query, $invitation_id));
 
-			//add creator - project status
-			$this->status_manager->updateStatus($userid, $invitation_detail["project_id"], "open");
+		if($project_status == "open"){
+			//check if user is the one to response
+			$result = $this->invitation_manager->reply($invitation_id, $action, $userid, $remark);
+			if(isset($result["added"]) && $result["added"]){
+				//user added
+				$invitation_detail = $this->invitation_manager->getInvitation($invitation_id);
+				$this->user_manager->addUser($userid, $invitation_detail["project_id"], "creator");
 
+				//add creator - project status
+				$this->status_manager->updateStatus($userid, $invitation_detail["project_id"], "open");
+
+			}
+		}else{
+			return array(
+				"error"=>1,
+				"success"=>0,
+				"msg"=>"Project no longer active, current status : ".( $project_status?$project_status:"NULL")
+			);
 		}
+
 		return $result;
 	}
 
@@ -465,44 +479,44 @@ class project{
 
 		if($filter == "all"){
 
-			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d";
+			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s";
 
-			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "removed", 0));
+			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "removed", 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
-			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "removed", 0, ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "removed", 0, "open", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
 		}else if($filter == "other"){
 
-			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d";
+			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s";
 
-			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", "removed", 0));
+			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", "removed", 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status =%s".$orderByCond." LIMIT %d, %d";
 
-			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", "removed", 0, ($page-1)*$pagesize, $pagesize), ARRAY_A);
+			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", "removed", 0, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 		}else if($filter == ""){
 
-			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d";
+			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s";
 			
-			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", 0));
+			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
-			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", 0, ($page-1).$pagesize, $pagesize), ARRAY_A);
+			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", 0, "open", ($page-1).$pagesize, $pagesize), ARRAY_A);
 		}else{
 
-			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d";
+			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s";
 
-			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, $orderby, 0));
+			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, $orderby, 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
-			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, $filter, 0, ($page-1)*$pagesize, $pagesize), ARRAY_A);
+			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, $filter, 0, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 		}
 
 		foreach($data as $key=>$value){

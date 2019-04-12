@@ -248,6 +248,7 @@ storify.creator.projectList_invite = {
             success:function(rs){
                 storify.creator.projectList_invite._gettingProject = false;
                 if(rs.error){
+                    console.log(rs);
                     alert(rs.msg);
                 }else{
                     $grid.attr({'data-page':rs.result.page});
@@ -288,6 +289,7 @@ storify.creator.projectList_invite = {
             success:function(rs){
                 if(rs.error){
                     console.log(rs);
+                    alert(rs.msg);
                 }else{
                     $(".project-item[id='"+project_id+"']").remove();
                     $("#rejectModal").modal("hide");
@@ -311,6 +313,7 @@ storify.creator.projectList_invite = {
                 storify.creator.projectList_invite._acceptingInvitation = false;
                 if(rs.error){
                     console.log(rs);
+                    alert(rs.msg);
                 }else{
                     $(".project-item[id='"+rs.added+"']").remove();
                     $("#acceptModal").modal("show");

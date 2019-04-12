@@ -24,14 +24,14 @@
                 "icon"=>"fa-briefcase",
                 "group"=>array(
                     array(
-                        "label"=>"Ongoing <small>(".$total_ongoing.")</small>",
+                        "label"=>"Ongoing <small class=\"left_menu_ongoing\">(".$total_ongoing.")</small>",
                         "link"=>"/user@".$current_user->ID."/projects/ongoing",
                         "icon"=>"fa-fire",
                         "query_item"=>"ongoing",
                         "query_index"=>2
                     ),
                     array(
-                        "label"=>"Closed <small>(".$total_closed.")</small>",
+                        "label"=>"Closed <small class=\"left_menu_closed\">(".$total_closed.")</small>",
                         "link"=>"/user@".$current_user->ID."/projects/closed",
                         "icon"=>"fa-archive",
                         "query_item"=>"closed",
@@ -99,8 +99,8 @@
     }else{
 
         //get ongoing and close number
-        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_invitation` WHERE user_id = %d AND status = %s";
-        $total_invite = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "pending"));
+        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE a.user_id = %d AND a.status = %s AND b.status = %s";
+        $total_invite = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "pending", "open"));
         $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_status` WHERE user_id = %d AND status = %s";
         $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "open"));
         $total_closed = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "close"));
@@ -124,21 +124,21 @@
                 "icon"=>"fa-briefcase",
                 "group"=>array(
                     array(
-                        "label"=>"Invites <small>(".$total_invite.")</small>",
+                        "label"=>"Invites <small class=\"left_menu_invite\">(".$total_invite.")</small>",
                         "link"=>"/user@".$current_user->ID."/projects/invited",
                         "icon"=>"fa-envelope",
                         "query_item"=>"invited",
                         "query_index"=>2
                     ),
                     array(
-                        "label"=>"Ongoing <small>(".$total_ongoing.")</small>",
+                        "label"=>"Ongoing <small class=\"left_menu_ongoing\">(".$total_ongoing.")</small>",
                         "link"=>"/user@".$current_user->ID."/projects/ongoing",
                         "icon"=>"fa-fire",
                         "query_item"=>"ongoing",
                         "query_index"=>2
                     ),
                     array(
-                        "label"=>"Closed <small>(".$total_closed.")</small>",
+                        "label"=>"Closed <small class=\"left_menu_closed\">(".$total_closed.")</small>",
                         "link"=>"/user@".$current_user->ID."/projects/closed",
                         "icon"=>"fa-archive",
                         "query_item"=>"closed",
@@ -179,7 +179,7 @@
                 "link"=>"/user@".$current_user->ID."/collections",
                 "icon"=>"fa-book",
                 "query_item"=>"collections",
-                "query_index"=>2
+                "query_index"=>1
             ),
             array(
                 "label"=>"Settings",
@@ -228,7 +228,7 @@
 <?php
             foreach($value["group"] as $key2=>$value2){
                 if($value2["link"]){
-                    if($value2["query_item"] == $query[$value2["query_index"]]){
+                    if($value2["query_item"] == $pathquery[$value2["query_index"]]){
                         $a_class = "nav-link sub-nav-link active icon";
                     }else{
                         $a_class = "nav-link sub-nav-link icon";
@@ -245,7 +245,7 @@
 <?php            
         }else{
             if($value["link"]){
-                if($value["query_item"] == $query[$value["query_index"]]){
+                if($value["query_item"] == $pathquery[$value["query_index"]]){
                     $a_class = "nav-link active icon";
                 }else{
                     $a_class = "nav-link icon";

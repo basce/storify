@@ -119,13 +119,8 @@ storify.brand.completion_closed = {
 			action_cont.append($("<span>").addClass("closed").text("Paid")
 				);
 		}else{
-			action_cont.append(
-				$("<button>").addClass("btn btn-primary small").text("Pay")
-					.click(function(e){
-						$("#finalizeDialog .modal-footer .btn:eq(1)").attr({"data-user_id":data.user_id});
-						$("#finalizeDialog").modal("show");
-					})
-			);
+			action_cont.append($("<span>").addClass("closed").text("Unpaid")
+				);
 		}
 		
 		var user_obj = storify.project.user.getUserDetail(data.user_id);
@@ -157,7 +152,7 @@ storify.brand.completion_closed = {
 		if(data && data.length){
 			
 		}else{
-			$("#final-content").append($("<p>").text("Empty"));
+			$("#final-content").append($("<div>").append($("<p>").text("No Submissions made yet.")));
 		}
 	},
 	_gettingCompletion:false,

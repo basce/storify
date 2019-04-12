@@ -225,7 +225,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <labal for="project_brand">Brand</labal>
-                                <select name="brand[]" id="edit_brand" data-placeholder="Select Brand" class="customselect" data-enable-input=true nc-method="addBrand" multiple>
+                                <select name="brand[]" id="edit_brand" data-placeholder="Select Brand." class="customselect" data-enable-input=true nc-method="addBrand" multiple>
                                     <option value="">Select Brand</option>
                             <?php
                                 $brands = $main->getAllBrands();
@@ -241,7 +241,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="project_location">Location</label>
-                                <select name="location[]" id="edit_location" data-placeholder="Select Location" class="customselect" data-enable-input=true nc-method="addLocation" multiple>
+                                <select name="location[]" id="edit_location" data-placeholder="Select Location." class="customselect" data-enable-input=true nc-method="addLocation" multiple>
                                     <option value="">Select Location</option>
                             <?php
                                 $country_tags = $main->getAllCountriesInUsed();
@@ -270,7 +270,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="project_tag">Passions</label>
-                                <select name="tag[]" id="edit_tag" data-placeholder="Select Passions" class="customselect" data-enable-input=true nc-method="addTag" multiple>
+                                <select name="tag[]" id="edit_tag" data-placeholder="Select Passions." class="customselect" data-enable-input=true nc-method="addTag" multiple>
                                     <option value="">Select Passions</option>
                             <?php
                                 $category_tags = $main->getAllTagsInUsed();
@@ -287,7 +287,7 @@ include("page/component/header.php"); ?>
                             <div class="form-group">
                                 <label for="samples">Moodboard</label>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" id="edit_samples" placeholder="Insert links to images to create a moodboard">
+                                    <input type="text" class="form-control" id="edit_samples" placeholder="Insert a link to your image.">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary edit_addSampleButton" type="button">Add Image</button>
                                     </div>
@@ -376,7 +376,7 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <labal for="project_brand">Brand</labal>
-                        <select name="brand[]" id="brand" data-placeholder="Select Brand" class="customselect" data-enable-input=true nc-method="addBrand" multiple>
+                        <select name="brand[]" id="brand" data-placeholder="Select Brand." class="customselect" data-enable-input=true nc-method="addBrand" multiple>
                             <option value="">Select Brand</option>
                     <?php
                         $brands = $main->getAllBrands();
@@ -392,7 +392,7 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="project_location">Location</label>
-                        <select name="location[]" id="location" data-placeholder="Select Location" class="customselect" data-enable-input=true nc-method="addLocation" multiple>
+                        <select name="location[]" id="location" data-placeholder="Select Location." class="customselect" data-enable-input=true nc-method="addLocation" multiple>
                             <option value="">Select Location</option>
                     <?php
                         $country_tags = $main->getAllCountriesInUsed();
@@ -421,7 +421,7 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="project_tag">Passions</label>
-                        <select name="tag[]" id="tag" data-placeholder="Select Passions" class="customselect" data-enable-input=true nc-method="addTag" multiple>
+                        <select name="tag[]" id="tag" data-placeholder="Select Passions." class="customselect" data-enable-input=true nc-method="addTag" multiple>
                             <option value="">Select Passions</option>
                     <?php
                         $category_tags = $main->getAllTagsInUsed();
@@ -451,21 +451,21 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="number_of_photo">No. Of Photos Per Creator</label>
-                        <input type="number" class="form-control" id="number_of_photo" placeholder="Enter Number of Photo" value="">
+                        <input type="number" class="form-control" id="number_of_photo" placeholder="Enter number of photos." value="">
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="number_of_video">No. Of Videos Per Creator</label>
-                        <input type="number" class="form-control" id="number_of_video" placeholder="Enter Number of Video" value="">
+                        <input type="number" class="form-control" id="number_of_video" placeholder="Enter number of videos." value="">
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="video_length">Video Length</label>
-                        <input type="number" class="form-control" id="video_length" placeholder="Enter Video Length">
+                        <input type="number" class="form-control" id="video_length" placeholder="Enter length of videos in seconds.">
                         <small id="videoLengthHelp" class="form-text text-muted">Video length in seconds</small>
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
@@ -474,7 +474,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="samples">Moodboard</label>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="samples" placeholder="Insert links to images to create a moodboard">
+                            <input type="text" class="form-control" id="samples" placeholder="Insert a link to your image.">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary addSampleButton" type="button">Add Image</button>
                             </div>
@@ -548,7 +548,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="creators">Creators To Invite</label>
                         <div class="input-group mb-3 creator-input">
-                            <select name="creators[]" class="form-control customselect" id="creators" data-placeholder="Select the creators that you want to assign this project to" multiple>
+                            <select name="creators[]" class="form-control customselect" id="creators" data-placeholder="Select creators for this project." multiple>
                             </select>
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary addCreatorButton" type="button">Add Creator</button>
@@ -856,7 +856,7 @@ include("page/component/header.php"); ?>
             function changeEditProjectProgress(progressindex){
                 if(progressindex > editProjectCurrentProgress){
                     $("#editDialog .bs-wizard .col-3").removeClass("complete active disabled");
-                    addProjectCurrentProgress = progressindex;
+                    editProjectCurrentProgress = progressindex;
                     switch(progressindex){
                         case 1:
                             $("#editDialog .bs-wizard .col-3:eq(0)").addClass("active");
@@ -1196,7 +1196,7 @@ include("page/component/header.php"); ?>
                     break;
                     case 4:
                         $("#newproject .bottom_panel .btn:eq(0)").removeClass("disabled");
-                        $("#newproject .bottom_panel .btn:eq(1)").text("Done");
+                        $("#newproject .bottom_panel .btn:eq(1)").text("Submit");
                         if(isPageReady(pageindex, true)){
                             //if page ready, can move to next
                             //$(".bottom_panel .btn:eq(1)").removeClass("disabled").text("Done");    
