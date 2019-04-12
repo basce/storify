@@ -221,7 +221,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="edit_project_short_description">Summary</label>
-                                <textarea class="form-control" id="edit_project_short_description" rows="2"></textarea>
+                                <textarea class="form-control" id="edit_project_short_description" rows="2" placeholder="Please include a short line to describe your project."></textarea>
                             </div>
                             <div class="form-group">
                                 <labal for="project_brand">Brand</labal>
@@ -298,7 +298,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="edit_deliverable_brief">Instructions to Creators</label>
-                                <textarea class="form-control" id="edit_deliverable_brief" row="2"></textarea>
+                                <textarea class="form-control" id="edit_deliverable_brief" row="2" placeholder="Provide further details about style, creative angle and other expectations."></textarea>
                             </div>
                         </div>
                     </div>
@@ -371,8 +371,8 @@ include("page/component/header.php"); ?>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="project_short_description">Short Description</label>
-                        <textarea class="form-control" id="project_short_description" rows="2"></textarea>
+                        <label for="project_short_description">Summary</label>
+                        <textarea class="form-control" id="project_short_description" rows="2" placeholder="Please include a short line to describe your project."></textarea>
                     </div>
                     <div class="form-group">
                         <labal for="project_brand">Brand</labal>
