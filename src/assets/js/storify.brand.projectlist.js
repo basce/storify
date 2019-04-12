@@ -76,9 +76,9 @@ storify.brand.projectList = {
                 div_description.append(document.createTextNode(value.amount+" "));
             }
             if(value.type == "photo"){
-                div_description.append($("<i>").addClass("fa fa-file-image-o").attr({"aria-hidden":"true"}));
+                div_description.append($("<i>").addClass("fa fa-camera").attr({"aria-hidden":"true"}));
             }else{
-                div_description.append($("<i>").addClass("fa fa-file-video-o").attr({"aria-hidden":"true"}));
+                div_description.append($("<i>").addClass("fa fa-video-camera").attr({"aria-hidden":"true"}));
             }
         });
 
@@ -145,6 +145,8 @@ storify.brand.projectList = {
             sort = $grid.attr("data-sort"),
             filter = $grid.attr("data-filter");
 
+        cur_page = cur_page ? cur_page + 1 : 1;
+
         $("#ongoingloadmore").html("Loading <i class=\"fa fa-spinner fa-spin\"></i>");
         $.ajax({
             method: "POST",
@@ -166,6 +168,10 @@ storify.brand.projectList = {
                         $("#ongoingloadmore").css({display:"inline-block"});
                     }else{
                         $("#ongoingloadmore").css({display:"none"});
+                    }
+
+                    if(!rs.result.data.length && cur_page == 1){
+                        $grid.append($("<p>").text("You have not created a project yet. Create one now!"));
                     }
 
                     $.each(rs.result.data, function(index,value){

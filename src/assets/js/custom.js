@@ -4,6 +4,10 @@
 var automaticGeoLocation = false;
 var resizeId;
 
+$(document).on('hidden.bs.modal', '.modal', function () {
+    $('.modal:visible').length && $(document.body).addClass('modal-open');
+});
+
 $(document).ready(function($) {
     "use strict";
 

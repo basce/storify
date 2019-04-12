@@ -73,14 +73,14 @@ storify.creator.detail_invite = {
         cashtable.append($("<div>").addClass("bountyrow")
                 .append($("<h2>")
                 .append($("<span>").text(detail.no_of_photo)
-                            .append($("<i>").addClass("fa fa-file-image-o"))
+                            .append($("<i>").addClass("fa fa-camera"))
                     )
                 .append($("<span>").text("S$"+storify.project.formatMoney(detail.cost_per_photo)+" each"))
             ));
         cashtable.append($("<div>").addClass("bountyrow")
                 .append($("<h2>")
                 .append($("<span>").text(detail.no_of_video)
-                            .append($("<i>").addClass("fa fa-file-video-o"))
+                            .append($("<i>").addClass("fa fa-video-camera"))
                     )
                 .append($("<span>").text("S$"+storify.project.formatMoney(detail.cost_per_video)+" each"))
             ));
@@ -164,17 +164,17 @@ storify.creator.detail_invite = {
         if(+data.detail.no_of_photo && +data.detail.no_of_video){
             deliverable_block
                 .append(document.createTextNode(data.detail.no_of_photo+" "))
-                .append($("<i>").addClass("fa fa-file-image-o"))
+                .append($("<i>").addClass("fa fa-camera"))
                 .append(document.createTextNode(" | "+data.detail.no_of_video+" "))
-                .append($("<i>").addClass("fa fa-file-video-o"));
+                .append($("<i>").addClass("fa fa-video-camera"));
         }else if(+data.detail.no_of_photo){
             deliverable_block
                 .append(document.createTextNode(data.detail.no_of_photo+" "))
-                .append($("<i>").addClass("fa fa-file-image-o"));
+                .append($("<i>").addClass("fa fa-camera"));
         }else if(+data.detail.no_of_video){
             deliverable_block
                 .append(document.createTextNode(data.detail.no_of_video+" "))
-                .append($("<i>").addClass("fa fa-file-video-o"));
+                .append($("<i>").addClass("fa fa-video-camera"));
         }
 
         //sample block
@@ -205,22 +205,16 @@ storify.creator.detail_invite = {
                     .append($("<div>").addClass("location").text(locationtext.join(", ")))
                     .append($("<div>").addClass("date_cont")
                         .append($("<div>").addClass("text-right")
-                                .append(document.createTextNode("Closing Date: "))
-                                .append(document.createTextNode(data.summary.closing_date))
+                                .append($("<i>").addClass("fa fa-calendar-o"))
+                                .append(document.createTextNode(" Accept "+data.summary.formatted_closing_date))
                             )
                         .append($("<div>").addClass("text-right")
-                                .append(document.createTextNode("Invitation Closing Date: "))
-                                .append(document.createTextNode(data.summary.invitation_closing_date))
+                                .append($("<i>").addClass("fa fa-calendar-o"))
+                                .append(document.createTextNode(" Deliver "+data.summary.formatted_invitation_closing_date))
                             )
                     )
             )
-            .append(
-                $("<div>").addClass("deliverable")
-                    .append(document.createTextNode("5 "))
-                    .append($("<i>").addClass("fa fa-file-image-o"))
-                    .append(document.createTextNode(" | 3 "))
-                    .append($("<i>").addClass("fa fa-file-video-o"))
-            )
+            .append(deliverable_block)
             .append($("<pre>").html(data.detail.description_brief))
             .append($("<pre>").html(data.detail.deliverable_brief))
             ;

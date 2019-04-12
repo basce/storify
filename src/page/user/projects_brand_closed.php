@@ -37,8 +37,14 @@
     <script src="/assets/js/scrollreveal.js"></script>
     <script src="/assets/js/custom.js"></script>
     <script src="/assets/js/nc_custom.js"></script>
+    <script src="/assets/js/owlcarousel/owl.carousel.js"></script>
+    <script src="/assets/js/owlcarousel/owl.animate.js"></script>
+    <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
     <script src="/assets/js/storify.brand.detail_closed.js"></script>
+    <script src="/assets/js/storify.brand.invitation_closed.js"></script>
+    <script src="/assets/js/storify.brand.deliverable_closed.js"></script>
+    <script src="/assets/js/storify.brand.completion_closed.js"></script>
     <script src="/assets/js/storify.project.users.js"></script>
     <script src="/assets/js/storify.brand.projectlist_closed.js"></script>
     <script src="/assets/js/SendBird.min.js"></script>
@@ -71,7 +77,7 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <div class="project-items" id="closed_grid" data-page="1" data-sort="date" data-filter="close">
+                            <div class="project-items" id="closed_grid" data-page="0" data-sort="date" data-filter="close">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="closeloadmore">Load More</a>

@@ -39,10 +39,34 @@ if($current_user->ID){
             $obj["data"] = $result;
         break;
         case "getDeliverable":
-            $result = $main->getProjectManager()->getDeliverables($_POST["project_id"], $_POST["user_id"]);
-            $obj["error"] = $result["error"];
-            $obj["msg"] = $result["msg"];
-            $obj["data"] = $result["data"];
+            $result = $main->getProjectManager()->getDeliverables($_POST["project_id"], $current_user->ID);
+            if($result["error"]){
+                $obj["error"] = 1;
+                $obj["msg"] = $result["msg"];
+            }else{
+                $obj["error"] = 0;
+                $obj["msg"] = $result["msg"];
+                $obj["data"] = $result["data"];
+                $obj["no_of_photo"] = $result["no_of_photo"];
+                $obj["no_of_video"] = $result["no_of_video"];
+            }
+        break;
+        case "getInvitationList":
+            $result = $main->getProjectManager()->getInvitationList($_POST["project_id"]);
+            $obj["error"] = 0;
+            $obj["msg"] = "";
+            $obj["data"] = $result;
+        break;
+        case "getCompletion":
+            $result = $main->getProjectManager()->get_project_completion($_POST["project_id"], $current_user->ID);
+            if($result["error"]){
+                $obj["error"] = 1;
+                $obj["msg"] = $result["msg"];
+            }else{
+                $obj["error"] = 0;
+                $obj["msg"] = "";
+                $obj["data"] = $result["data"];
+            }
         break;
         default:
             $obj["msg"] = "unknown method";

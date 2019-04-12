@@ -69,8 +69,8 @@ storify.creator.detail = {
                                                 .append($("<h2>").addClass("submission_title"))
                                                 /*
                                                 .append($("<div>").addClass("icon_select")
-                                                    .append($("<a>").attr({href:"#"}).append($("<i>").addClass("fa fa-file-image-o")))
-                                                    .append($("<a>").attr({href:"#"}).append($("<i>").addClass("fa fa-file-video-o")))
+                                                    .append($("<a>").attr({href:"#"}).append($("<i>").addClass("fa fa-camera")))
+                                                    .append($("<a>").attr({href:"#"}).append($("<i>").addClass("fa fa-video-camera")))
                                                 )*/
                                                 .append($("<div>").addClass("submission_form")
                                                     .append($("<div>").addClass("submission_form_top")
@@ -111,14 +111,14 @@ storify.creator.detail = {
                                                         .append($("<a>").addClass("nav-link active").attr({id:"photo-tab","data-toggle":"tab",href:"#photolist",role:"tab","aria-controls":"photolist","aria-expanded":true})
                                                                     .append($("<span>").text("99/100"))
                                                                     .append(document.createTextNode(" "))
-                                                                    .append($("<i>").addClass("fa fa-file-image-o"))
+                                                                    .append($("<i>").addClass("fa fa-camera"))
                                                             )
                                                     )
                                                     .append($("<li>").addClass("nav-item")
                                                         .append($("<a>").addClass("nav-link").attr({id:"video-tab","data-toggle":"tab",href:"#videolist",role:"tab","aria-controls":"videolist","aria-expanded":true})
                                                                     .append($("<span>").text("100/100"))
                                                                     .append(document.createTextNode(" "))
-                                                                    .append($("<i>").addClass("fa fa-file-video-o"))
+                                                                    .append($("<i>").addClass("fa fa-video-camera"))
                                                             )
                                                     )
                                                 )
@@ -202,14 +202,14 @@ storify.creator.detail = {
         cashtable.append($("<div>").addClass("bountyrow")
                 .append($("<h2>")
                 .append($("<span>").text(detail.no_of_photo)
-                            .append($("<i>").addClass("fa fa-file-image-o"))
+                            .append($("<i>").addClass("fa fa-camera"))
                     )
                 .append($("<span>").text("S$"+storify.project.formatMoney(detail.cost_per_photo)+" each"))
             ));
         cashtable.append($("<div>").addClass("bountyrow")
                 .append($("<h2>")
                 .append($("<span>").text(detail.no_of_video)
-                            .append($("<i>").addClass("fa fa-file-video-o"))
+                            .append($("<i>").addClass("fa fa-video-camera"))
                     )
                 .append($("<span>").text("S$"+storify.project.formatMoney(detail.cost_per_video)+" each"))
             ));
@@ -304,17 +304,17 @@ storify.creator.detail = {
         if(+data.detail.no_of_photo && +data.detail.no_of_video){
             deliverable_block
                 .append(document.createTextNode(data.detail.no_of_photo+" "))
-                .append($("<i>").addClass("fa fa-file-image-o"))
+                .append($("<i>").addClass("fa fa-camera"))
                 .append(document.createTextNode(" | "+data.detail.no_of_video+" "))
-                .append($("<i>").addClass("fa fa-file-video-o"));
+                .append($("<i>").addClass("fa fa-video-camera"));
         }else if(+data.detail.no_of_photo){
             deliverable_block
                 .append(document.createTextNode(data.detail.no_of_photo+" "))
-                .append($("<i>").addClass("fa fa-file-image-o"));
+                .append($("<i>").addClass("fa fa-camera"));
         }else if(+data.detail.no_of_video){
             deliverable_block
                 .append(document.createTextNode(data.detail.no_of_video+" "))
-                .append($("<i>").addClass("fa fa-file-video-o"));
+                .append($("<i>").addClass("fa fa-video-camera"));
         }
 
         //sample block
@@ -345,22 +345,16 @@ storify.creator.detail = {
                     .append($("<div>").addClass("location").text(locationtext.join(", ")))
                     .append($("<div>").addClass("date_cont")
                         .append($("<div>").addClass("text-right")
-                                .append(document.createTextNode("Closing Date: "))
-                                .append(document.createTextNode(data.summary.closing_date))
+                                .append($("<i>").addClass("fa fa-calendar-o"))
+                                .append(document.createTextNode(" Accept "+data.summary.formatted_closing_date))
                             )
                         .append($("<div>").addClass("text-right")
-                                .append(document.createTextNode("Invitation Closing Date: "))
-                                .append(document.createTextNode(data.summary.invitation_closing_date))
+                                .append($("<i>").addClass("fa fa-calendar-o"))
+                                .append(document.createTextNode(" Deliver "+data.summary.formatted_invitation_closing_date))
                             )
                     )
             )
-            .append(
-                $("<div>").addClass("deliverable")
-                    .append(document.createTextNode("5 "))
-                    .append($("<i>").addClass("fa fa-file-image-o"))
-                    .append(document.createTextNode(" | 3 "))
-                    .append($("<i>").addClass("fa fa-file-video-o"))
-            )
+            .append(deliverable_block)
             .append($("<pre>").html(data.detail.description_brief))
             .append($("<pre>").html(data.detail.deliverable_brief))
             ;
@@ -369,7 +363,7 @@ storify.creator.detail = {
         if(owlImages){
             var _interval = setInterval(function(args) {
                 // body
-                if(owlImages.parent().is(":visible")){
+                if(owlImages && owlImages.parent().is(":visible")){
                     console.log("owlimage done");
                     owlImages.owlCarousel({
                         loop:false,
@@ -465,10 +459,10 @@ storify.creator.detail = {
             actiondiv = $("<div>").addClass("urlaction");
 
         if(data.type == "photo"){
-            iconClass = "fa-file-image-o";
+            iconClass = "fa-camera";
             mainClass = "photo";
         }else{
-            iconClass = "fa-file-video-o";
+            iconClass = "fa-video-camera";
             mainClass = "video";
         }
 

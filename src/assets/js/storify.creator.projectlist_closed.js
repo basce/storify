@@ -80,9 +80,9 @@ storify.creator.projectList_closed = {
                 div_description.append(document.createTextNode(value.amount+" "));
             }
             if(value.type == "photo"){
-                div_description.append($("<i>").addClass("fa fa-file-image-o").attr({"aria-hidden":"true"}));
+                div_description.append($("<i>").addClass("fa fa-camera").attr({"aria-hidden":"true"}));
             }else{
-                div_description.append($("<i>").addClass("fa fa-file-video-o").attr({"aria-hidden":"true"}));
+                div_description.append($("<i>").addClass("fa fa-video-camera").attr({"aria-hidden":"true"}));
             }
         });
 
@@ -145,9 +145,11 @@ storify.creator.projectList_closed = {
         storify.creator.projectList_closed._gettingProject = true;
 
         var $grid = $("#closed_grid"),
-            cur_page = parseInt($grid.attr("data-page"), 19),
+            cur_page = parseInt($grid.attr("data-page"), 10),
             sort = $grid.attr("data-sort"),
             filter = $grid.attr("data-filter");
+
+        cur_page = cur_page ? cur_page + 1 : 1;
 
         $("#closeloadmore").html("Loading <i class=\"fa fa-spinner fa-spin\"></i>");
         $.ajax({

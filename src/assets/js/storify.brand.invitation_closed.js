@@ -1,76 +1,8 @@
 var storify = storify || {};
 storify.brand = storify.brand || {};
 
-storify.brand.invitation = {
+storify.brand.invitation_closed = {
 	addElementIfNotExist:function(){
-		if( !$("#single_invitation_dialog").length ){
-			$("body").append(
-				$("<modal>").addClass("modal")
-					.attr({tabindex:"-1", role:"dialog", id:"single_invitation_dialog"})
-					.append(
-						$("<div>").addClass("modal-dialog modal-dialog-centered")
-							.attr({role:"document"})
-							.append(
-								$("<div>").addClass("modal-content")
-									.append(
-										$("<div>").addClass("modal-header")
-											.append(
-												$("<h5>").addClass("modal-title")
-													.text("Manage Invitation")
-											)
-											.append(
-												$("<button>").addClass("close")
-													.attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"})
-													.append(
-														$("<span>").attr({"aria-hidden":true})
-															.html("&times;")
-													)
-											)
-									)
-									.append(
-										$("<div>").addClass("modal-body")
-											.append(
-												$("<div>").addClass("container")
-													.append(
-														$("<div>").addClass("row")
-															.append(
-																$("<div>").addClass("col-3")
-																	.append($("<div>").addClass("profile-image"))
-															)
-															.append(
-																$("<div>").addClass("col-9")
-																	.append(
-																		$("<div>").append($("<strong>"))
-																	)
-																	.append(
-																		$("<div>").append(document.createTextNode("Status : "))
-																			.append(
-																				$("<span>").addClass("status")
-																			)
-																	)
-																	.append(
-																		$("<div>").addClass("remark")
-																	)
-															)
-													)
-											)
-									)
-									.append(
-										$("<div>").addClass("modal-footer")
-											.append(
-												$("<div>").addClass("text-center")
-													.append(
-														$("<button>").addClass("btn btn-primary")
-															.text("invite")
-													)
-											)
-									)
-							)
-					)
-			);
-
-			$("#single_invitation_dialog .modal-footer button").click(storify.brand.invitation.dialog_click);
-		}
 	},
 	_updatingInvitation:false,
 	dialog_click:function(e){
@@ -91,8 +23,8 @@ storify.brand.invitation = {
 			return;
 		}
 		if( command_type ){
-			if( storify.brand.invitation._updatingInvitation ) return;
-			storify.brand.invitation._updatingInvitation = true;
+			if( storify.brand.invitation_closed._updatingInvitation ) return;
+			storify.brand.invitation_closed._updatingInvitation = true;
 			$.ajax({
 				type: 	"POST",
 				dataType: "json",
@@ -103,8 +35,8 @@ storify.brand.invitation = {
 					method: 		"editInvitation"
 				},
 				success: function(rs){
-					storify.brand.invitation._updatingInvitation = false;
-					storify.brand.invitation.getList(function(){
+					storify.brand.invitation_closed._updatingInvitation = false;
+					storify.brand.invitation_closed.getList(function(){
 						$("#single_invitation_dialog").modal("hide");
 					});
 				}
@@ -112,7 +44,7 @@ storify.brand.invitation = {
 		}
 	},
 	resetForm:function(){
-		storify.brand.invitation.addElementIfNotExist();
+		storify.brand.invitation_closed.addElementIfNotExist();
 		if($("#invite").length){
 			$("#invite")[0].selectize.clear(true);
 		}
@@ -155,31 +87,31 @@ storify.brand.invitation = {
                     .append($("<div>").addClass("profile-image").css({"background-image":"url("+data.profile_image+")"}))
                     .click(function(e){
                         e.preventDefault();
-                        storify.brand.invitation.displaySingleInvite(data);
+                        storify.brand.invitation_closed.displaySingleInvite(data);
                     });
         switch(data.invitation_status){
             case "pending":
-                a.addClass("item-pending").attr({title:data.display_name});
+                a.addClass("item-pending default-pointer").attr({title:data.display_name});
             break;
             case "accepted":
-                a.addClass("item-accepted").attr({title:data.display_name});
+                a.addClass("item-accepted default-pointer").attr({title:data.display_name});
             break;
             case "rejected":
-                a.addClass("item-rejected").attr({title:data.display_name});
+                a.addClass("item-rejected default-pointer").attr({title:data.display_name});
             break;
         }
 
         return a;
 	},
 	display:function(data, callback){
-		storify.brand.invitation.resetForm();
+		storify.brand.invitation_closed.resetForm();
 
 		var accepted_count = 0,
 			rejected_count = 0,
 			waiting_count = 0;
 
 		$.each(data, function(index,value){
-			$(".invite-group").append(storify.brand.invitation.createItem(value));
+			$(".invite-group").append(storify.brand.invitation_closed.createItem(value));
 			switch(value.invitation_status){
 				case "pending":
 				case "waiting":
@@ -213,9 +145,9 @@ storify.brand.invitation = {
 	},
 	_gettingInvitation:false,
 	getList:function(callback){
-		if(storify.brand.invitation._gettingInvitation) return;
-		storify.brand.invitation.resetForm();
-		storify.brand.invitation._gettingInvitation = true;
+		if(storify.brand.invitation_closed._gettingInvitation) return;
+		storify.brand.invitation_closed.resetForm();
+		storify.brand.invitation_closed._gettingInvitation = true;
 		$.ajax({
 			type: "POST",
 			dataType: "json",
@@ -224,39 +156,13 @@ storify.brand.invitation = {
 				method:"getInvitationList"
 			},
 			success:function(rs){
-				storify.brand.invitation._gettingInvitation = false;
+				storify.brand.invitation_closed._gettingInvitation = false;
 				if(rs.error){
 					alert(rs.msg);
 				}else{
-					storify.brand.invitation.display(rs.data, callback);
+					storify.brand.invitation_closed.display(rs.data, callback);
 				}
 			}
 		});
-	},
-	_sendingInvitation:false,
-	invite_click:function(e){
-		e.preventDefault();
-
-		var a = $("#invite").val();
-		if(a && a.length){
-			if(storify.brand.invitation._sendingInvitation) return;
-			storify.brand.invitation._sendingInvitation = true;
-			$.ajax({
-				type: "POST",
-				dataType: "json",
-				data:{
-					project_id:storify.project._project_id,
-					userids:a,
-					method:"sendInvitation"
-				},
-				error:function(request, status, error){
-                    storify.brand.invitation._sendingInvitation = false;
-                },
-                success:function(rs){
-                    storify.brand.invitation._sendingInvitation = false;
-                    storify.brand.invitation.getList();
-                }
-			});
-		}
 	}
 };

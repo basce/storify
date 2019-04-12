@@ -3,7 +3,7 @@ storify.brand = storify.brand || {};
 
 storify.brand.detail_closed = {
     addElementIfNotExist:function(){
-        if( !$("#detailModal").length ){
+        if( !$("#detailModal").length  && 0){
             $("body").append(
                 $("<modal>").addClass("modal fullscreen").attr({tabindex:-1, role:"dialog", id:"detailModal"})
                     .append($("<div>").addClass("modal-dialog").attr({role:"document"})
@@ -19,12 +19,85 @@ storify.brand.detail_closed = {
                                             .append($("<section>").addClass("section-container detailcontent").attr({id:"detailcontent"}))
                                         )
                                         .append($("<div>").addClass("col-md-6 actioncontent")
-                                            .append($("<section>").addClass("section-container summarycontent").attr({id:"summarycontent"})
-                                                .append($("<h1>").text("Summary"))
-                                                .append($("<div>").addClass("creators"))
-                                                .append($("<div>").addClass("summary"))
-                                                )   
+                                            .append($("<section>").addClass("section-container invite-section")
+                                                .append($("<h1>").text("Creator Management"))
+                                                .append($("<div>").addClass("form-group")
+                                                    .append($("<div>").addClass("input-group mb-3 invite-input")
+                                                        .append($("<select>").addClass("form-control customselect").attr({name:"invite[]", id:"invite", "data-placeholder":"Select Creator", multiple:true}))
+                                                        .append($("<div>").addClass("input-group-append")
+                                                            .append($("<button>").addClass("btn btn-outline-secondary sendInviteButton").attr({type:"button"}).text("Invite"))
+                                                        )
+                                                    )
+                                                )
+                                                .append($("<div>").addClass("invite-group"))
+                                                .append($("<div>").addClass("invite-summary"))
+                                            )
+                                            .append($("<section>").addClass("section-container deliverable-section")
+                                                .append($("<h1>").text("Deliverable Management"))
+                                                .append($("<div>").addClass("deliverable-groups"))
+                                            )
                                         )
+                                    )
+                                )
+                            )
+                            .append($("<div>").addClass("modal-footer").append(
+                                $("<button>").addClass("btn btn-primary small viewCompletion").text("View completion")
+                                )
+                                .append($("<button>").addClass("btn btn-primary small").text("Edit").click(function(){
+                                    $("#editDialog").modal("show");
+                                }))
+                            )
+                        )
+                    )
+            );
+        }
+        if( !$("#newDetailModal").length ){
+            $("body").append(
+                $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"newDetailModal"})
+                    .append($("<div>").addClass("modal-dialog modal-dialog-centered modal-custom-xl").attr({role:"document"})
+                        .append($("<div>").addClass("modal-content")
+                            .append($("<div>").addClass("modal-header")
+                                .append($("<h5>").addClass("modal-title").text(""))
+                                .append($("<button>").addClass("close").attr({type:"button","data-dismiss":"modal", "aria-label":"Close"}).append($("<span>").attr({"aria-hidden":"true"}).html("&times")))
+                            )
+                            .append($("<div>").addClass("modal-body")
+                                .append($("<ul>").addClass("nav nav-tabs").attr({role:"tablist", id:"tab_control"})
+                                    .append($("<li>").addClass("nav-item")
+                                        .append($("<a>").addClass("nav-link active").attr({id:"brief-tab","data-toggle":"tab",href:"#brief",role:"tab","aria-controls":"brief","aria-expanded":true}).text("Brief"))
+                                    )
+                                    .append($("<li>").addClass("nav-item")
+                                        .append($("<a>").addClass("nav-link").attr({id:"bounty-tab","data-toggle":"tab",href:"#bounty",role:"tab","aria-controls":"bounty","aria-expanded":true}).text("Bounty"))
+                                    )
+                                    .append($("<li>").addClass("nav-item")
+                                        .append($("<a>").addClass("nav-link").attr({id:"creator-tab","data-toggle":"tab",href:"#creator",role:"tab","aria-controls":"creator","aria-expanded":true}).text("Creators"))
+                                    )
+                                    .append($("<li>").addClass("nav-item")
+                                        .append($("<a>").addClass("nav-link").attr({id:"submission-tab","data-toggle":"tab",href:"#submission",role:"tab","aria-controls":"submission","aria-expanded":true}).text("Submission"))
+                                    )
+                                    .append($("<li>").addClass("nav-item")
+                                        .append($("<a>").addClass("nav-link").attr({id:"final-tab","data-toggle":"tab",href:"#final",role:"tab","aria-controls":"final","aria-expanded":true}).text("Final"))
+                                    )
+                                )
+                                .append($("<div>").addClass("tab-content").attr({id:"tab_content"})
+                                    .append($("<div>").addClass("tab-pane fade show active").attr({id:"brief",role:"tabpanel","aria-labelledby":"brief-tab"})
+                                        .append($("<div>").addClass("detailcontent").attr({id:"brief-content"}))
+                                    )
+                                    .append($("<div>").addClass("tab-pane fade").attr({id:"bounty",role:"tabpanel","aria-labelledby":"bounty-tab"})
+                                        .append($("<div>").addClass("bountycontent").attr({id:"bounty-content"}))
+                                    )
+                                    .append($("<div>").addClass("tab-pane fade").attr({id:"creator",role:"tabpanel","aria-labelledby":"creator-tab"})
+                                        .append($("<div>").addClass("creatorcontent").attr({id:"creator-content"})
+                                            .append($("<h5>").text("People who have accepted this project: ")
+                                                .append($("<span>").addClass("no_of_invited").text("0"))
+                                            )
+                                            .append($("<div>").addClass("invite-group"))
+                                        )
+                                    )
+                                    .append($("<div>").addClass("tab-pane fade").attr({id:"submission",role:"tabpanel","aria-labelledby":"submission-tab"})
+                                        .append($("<div>").addClass("deliverable-groups").attr({id:"submission-content"}))
+                                    )
+                                    .append($("<div>").addClass("tab-pane fade").attr({id:"final",role:"tabpanel","aria-labelledby":"final-tab"})
+                                        .append($("<div>").addClass("finalcontent").attr({id:"final-content"}))
                                     )
                                 )
                             )
@@ -32,337 +105,7 @@ storify.brand.detail_closed = {
                         )
                     )
             );
-        }     
-        if( !$("#deliverableModal").length ){
-            $("body").append(
-                $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"deliverableModal"})
-                    .append($("<div>").addClass("modal-dialog modal-xl").attr({role:"document"})
-                        .append($("<div>").addClass("modal-content")
-                            .append($("<div>").addClass("modal-header")
-                                .append($("<h5>").addClass("modal-title"))
-                                .append($("<button>").addClass("close").attr({type:"button","data-dismiss":"modal", "aria-label":"Close"}).append($("<span>").attr({"aria-hidden":"true"}).html("&times")))
-                            )
-                            .append($("<div>").addClass("modal-body")
-                                .append($("<div>").addClass("deliverable-groups"))
-                            )
-                            .append($("<div>").addClass("modal-footer"))
-                        )
-                    )
-            );
         }
-    },
-    createCreator:function(data){
-        var items = $("<div>").addClass("items"),
-            compact, detail;
-
-        compact = $("<div>").addClass("compact")
-                        .append($("<div>").addClass("breakdown_row")
-                                    .append($("<div>").addClass("breakdown_item_left")
-                                        .append($("<div>").addClass("single_row")
-                                                    .append($("<label>").text("Completion"))
-                                                    .append(document.createTextNode(parseInt(data.completion*100,10)+"%"))
-                                            )
-                                        )
-                                    .append($("<div>").addClass("breakdown_item_right")
-                                                .text("$"+data.total_cash)
-                                        )
-                            );
-
-        $.each(data.deliverables, function(index,value){
-            var icon;
-            if(value.type == "photo"){
-                icon = $("<i>").addClass("fa fa-file-image-o");
-            }else{
-                icon = $("<i>").addClass("fa fa-file-video-o");
-            }
-            if(value.status == "accepted"){
-                items.append($("<div>").addClass("item complete "+value.type)
-                                    .attr({title:"done"})
-                        .append($("<div>").addClass("icon")
-                            .append(icon)
-                        )
-                        .append($("<div>").addClass("icon_name"))
-                    );
-            }else{
-                items.append($("<div>").addClass("item "+value.type)
-                        .append($("<div>").addClass("icon")
-                            .append(icon)
-                        )
-                        .append($("<div>").addClass("icon_name"))
-                    );
-            }
-        });
-
-        if(data.deliverables.length){
-            items.append($("<div>").addClass("item iconcenter").append($("<a>").attr({href:"#"}).append($("<i>").addClass("fa fa-search-plus")).click(function(e){
-                e.preventDefault();
-                e.stopPropagation(); 
-                storify.brand.detail_closed.getDeliverables(data.user_id, function(){
-                    $("#deliverableModal").modal("show");
-                });
-            })));
-        }
-
-        //build breakdown_table
-        var breakdown_table = $("<div>").addClass("breakdown_table"),
-            breakdown_items = $("<div>").addClass("breakdown_items");
-
-        $.each(data.breakdown, function(index, value){
-            var icon;
-            if(value.type == "photo"){
-                icon = $("<i>").addClass("fa fa-file-image-o");
-            }else{
-                icon = $("<i>").addClass("fa fa-file-video-o");
-            }
-            breakdown_items.append($("<div>").addClass("breakdown_row")
-                    .append($("<div>").addClass("breakdown_item_left")
-                            .append(icon)
-                            .append(document.createTextNode(" × "+value.amount+" "))
-                            .append($("<small>").text("out of "+value.expected))
-                        )
-                    .append($("<div>").addClass("breakdown_item_right")
-                            .append("$"+ value.amount*value.cost_per_item)
-                        )
-                    );
-        });
-        breakdown_table.append(breakdown_items);
-
-        //build summary
-        var summary_cont = $("<div>").addClass("breakdown_summary");
-
-        summary_cont.append($("<div>").addClass("summary_item")
-                .text("$"+data.total_cash)
-            );
-
-        if(data.gift){
-            summary_cont.append($("<div>").addClass("summary_item")
-                .append(document.createTextNode(data.gift))
-                .append($("<small>").text("(Gift)"))
-            );
-        }
-
-        breakdown_table.append(summary_cont);
-
-        detail = $("<div>").addClass("detail")
-                        .append(items)
-                        .append(
-                            $("<div>").addClass("description_block")
-                                .append($("<div>").addClass("single_row")
-                                    .append($("<label>").text("Completion"))
-                                    .append(document.createTextNode(parseInt(data.completion*100,10)+"%"))
-                                )    
-                        )
-                        .append($("<h2>").text("Breakdown"))
-                        .append(breakdown_table);
-
-        var tempUserObj = storify.project.user.getUserDetail(data.user_id)
-
-        return $("<div>").addClass("creator")
-                    .append($("<div>").addClass("creator_left")
-                                .append($("<div>").addClass("profile-image").css({"background-image":"url("+tempUserObj.profile_image+")"}))
-                        )
-                    .append($("<div>").addClass("creator_right")
-                        .append(compact)
-                        .append(detail)
-                    )
-                    .click(function(e){
-                                e.preventDefault();
-                                $(this).toggleClass("expand");
-                            });
-    },
-    _gettingHistory:false,
-    getHistory:function(deliverable_id, user_id, callback){
-        if(storify.brand.detail_closed._gettingHistory) return;
-        storify.brand.detail_closed._gettingHistory = true;
-        $.ajax({
-            type:"POST",
-            dataType:"json",
-            data:{
-                deliverable_id:deliverable_id,
-                user_id:user_id,
-                method:"getDeliverableHistory"
-            },
-            error:function(request, status, error){
-                storify.brand.detail_closed._gettingHistory = false;
-            },
-            success:function(rs){
-                storify.brand.detail_closed._gettingHistory = false;
-                if(rs.error){
-                    alert(rs.msg);
-                }else{
-                    if(callback) callback(rs);
-                }
-            }
-        })
-    },
-    createHistoryBlock:function(data){
-        return $("<div>").addClass("history_item")
-            .append($("<div>").addClass("submission_block")
-                        .append($("<div>").addClass("item_row")
-                                    .append($("<div>").addClass("label").text("URL"))
-                                    .append($("<div>").addClass("value").text(data.URL))
-                            )
-                        .append($("<div>").addClass("item_row")
-                                    .append($("<div>").addClass("label").text("Instruction"))
-                                    .append($("<div>").addClass("value").text(data.remark))
-                            )
-                        .append($("<div>").addClass("item_row")
-                                    .append($("<div>").addClass("label").text("Submit Time"))
-                                    .append($("<div>").addClass("value").text(data.submit_tt))
-                            )
-                )
-            .append($("<div>").addClass("reply_block")
-                        .append($("<div>").addClass("item_row")
-                                    .append($("<div>").addClass("label").text("Status"))
-                                    .append($("<div>").addClass("value").text(data.response_status))
-                            )
-                        .append($("<div>").addClass("item_row")
-                                    .append($("<div>").addClass("label").text("Reason"))
-                                    .append($("<div>").addClass("value").text(data.response_remark))
-                            )
-                        .append($("<div>").addClass("item_row")
-                                    .append($("<div>").addClass("label").text("Reply Time"))
-                                    .append($("<div>").addClass("value").text(data.response_tt))
-                            )
-                );
-    },
-    createDeliverableItem:function(data){
-        var d = $("<div>").addClass("deliverable-creator-item").attr({"deliverable-id":data.deliverable_id}),
-            temp_creator = storify.project.user.getUserDetail(data.user_id),
-            temp_remark = null,
-            temp_status = null,
-            temp_action = null,
-            temp_history = null;
-
-        if(data.remark){
-            temp_remark = $("<div>").addClass("single_block")
-                                .append($("<label>").text("Remark"))
-                                .append(document.createTextNode(data.remark));
-        }
-        
-        temp_status = $("<div>").addClass("single_block")
-                            .append($("<label>").text("Status"))
-                            .append($("<span>").addClass("item-status").text(data.status))
-                            .append($("<small>").text(data.admin_response_tt));
-
-        d.addClass("item-accepted");
-
-        if(data.URL){
-            d.append($("<div>").addClass("top_panel")
-                .append($("<div>").addClass("single_block")
-                    .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-file-"+data.type+"-o").css({"margin-right":"5px"})))
-                    .append($("<input>").attr({type:"text",readonly:true})
-                        .val(data.URL)
-                        .click(function(e){
-                            e.preventDefault();
-                            this.setSelectionRange(0, this.value.length);
-                        })
-                    )
-                )
-                .append(temp_remark)
-                .append(temp_status)
-            )
-            .append(temp_action);
-        }else{
-           d.append($("<div>").addClass("top_panel")
-                    .append($("<div>").addClass("single_block")
-                        .append($("<p>").text("waiting for submit"))
-                    )
-            )
-            .append(temp_action); 
-        }
-        return d;
-    },
-    display:function(data, callback){
-        $(".deliverable-groups").empty();
-        var photo_type = 0,
-            video_type = 0;
-        $.each(data, function(index,value){
-            var a = $("<div>").addClass("deliverable-group"),
-                b = $("<div>").addClass("deliverable-creator-group"),
-                c = $("<div>").addClass("deliverable-creator-summary"),
-                creator_not_submit = null,
-                tempname = "",
-                tempuser = storify.project.user.data.slice(0);
-
-            a.append($("<h3>").text(tempname));
-            if(value.deliverable_remark){
-                a.append($("<div>").addClass("deliverable-remark").text(value.deliverable_remark));
-            }
-            b.append(storify.brand.detail_closed.createDeliverableItem(value));
-
-            a.append(b);
-            a.append(c);
-            $(".deliverable-groups").append(a);
-        });
-
-        if( typeof callback === "function" ){
-            callback();
-        }
-    },
-    _gettingDeliverable:false,
-    getDeliverables:function(user_id, callback){
-        if(storify.brand.detail_closed._gettingDeliverable) return;
-        storify.brand.detail_closed._gettingDeliverable = true;
-        $.ajax({
-            type: "POST",
-            dataType: "json",
-            data:{
-                project_id:storify.project._project_id,
-                user_id:user_id,
-                method:"getDeliverable"
-            },
-            error:function(request, status, error){
-                storify.brand.detail_closed._gettingDeliverable = false;
-            },
-            success:function(rs){
-                storify.brand.detail_closed._gettingDeliverable = false;  
-                if(rs.error){
-                    alert(rs.msg);
-                }else{
-                    storify.brand.detail_closed.display(rs.data, callback);
-                }
-            }
-        });
-    },
-    createSummary:function(data){
-        $(".creators").empty();
-
-        $.each(data.creators, function(index,value){
-            $(".creators").append(storify.brand.detail_closed.createCreator(value));
-        });
-
-        $(".summary").empty();
-
-        if(+data.total_cash){
-            $(".summary").append($("<div>").addClass("summary_item").text("$"+data.total_cash));
-        }
-
-        if(data.total_gift && data.total_gift.amount && data.total_gift.name){
-            $(".summary").append(document.createTextNode(data.total_gift.name+" "))
-                         .append($("<small>").text(" × "+data.total_gift.amount+" "));
-        }
-    },
-    _gettingCompletionSummary:false,
-    getCompletionSummary:function(project_id, callback){
-        if(storify.brand.detail_closed._gettingCompletionSummary) return;
-        storify.brand.detail_closed._gettingCompletionSummary = true;
-        $.ajax({
-            method: "POST",
-            dataType: 'json',
-            data: {
-                method: "getBrandCompletion",
-                project_id: project_id
-            },
-            success:function(rs){
-                storify.brand.detail_closed._gettingCompletionSummary = false;
-                if(rs.error){
-                    console.log(rs);
-                }else{
-                    if(callback) callback(rs);
-                }
-            }
-        })
     },
     _gettingDetail:false,
     viewDetail:function(project_id){
@@ -370,6 +113,10 @@ storify.brand.detail_closed = {
         storify.brand.detail_closed._gettingDetail = true;
         storify.brand.detail_closed.addElementIfNotExist();
         storify.loading.show();
+        $("#newDetailModal .nav-tabs").each(function(index,value){
+          $(value).find("a:eq(0)").tab("show");
+        });
+        $(".invite-group").empty();
         $.ajax({
             method: "POST",
             dataType: 'json',
@@ -384,28 +131,79 @@ storify.brand.detail_closed = {
                 }else{
                     _project_id = project_id;
                     storify.project._project_id = project_id;
+                    storify.brand.invitation_closed.getList();
                     storify.project.user.getAllUser(function(){
-                        storify.loading.hide();
-                        storify.brand.detail_closed.createDetail(rs.data);
-                        $("#detailModal").modal();
-                        storify.brand.detail_closed.getCompletionSummary(project_id, function(rs2){
-                            storify.brand.detail_closed.createSummary(rs2.data);
-                            $("#detailModal").modal();
+                        storify.brand.deliverable_closed.getList(function(){
+                            storify.brand.completion_closed.getCompletion(project_id, function(){
+                                storify.loading.hide();
+                                storify.brand.detail_closed.createDetail(rs.data);
+                                //$("#detailModal").modal();
+                                $("#newDetailModal").modal("show");
+                                //setup edit dialog
+                            });
                         });
                     });
                 }
             }
         });
     },
-    createDetail:function(data){
+    createBountyTable:function(detail){
+        var cashtable = $("<div>").addClass("bountycash2"),
+            gifttable = null;
 
-        //bramd
+        var totalcash = 0;
+
+        if(detail.bounty_type == "gift"){
+            detail.cost_per_photo = 0;
+            detail.cost_per_video = 0;
+        }
+
+        totalcash = detail.no_of_photo * detail.cost_per_photo + detail.no_of_video * detail.cost_per_video;
+
+        cashtable.append($("<div>").addClass("bountyrow")
+                .append($("<h2>")
+                .append($("<span>").text(detail.no_of_photo)
+                            .append($("<i>").addClass("fa fa-camera"))
+                    )
+                .append($("<span>").text("S$"+storify.project.formatMoney(detail.cost_per_photo)+" each"))
+            ));
+        cashtable.append($("<div>").addClass("bountyrow")
+                .append($("<h2>")
+                .append($("<span>").text(detail.no_of_video)
+                            .append($("<i>").addClass("fa fa-video-camera"))
+                    )
+                .append($("<span>").text("S$"+storify.project.formatMoney(detail.cost_per_video)+" each"))
+            ));
+
+        if(detail.bounty_type == "both" || detail.bounty_type == "gift"){
+            gifttable = $("<div>").addClass("bountygift2");
+            gifttable.append($("<div>").addClass("bountyrow giftrow")
+                .append($("<h2>")
+                .append($("<span>").text("1")
+                            .append($("<i>").addClass("fa fa-gift"))
+                    )
+                .append($("<span>").text(detail.reward_name)))
+            );
+        }
+
+        var div = $("<div>");
+        div.append($("<h5>").text("Do a good job and you will be well-rewarded."))
+            .append(cashtable)
+            .append(gifttable)
+            .append($("<h5>").text("In total, you will receive S$"+storify.project.formatMoney(totalcash)+", and entitlements, if any."));
+        $("#bounty-content").empty()
+            .append(div);
+    },
+    createDetail:function(data){
+         //bramd
         var brandtext = [];
         if(data.summary.brand && data.summary.brand.length){
             $.each(data.summary.brand, function(index, value){
                 brandtext.push(value.name);
             });
         }
+
+        $("#submission-content .brand").text(brandtext);
 
         //locations
         var locationtext = [];
@@ -415,71 +213,104 @@ storify.brand.detail_closed = {
             });
         }
 
-        //tags
-        var tagstext = [];
-        if(data.summary.tag && data.summary.tag.length){
-            $.each(data.summary.tag, function(index, value){
-                tagstext.push(value.name);
-            });   
-        }
-
-        //deliverable detail
-        var deliverable_ar = [], photocount = 1, videocount = 1;
-        $.each(data.delivery, function(index,value){
-            if(value.remark){
-                if(value.type == "photo"){
-                    deliverable_ar.push([
-                        "photo #" + photocount,
-                        value.remark
-                        ]);
-                    photocount++;
-                }
-                if(value.type == "video"){
-                    deliverable_ar.push([
-                        "video #" + photocount,
-                        value.remark
-                        ]);
-                    photocount++;
-                }
-            }
-        });
-
-        var deliverable_block =$("<div>").addClass("description_block")
-                    .append($("<h2>").text("Deliverables"))
-                    .append($("<p>").text(data.summary.deliverables)
-                                    .append(data.detail.no_of_video != "0" && data.detail.video_length ? document.createTextNode(" ("+data.detail.video_length+"s)") : null)
-                        );
-
-        if(deliverable_ar.length){
-            deliverable_block.append($("<h3>").text("Details"));
-
-            $.each(deliverable_ar, function(index, value){
-                deliverable_block.append($("<div>").addClass("single_row")
-                                            .append($("<label>").text(value[0]))
-                                            .append(document.createTextNode(value[1]))
-                    );
-            });
+        var deliverable_block = $("<div>").addClass("deliverable");
+        if(+data.detail.no_of_photo && +data.detail.no_of_video){
+            deliverable_block
+                .append(document.createTextNode(data.detail.no_of_photo+" "))
+                .append($("<i>").addClass("fa fa-camera"))
+                .append(document.createTextNode(" | "+data.detail.no_of_video+" "))
+                .append($("<i>").addClass("fa fa-video-camera"));
+        }else if(+data.detail.no_of_photo){
+            deliverable_block
+                .append(document.createTextNode(data.detail.no_of_photo+" "))
+                .append($("<i>").addClass("fa fa-camera"));
+        }else if(+data.detail.no_of_video){
+            deliverable_block
+                .append(document.createTextNode(data.detail.no_of_video+" "))
+                .append($("<i>").addClass("fa fa-video-camera"));
         }
 
         //sample block
-        var sample_block = null, sample_inner_block = [];
+        var owlImages = null;
 
         if(data.sample.length){
-            sample_block = $("<div>").addClass("description_block")
-                                .append($("<h2>").text("Samples"));;
-
-            sample_inner_block = $("<div>").addClass("sample_groups");
+            owlImages = $("<div>").addClass("samples_cont owl-carousel owl-theme");
 
             $.each(data.sample, function(index, value){
-                sample_inner_block.append(
+                owlImages.append(
                     $("<a>").addClass("sample_clickable")
                         .attr({href:value.URL, target:"_blank"})
                         .css({"background-image":"url("+value.URL+")"})
                     );
             });
-
-            sample_block.append(sample_inner_block);
         }
+
+        $("#bounty-content").empty();
+        storify.brand.detail_closed.createBountyTable(data.detail);
+
+        var cont = $("#brief-content");
+        cont.empty();
+
+        cont.append(
+                $("<div>").addClass("project_header")
+                    .append($("<div>").addClass("brand").text(brandtext.join(", ")))
+                    .append($("<h2>").text(data.name))
+                    .append($("<div>").addClass("location").text(locationtext.join(", ")))
+                    .append($("<div>").addClass("date_cont")
+                        .append($("<div>").addClass("text-right")
+                                .append($("<i>").addClass("fa fa-calendar-o"))
+                                .append(document.createTextNode(" Accept "+data.summary.formatted_closing_date))
+                            )
+                        .append($("<div>").addClass("text-right")
+                                .append($("<i>").addClass("fa fa-calendar-o"))
+                                .append(document.createTextNode(" Deliver "+data.summary.formatted_invitation_closing_date))
+                            )
+                    )
+            )
+            .append(deliverable_block)
+            .append($("<pre>").html(data.detail.description_brief))
+            .append($("<pre>").html(data.detail.deliverable_brief))
+            ;
+        cont.append(owlImages);
+
+        if(owlImages){
+            var _interval = setInterval(function(args) {
+                // body
+                if(owlImages.parent().is(":visible")){
+                    owlImages.owlCarousel({
+                        loop:false,
+                        autoplay:true,
+                        margin:10,
+                        responsiveClass:true,
+                        responsiveBaseElement:"#brief-content",
+                        responsive:{
+                            0:{
+                                items:1,
+                                nav:true
+                            },
+                            250:{
+                                items:2,
+                                nav:true
+                            },
+                            650:{
+                                items:3,
+                                nav:true
+                            },
+                            1000:{
+                                items:5,
+                                nav:true
+                            }
+                        }
+                    });
+                    clearInterval(_interval);
+                }
+            }, 50);
+        }
+        return cont;
+
+        /*
+        $("#bounty-content").empty();
+        storify.creator.detail.createBountyTable(data.detail);
 
         var bounty_block = null, bounty_ul;
         bounty_block = $("<div>").addClass("description_block");
@@ -490,9 +321,9 @@ storify.brand.detail_closed = {
             bounty_ul.append(
                 $("<li>").append($("<label>").text("Cash"))
                         .append(document.createTextNode("$"+data.summary.bounty[0].value+" ( $"+data.detail.cost_per_photo+" for each "))
-                        .append($("<i>").addClass("fa fa-file-image-o"))
+                        .append($("<i>").addClass("fa fa-camera"))
                         .append(document.createTextNode(", $"+data.detail.cost_per_video+" for each "))
-                        .append($("<i>").addClass("fa fa-file-video-o"))
+                        .append($("<i>").addClass("fa fa-video-camera"))
                         .append(document.createTextNode(" )"))
             );
 
@@ -504,9 +335,9 @@ storify.brand.detail_closed = {
             bounty_ul.append(
                 $("<li>").append($("<label>").text("Cash"))
                         .append(document.createTextNode("$"+data.summary.bounty[0].value+" ( $"+data.detail.cost_per_photo+" for each "))
-                        .append($("<i>").addClass("fa fa-file-image-o"))
+                        .append($("<i>").addClass("fa fa-camera"))
                         .append(document.createTextNode(", $"+data.detail.cost_per_video+" for each "))
-                        .append($("<i>").addClass("fa fa-file-video-o"))
+                        .append($("<i>").addClass("fa fa-video-camera"))
                         .append(document.createTextNode(" )"))
             );
         }else{
@@ -517,6 +348,8 @@ storify.brand.detail_closed = {
         }
 
         bounty_block.append(bounty_ul);
+
+        $("#detailModal .viewCompletion").attr({"data-project_id":data.detail.project_id})
 
         var cont = $("#detailcontent");
         cont.empty();
@@ -575,5 +408,6 @@ storify.brand.detail_closed = {
             .append(bounty_block);
 
         return cont;
+        */
     }
 };

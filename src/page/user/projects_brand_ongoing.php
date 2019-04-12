@@ -85,7 +85,7 @@ include("page/component/header.php"); ?>
                             <div class="section-title clearfix">
                                 <a href="#" class="btn btn-primary text-caps btn-rounded btn-framed width-100" id="addproject">+ NEW PROJECT</a>
                             </div>
-                            <div class="project-items" id="ongoing_grid" data-page="1" data-sort="closing_date" data-filter="ongoing">
+                            <div class="project-items" id="ongoing_grid" data-page="0" data-sort="closing_date" data-filter="ongoing">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="ongoingloadmore">Load More</a>
@@ -173,55 +173,55 @@ include("page/component/header.php"); ?>
         <div class="modal-dialog modal-dialog-centered modal-custom-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit</h5>
+                    <h5 class="modal-title">Edit Project</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row bs-wizard" style="border-bottom:0">
-                        <div class="col-4 bs-wizard-step complete">
-                          <div class="text-center bs-wizard-stepnum">Step 1</div>
-                          <div class="progress"><div class="progress-bar"></div></div>
-                          <a href="#" class="bs-wizard-dot"></a>
-                          <div class="bs-wizard-info text-center"></div>
-                        </div>
-                        <div class="col-4 bs-wizard-step complete">
-                          <div class="text-center bs-wizard-stepnum">Step 2</div>
-                          <div class="progress"><div class="progress-bar"></div></div>
-                          <a href="#" class="bs-wizard-dot"></a>
-                          <div class="bs-wizard-info text-center"></div>
-                        </div>
-                        <div class="col-4 bs-wizard-step complete">
-                          <div class="text-center bs-wizard-stepnum">Step 3</div>
-                          <div class="progress"><div class="progress-bar"></div></div>
-                          <a href="#" class="bs-wizard-dot"></a>
-                          <div class="bs-wizard-info text-center"></div>
-                        </div>
-                    </div>
                     <div class="row">
-                        <div class="col-md-10 offset-md-1" id="edit_project_page_1" style="display:none;">
+                        <div class="col-md-10 offset-md-1">
+                            <div class="form-group">
+                                <label for="edit_closing_date" class="required">Submission Closing Date</label>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" id="edit_closing_date" placeholder="dd/mm/yy" required>
+                                    <span class="input-group-addon">
+                                        <span class="fa fa-calendar"></span>
+                                    </span>
+                                </div>
+                                <div class="form-width">
+                                    <div class="alert alert-danger hide">Some error message</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_invitation_closing_date" class="required">Invitation closing date</label>
+                                <div class="input-group date">
+                                    <input type="text" class="form-control" id="edit_invitation_closing_date" placeholder="dd/mm/yy" required>
+                                    <span class="input-group-addon">
+                                        <span class="fa fa-calendar"></span>
+                                    </span>
+                                </div>
+                                <div class="form-width">
+                                    <div class="alert alert-danger hide">Some error message</div>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label for="edit_project_name" class="required">Title</label>
                                 <input type="text" class="form-control" id="edit_project_name" placeholder="Enter a name for this project." required>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_closing_date">Submission Closing Date</label>
-                                <div class="input-group date">
-                                    <input type="text" class="form-control" id="edit_closing_date">
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-calendar"></span>
-                                    </span>
+                                <div class="form-width">
+                                    <div class="alert alert-danger hide">Some error message</div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="edit_invitation_closing_date">Invitation closing date</label>
-                                <div class="input-group date">
-                                    <input type="text" class="form-control" id="edit_invitation_closing_date">
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-calendar"></span>
-                                    </span>
+                                <label for="edit_project_description" class="required">Details</label>
+                                <textarea class="form-control" id="edit_project_description" rows="3" placeholder="Please provide details to your campaign." required></textarea>
+                                <div class="form-width">
+                                    <div class="alert alert-danger hide">Some error message</div>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_project_short_description">Summary</label>
+                                <textarea class="form-control" id="edit_project_short_description" rows="2"></textarea>
                             </div>
                             <div class="form-group">
                                 <labal for="project_brand">Brand</labal>
@@ -284,22 +284,6 @@ include("page/component/header.php"); ?>
                             ?>
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-10 offset-md-1" id="edit_project_page_2" style="display:none;">
-                            <div class="form-group">
-                                <label for="edit_project_description" class="required">Description</label>
-                                <textarea class="form-control" id="edit_project_description" rows="4" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_project_short_description">Short Description</label>
-                                <textarea class="form-control" id="edit_project_short_description" rows="2"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="edit_deliverable_brief">Deliverable Remark</label>
-                                <textarea class="form-control" id="edit_deliverable_brief" row="4"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-10 offset-md-1" id="edit_project_page_3" style="display:none">
                             <div class="form-group">
                                 <label for="samples">Moodboard</label>
                                 <div class="input-group mb-3">
@@ -312,13 +296,16 @@ include("page/component/header.php"); ?>
                             <div class="image-groups">
                                 
                             </div>
+                            <div class="form-group">
+                                <label for="edit_deliverable_brief">Instructions to Creators</label>
+                                <textarea class="form-control" id="edit_deliverable_brief" row="2"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <div class="float-right bottom_panel">
-                        <button class="btn btn-primary">Back</button>
-                        <button class="btn btn-primary">Next</button>
+                        <button class="btn btn-primary">Update</button>
                     </div>
               </div>
             </div>
@@ -453,7 +440,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="closing_date">Submission Closing Date</label>
                         <div class="input-group date">
-                            <input type="text" class="form-control" id="closing_date">
+                            <input type="text" class="form-control" placeholder="dd/mm/yy" id="closing_date">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -552,7 +539,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="invitation_closing_date">Invitation closing date</label>
                         <div class="input-group date">
-                            <input type="text" class="form-control" id="invitation_closing_date">
+                            <input type="text" class="form-control" placeholder="dd/mm/yy" id="invitation_closing_date">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -709,54 +696,48 @@ include("page/component/header.php"); ?>
                 );
             }
 
-            function isEditPageReady(pageindex, silence){
+            function isEditPageReady(silence){
                 var pageReady = true,
                     msg = "";
-                if(pageindex == 1){
-                    //page 1
-                    $("#edit_project_page_1 *[required]").each(function(index,value){
-                        if($(value).val() == ""){
-                            pageReady = false;
-                            msg = "Please fill in all required fields.";
-                        }
-                    });
-                    if(!$("#edit_closing_date").val()){
+
+                $('#editDialog .alert').addClass("hide");
+                
+                $("#editDialog *[required]").each(function(index,value){
+                    if($(value).val() == ""){
                         pageReady = false;
-                        msg = "Please fill in the closing date";
-                    }
-                    if(!$("#edit_invitation_closing_date").val()){
-                        pageReady = false;
-                        msg = "Please fill in the invitation closing date";
-                    }
-                }else if(pageindex == 2){
-                    //page 2
-                    $("#edit_project_page_2 *[required]").each(function(index,value){
-                        if($(value).val() == ""){
-                            pageReady = false;
-                            msg = "Please fill in all required fields.";
+                        msg = "Please fill in all required fields.";
+                        if(!silence){
+                            $(this).parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
                         }
-                    });
-                }else if(pageindex == 3){
-                    //page 3
+                    }
+                });
+                if(!$("#edit_closing_date").val()){
+                    pageReady = false;
+                    msg = "Please fill in the closing date";
+                    if(!silence){
+                        $("#edit_closing_date").parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
+                    }
+                }
+                if(!$("#edit_invitation_closing_date").val()){
+                    pageReady = false;
+                    msg = "Please fill in the invitation closing date";
+                    if(!silence){
+                        $("#edit_invitation_closing_date").parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
+                    }
                 }
                 if(!silence && msg){
-                    alert(msg);
+                    //alert(msg);
+                    if($(".alert:visible").length){ //with error message
+                        var temp_a = $($(".alert:visible")[0]).parents(".form-group").offset(),
+                            temp_b = $(".alert:visible").parents(".modal-body").offset();
+                            if( (temp_a.top - temp_b.top ) < 0){
+                                $(".alert:visible").parents(".modal-body").stop().animate({scrollTop:0}, 200, 'linear', function() { 
+   
+                                });
+                            }
+                    }
                 }
                 return pageReady;
-            }
-
-            function edit_formBack(){
-                var currentPage = 0;
-                if($("#edit_project_page_1").is(":visible")){
-                    currentPage = 1;
-                }else if($("#edit_project_page_2").is(":visible")){
-                    currentPage = 2;
-                }else if($("#edit_project_page_3").is(":visible")){
-                    currentPage = 3;
-                }
-                if(currentPage > 1){
-                    showEditProjectPage(currentPage-1);
-                }
             }
 
             function edit_gatherAllData(){
@@ -850,11 +831,9 @@ include("page/component/header.php"); ?>
                     });
                 }
 
-                $("#editDialog .bottom_panel .btn:eq(1)").attr({"data-project_id":data.detail.project_id})
+                $("#editDialog .bottom_panel .btn:eq(0)").attr({"data-project_id":data.detail.project_id})
 
                 editProjectCurrentProgress = 0;
-                showEditProjectPage(1);
-
             }
 
             function resetEditProject(){
@@ -915,42 +894,10 @@ include("page/component/header.php"); ?>
                 }
             }
 
-            function showEditProjectPage(pageindex){
-                $("#edit_project_page_1, #edit_project_page_2, #edit_project_page_3").css({"display":"none"});
-                changeEditProjectProgress(pageindex);
-                switch(pageindex){
-                    case 1:
-                        $("#edit_project_page_1").removeAttr("style");
-                        editCheckFooterButton(pageindex);
-                    break;
-                    case 2:
-                        $("#edit_project_page_2").removeAttr("style");
-                        editCheckFooterButton(pageindex);
-                    break;
-                    case 3:
-                        $("#edit_project_page_3").removeAttr("style");
-                        editCheckFooterButton(pageindex);
-                    break;
-                }
-            }
-
             function edit_formNext(project_id){
-                var currentPage = 0;
-                if($("#edit_project_page_1").is(":visible")){
-                    currentPage = 1;
-                }else if($("#edit_project_page_2").is(":visible")){
-                    currentPage = 2;
-                }else if($("#edit_project_page_3").is(":visible")){
-                    currentPage = 3;
-                }
-
-                if(isEditPageReady(currentPage, false)){
-                    if(currentPage == 3){
-                        var a = edit_gatherAllData();
-                        updateProject(a, project_id);
-                    }else{
-                        showEditProjectPage(currentPage + 1);
-                    }
+                if(isEditPageReady(false)){
+                    var a = edit_gatherAllData();
+                    updateProject(a, project_id);
                 }
             }
 
@@ -1328,7 +1275,10 @@ include("page/component/header.php"); ?>
             });
 
             $('.input-group.date input').each(function(index,value){
-                $(this).datepicker();
+                $(this).datepicker({
+                    format: 'dd/mm/yy',
+                    startDate: 0
+                });
             });
 
             $("#newproject .bottom_panel button:eq(0)").click(function(e){
@@ -1342,11 +1292,6 @@ include("page/component/header.php"); ?>
             });
 
             $("#editDialog .bottom_panel button:eq(0)").click(function(e){
-                e.preventDefault();
-                edit_formBack();
-            });
-
-            $("#editDialog .bottom_panel button:eq(1)").click(function(e){
                 e.preventDefault();
                 edit_formNext($(this).attr("data-project_id"));
             });

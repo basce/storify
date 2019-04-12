@@ -283,7 +283,9 @@ class project{
 			"name"=>$details["name"],
 			"description"=>$description,
 			"invitation_closing_date"=>$details["invitation_closing_date"],
+			"formatted_invitation_closing_date"=>date('d-m-y',strtotime($details["invitation_closing_date"])),
 			"closing_date"=>$details["closing_date"],
+			"formatted_colsing_date"=>date('d-m-y',strtotime($details["closing_date"])),
 			"created_date"=>$details["tt"],
 			"deliverables_ar"=>$deliverables,
 			"deliverables"=>$deliverables_text,
@@ -713,6 +715,11 @@ class project{
 			//get summary
 			$project["summary"] = json_decode($this->summary_manager->getSummary($project_id), true);
 
+			foreach($project["summary"] as $key=>$value){
+				$project["summary"]["formatted_invitation_closing_date"] = date("d-m-y", strtotime($project["summary"]["invitation_closing_date"]));
+				$project["summary"]["formatted_closing_date"] = date("d-m-y", strtotime($project["summary"]["closing_date"]));
+			}
+
 			//get delviery
 			$project["delivery"]  = $this->deliverable_manager->getDeliverables($project_id);
 
@@ -1074,6 +1081,32 @@ class project{
 
 		$deliverables = $wpdb->get_results($wpdb->prepare($query, $user_id, $project_id), ARRAY_A);
 
+		usort($deliverables, function($a, $b){
+			if($a["status"] == "" || $a["status"] == "pending"){
+				$a_sort_weight = 0;
+			}else if($a["status"] == "rejected"){
+				$a_sort_weight = 1;
+			}else{
+				$a_sort_weight = 2;
+			}
+
+			if($b["status"] == "" || $b["status"] == "pending"){
+				$b_sort_weight = 0;
+			}else if($b["status"] == "rejected"){
+				$b_sort_weight = 1;
+			}else{
+				$b_sort_weight = 2;
+			}
+
+			if($a_sort_weight == $b_sort_weight){
+				return 0;
+			}else if($a_sort_weight > $b_sort_weight){
+				return -1;
+			}else{
+				return 1;
+			}
+		});
+
 		//calculate 
 		if($result["bounty_type"] == "cash" || $result["bounty_type"] == "both"){
 			$cost_per_photo = (int)$result["cost_per_photo"];
@@ -1118,6 +1151,8 @@ class project{
 			"cash"=>$cash,
 			"complete"=>$complete,
 			"total_item"=>$result["no_of_photo"] + $result["no_of_video"],
+			"total_photo"=>$result["no_of_photo"],
+			"total_video"=>$result["no_of_video"],
 			"complete_item"=>$complete_count,
 			"gift"=>$at_least_one ? $gift : "",
 			"cost_per_photo"=>$cost_per_photo,
@@ -1200,9 +1235,9 @@ class project{
 						if(sizeof($opening_items)){
 							foreach($opening_items as $key=>$value){
 								//change each item to reject
-								$this->submission_manager->responseSubmission($value, "rejected", "Project force close");
+								$this->submission_manager->responseSubmission($value, "rejected", "Project close");
 								//move the item to history
-								$this->submission_manager->removeSubmission($value);
+								//$this->submission_manager->removeSubmission($value);
 							}
 						}
 					}
@@ -1236,9 +1271,9 @@ class project{
 				if(sizeof($opening_items)){
 					foreach($opening_items as $key=>$value){
 						//change each item to reject
-						$this->submission_manager->responseSubmission($value, "rejected", "Project force close");
+						$this->submission_manager->responseSubmission($value, "rejected", "Project close");
 						//move the item to history
-						$this->submission_manager->removeSubmission($value);
+						//$this->submission_manager->removeSubmission($value);
 					}
 				}
 			}

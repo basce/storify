@@ -85,7 +85,7 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <div class="project-items" id="invite_grid" data-page="1" data-sort="date" data-filter="pending">
+                            <div class="project-items" id="invite_grid" data-page="0" data-sort="date" data-filter="pending">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="invitationloadmore">Load More</a>

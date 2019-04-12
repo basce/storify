@@ -3,7 +3,8 @@ storify.brand = storify.brand || {};
 
 storify.brand.completion = {
 	addElementIfNotExist:function(){
-		if( !$("#completionDialog").length ){
+		if( !$("#finalizeDialog").length ){
+			/*
 			$("body").append($("<modal>").addClass("modal").attr({tabindex:-1,role:"dialog", id:"completionDialog"})
 				.append($("<div>").addClass("modal-dialog modal-dialog-centered modal-xl").attr({role:"document"})
 					.append($("<div>").addClass("modal-content")
@@ -36,18 +37,19 @@ storify.brand.completion = {
 					)
 				)
 			);
+			*/
 
 			$("body").append($("<modal>").addClass("modal").attr({tabindex:-1,role:"dialog", id:"finalizeDialog"})
 				.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
 					.append($("<div>").addClass("modal-content")
 						.append($("<div>").addClass("modal-header")
-							.append($("<h5>").addClass("modal-title").text("Close Creator Task"))
+							.append($("<h5>").addClass("modal-title").text("Pay for submission"))
 							.append($("<button>").attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"})
 								.append($("<span>").attr({"aria-hidden":true}).html("&times;"))
 							)
 						)
 						.append($("<div>").addClass("modal-body")
-							.append($("<p>").append("Close creator's task even he/she hasn't complete all task?"))
+							.append($("<p>").append("This will confirm this submission and we will arrange to pay the Creator."))
 						)
 						.append($("<div>").addClass("modal-footer")
 							.append($("<button>").attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"}).addClass("btn btn-primary small").text("Cancel"))
@@ -66,13 +68,13 @@ storify.brand.completion = {
 				.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
 					.append($("<div>").addClass("modal-content")
 						.append($("<div>").addClass("modal-header")
-							.append($("<h5>").addClass("modal-title").text("Close All Creator Task"))
+							.append($("<h5>").addClass("modal-title").text("Pay for all submissions"))
 							.append($("<button>").attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"})
 								.append($("<span>").attr({"aria-hidden":true}).html("&times;"))
 							)
 						)
 						.append($("<div>").addClass("modal-body")
-							.append($("<p>").append("Close all creator's task even they haven't complete all task?"))
+							.append($("<p>").append("This will confirm all submissions and we will arrange to pay all Creators."))
 						)
 						.append($("<div>").addClass("modal-footer")
 							.append($("<button>").attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"}).addClass("btn btn-primary small").text("Cancel"))
@@ -84,7 +86,31 @@ storify.brand.completion = {
 						)
 					)
 				)
-			);	
+			);
+
+			$("body").append($("<modal>").addClass("modal").attr({tabindex:-1,role:"dialog", id:"closeProjectDialog"})
+				.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
+					.append($("<div>").addClass("modal-content")
+						.append($("<div>").addClass("modal-header")
+							.append($("<h5>").addClass("modal-title").text("Close project"))
+							.append($("<button>").attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"})
+								.append($("<span>").attr({"aria-hidden":true}).html("&times;"))
+							)
+						)
+						.append($("<div>").addClass("modal-body")
+							.append($("<p>").append("This project is done. We will close it now."))
+						)
+						.append($("<div>").addClass("modal-footer")
+							.append($("<button>").attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"}).addClass("btn btn-primary small").text("Cancel"))
+							.append($("<button>").addClass("btn btn-primary small").text("Confirm").click(function(e){
+                                    e.preventDefault();
+                                    var project_id = $(this).attr("data-project_id");
+                                    storify.brand.completion.closeProject(project_id);
+                                }))
+						)
+					)
+				)
+			);
 		}
 	},
 	createCompletionItem:function(data){
@@ -92,49 +118,82 @@ storify.brand.completion = {
 		//deliverable items
 		var items = $("<div>").addClass("items");
 
+		var photo_count = parseInt(data.completion.total_photo, 10),
+			video_count = parseInt(data.completion.total_video, 10);
+
 		$.each(data.completion.deliverables, function(index,value){
 			var icon;
 			if(value.type == "photo"){
-				icon = $("<i>").addClass("fa fa-file-image-o");
+				icon = $("<i>").addClass("fa fa-camera");
+				photo_count--;
 			}else{
-				icon = $("<i>").addClass("fa fa-file-video-o")
+				icon = $("<i>").addClass("fa fa-video-camera");
+				video_count--;
 			}
 			if(value.status == "accepted"){
 				items.append($("<div>").addClass("item complete "+value.type)
-									.attr({title:"done"})
+							.attr({title:"approved"})
 						.append($("<div>").addClass("icon")
 							.append(icon)
 						)
-						.append($("<div>").addClass("icon_name"))
+					);
+			}else if(value.status == "rejected"){
+				items.append($("<div>").addClass("item rejected "+value.type)
+							.attr({title:"rejected"})
+						.append($("<div>").addClass("icon")
+							.append(icon)
+						)
 					);
 			}else{
-				items.append($("<div>").addClass("item "+value.type)
+				items.append($("<div>").addClass("item pending "+value.type)
+							.attr({title:"pending"})
 						.append($("<div>").addClass("icon")
 							.append(icon)
 						)
-						.append($("<div>").addClass("icon_name"))
 					);
 			}
 		});
 
-		//bounty
-		var bounty_cont = $("<div>").addClass("bounty_cont");
-		if(data.completion.bounty_type == "cash" || data.completion.bounty_type == "both"){
-			bounty_cont.append($("<div>").addClass("cash").text(data.completion.cash));
+		if(photo_count){
+			while(photo_count-- > 0){
+				items.append($("<div>").addClass("item photo")
+							.attr({title:"empty"})
+						.append($("<div>").addClass("icon")
+							.append($("<i>").addClass("fa fa-camera"))
+						)
+					);
+			}
 		}
 
-		if(data.completion.bounty_type == "gift" || data.completion.bounty_type == "both"){
-			bounty_cont.append($("<div>").addClass("gift").text(data.completion.gift));	
+		if(video_count){
+			while(video_count-- > 0){
+				items.append($("<div>").addClass("item video")
+						.append($("<div>").addClass("icon")
+							.append($("<i>").addClass("fa fa-video-camera"))
+						)
+					);	
+			}
+		}
+
+		//bounty
+		var bounty_cont = $("<h2>").addClass("bounty_cont");
+		if(data.completion.bounty_type == "cash"){
+			bounty_cont.text("S$"+storify.project.formatMoney(data.completion.cash));
+		}else if(data.completion.bounty_type == "both"){
+			bounty_cont.text("S$"+storify.project.formatMoney(data.completion.cash)+" & ")
+					.append($("<i>").addClass("fa fa-gift"));
+		}else{
+			bounty_cont.append($("<i>").addClass("fa fa-gift"));
 		}
 
 		//action
-		var action_cont = $("<div>").addClass("text-center");
+		var action_cont = $("<div>").addClass("text-right");
 		if(data.status == "close"){
-			action_cont.append($("<span>").addClass("closed").text("Closed")
+			action_cont.append($("<span>").addClass("closed").text("Paid")
 				);
 		}else{
 			action_cont.append(
-				$("<button>").addClass("btn btn-primary small").text("Close")
+				$("<button>").addClass("btn btn-primary small").text("Pay")
 					.click(function(e){
 						$("#finalizeDialog .modal-footer .btn:eq(1)").attr({"data-user_id":data.user_id});
 						$("#finalizeDialog").modal("show");
@@ -146,12 +205,12 @@ storify.brand.completion = {
 
 		return $("<div>").addClass("completion_item")
 					.append($("<div>").addClass("user_col")
-						.append($("<div>").addClass("user_profile").css({"background-image":"url("+user_obj.profile_image+")"}))
-						.append($("<div>").addClass("user_name").text(user_obj.display_name))
+						.append($("<div>").addClass("user_profile").css({"background-image":"url("+user_obj.profile_image+")"}).attr({title:user_obj.display_name}))
 					)
-					.append($("<div>").addClass("completion_col").append(items)
-								.append($("<div>").addClass("completion_summary").text("Complete :"+parseInt(data.completion.complete*100, 10)+"%"))
-						)
+					.append($("<div>").addClass("perc_col")
+						.append($("<h2>").text(parseInt(data.completion.complete*100, 10)+"%"))
+					)
+					.append($("<div>").addClass("completion_col").append(items))
 					.append($("<div>").addClass("bounty_col").append(bounty_cont)
 						)
 					.append($("<div>").addClass("action_col").append(action_cont));
@@ -159,22 +218,38 @@ storify.brand.completion = {
 	displayCompletion:function(data){
 		storify.brand.completion.addElementIfNotExist();
 
-		$("#completionDialog .completion_items").empty();
+		$("#final-content").empty();
 		var alldone = true;
 		$.each(data, function(index,value){
-			$("#completionDialog .completion_items").append(storify.brand.completion.createCompletionItem(value));
+			$("#final-content").append(storify.brand.completion.createCompletionItem(value));
 			if(value.status != "close"){
 				alldone = false;
 			}
 		});
+
 		if(alldone){
-			$("#completionDialog .modal-footer .btn:eq(0)").css({display:"none"});
-			$("#completionDialog .modal-footer .btn:eq(1)").removeAttr("style");
+			$("#final-content").append(
+				$("<div>").addClass("text-right")
+					.append(
+						$("<button>").addClass("btn btn-primary small").text("Close")
+							.click(function(e){
+								/*$("#closeProjectDialog .modal-footer .btn:eq(1)").attr({"data-project_id":data.user_id});*/
+								$("#closeProjectDialog").modal("show");
+							})
+					)
+			);	
 		}else{
-			$("#completionDialog .modal-footer .btn:eq(0)").removeAttr("style");
-			$("#completionDialog .modal-footer .btn:eq(1)").css({display:"none"});
+			$("#final-content").append(
+				$("<div>").addClass("text-right")
+					.append(
+						$("<button>").addClass("btn btn-primary small").text("Pay All")
+							.click(function(e){
+								/*$("#finalizeAllDialog .modal-footer .btn:eq(1)").attr({"data-user_id":data.user_id});*/
+								$("#finalizeAllDialog").modal("show");
+							})
+					)
+			);
 		}
-		$("#completionDialog").modal("show");
 	},
 	_gettingCompletion:false,
 	getCompletion:function(project_id, callback){
@@ -198,7 +273,7 @@ storify.brand.completion = {
             	storify.brand.completion.displayCompletion(res.data);
             	$("#finalizeDialog .modal-footer .btn:eq(1)").attr({"data-project_id":project_id});
             	$("#finalizeAllDialog .modal-footer .btn:eq(1)").attr({"data-project_id":project_id});
-            	$("#completionDialog .modal-footer .btn").attr({"data-project_id":project_id});
+            	$("#closeProjectDialog .modal-footer .btn:eq(1)").attr({"data-project_id":project_id});
                 if(callback){
                     callback(res.data);
                 }
@@ -224,6 +299,7 @@ storify.brand.completion = {
 			success:function(res){
 				storify.brand.completion._completingCompletion = false;
 				$("#finalizeDialog").modal("hide");
+				storify.brand.deliverable.getList();
 				storify.brand.completion.getCompletion(project_id);
 			}
 		});
@@ -244,7 +320,8 @@ storify.brand.completion = {
 			},
 			success:function(res){
 				storify.brand.completion._completingCompletionAll = false;
-				$("#finalizeAllDialog").modal("hide");				
+				$("#finalizeAllDialog").modal("hide");			
+				storify.brand.deliverable.getList();	
 				storify.brand.completion.getCompletion(project_id);
 				
 			}
@@ -267,9 +344,12 @@ storify.brand.completion = {
 			success:function(rs){
 				storify.brand.completion._closingProject = false;
 				
-
-				window.location.href = "/user@"+rs.userid+"/projects/closed/"+rs.project_id;
-				//go to close project page
+				if(rs.project_id){
+					//go to close project page
+					window.location.href = "/user@"+rs.userid+"/projects/closed/"+rs.project_id;
+				}else{
+					alert("error, project id missing");
+				}
 			}
 		})
 	}

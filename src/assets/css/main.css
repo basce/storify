@@ -78,70 +78,73 @@
   background-color: #ccc;
   padding: .5rem; }
 
-.actioncontent .input-group .input-group-append button {
+.actioncontent .input-group .input-group-append button, #creator-content .input-group .input-group-append button {
   background-color: black; }
-.actioncontent .icheckbox::after, .actioncontent .iradio::after {
+.actioncontent .icheckbox::after, .actioncontent .iradio::after, #creator-content .icheckbox::after, #creator-content .iradio::after {
   pointer-events: none; }
-.actioncontent .invite-section .invite-input select.customselect {
+.actioncontent .invite-section .invite-input select.customselect, #creator-content .invite-section .invite-input select.customselect {
   display: none !important; }
-.actioncontent .invite-section .invite-input .selectize-control {
+.actioncontent .invite-section .invite-input .selectize-control, #creator-content .invite-section .invite-input .selectize-control {
   padding: 0; }
-  .actioncontent .invite-section .invite-input .selectize-control .selectize-input {
+  .actioncontent .invite-section .invite-input .selectize-control .selectize-input, #creator-content .invite-section .invite-input .selectize-control .selectize-input {
     box-shadow: none;
     border: none; }
-.actioncontent .invite-group {
+.actioncontent .invite-group, #creator-content .invite-group {
   border: solid 1px #ccc;
   padding: 10px; }
-  .actioncontent .invite-group .invite-item {
+  .actioncontent .invite-group .invite-item, #creator-content .invite-group .invite-item {
     margin: 3px;
     cursor: pointer;
     float: left; }
-    .actioncontent .invite-group .invite-item .profile-image {
+    .actioncontent .invite-group .invite-item .profile-image, #creator-content .invite-group .invite-item .profile-image {
       width: 50px;
       height: 50px;
       border: solid 3px #999;
       border-radius: 50%;
       background-size: cover; }
-  .actioncontent .invite-group .invite-item.item-waiting .profile-image, .actioncontent .invite-group .invite-item.item-pending .profile-image {
+  .actioncontent .invite-group .invite-item.default-pointer, #creator-content .invite-group .invite-item.default-pointer {
+    cursor: default; }
+  .actioncontent .invite-group .invite-item.item-waiting .profile-image, .actioncontent .invite-group .invite-item.item-pending .profile-image, #creator-content .invite-group .invite-item.item-waiting .profile-image, #creator-content .invite-group .invite-item.item-pending .profile-image {
     border-color: #8a6d3b; }
-  .actioncontent .invite-group .invite-item.item-accepted .profile-image {
+  .actioncontent .invite-group .invite-item.item-accepted .profile-image, #creator-content .invite-group .invite-item.item-accepted .profile-image {
     border-color: #3c763d; }
-  .actioncontent .invite-group .invite-item.item-rejected .profile-image {
+  .actioncontent .invite-group .invite-item.item-rejected .profile-image, #creator-content .invite-group .invite-item.item-rejected .profile-image {
     border-color: #a94442; }
-  .actioncontent .invite-group::after {
+  .actioncontent .invite-group::after, #creator-content .invite-group::after {
     content: "";
     display: block;
     clear: both; }
-.actioncontent .invite-summary span {
+.actioncontent .invite-summary span, #creator-content .invite-summary span {
   margin-left: 1rem; }
-.actioncontent .invite-summary span.item-accepted {
+.actioncontent .invite-summary span.item-accepted, #creator-content .invite-summary span.item-accepted {
   color: #3c763d; }
-.actioncontent .invite-summary span.item-rejected {
+.actioncontent .invite-summary span.item-rejected, #creator-content .invite-summary span.item-rejected {
   color: #a94442; }
-.actioncontent .invite-summary span.item-waiting, .actioncontent .invite-summary span.item-pending {
+.actioncontent .invite-summary span.item-waiting, .actioncontent .invite-summary span.item-pending, #creator-content .invite-summary span.item-waiting, #creator-content .invite-summary span.item-pending {
   color: #8a6d3b; }
-.actioncontent .deliverable-section .single_block {
+.actioncontent .deliverable-section .single_block, #creator-content .deliverable-section .single_block {
   margin-bottom: 1rem; }
-  .actioncontent .deliverable-section .single_block label {
+  .actioncontent .deliverable-section .single_block label, #creator-content .deliverable-section .single_block label {
     display: block;
     font-size: 1.2rem;
     padding-bottom: 0;
     margin-bottom: 0;
     font-weight: 700;
     color: #333; }
-.actioncontent .deliverable-section .deliverable-creator-summary span {
+.actioncontent .deliverable-section .deliverable-creator-summary span, #creator-content .deliverable-section .deliverable-creator-summary span {
   margin-left: 1rem; }
-.actioncontent .deliverable-section .deliverable-creator-summary span.item-accepted {
+.actioncontent .deliverable-section .deliverable-creator-summary span.item-accepted, #creator-content .deliverable-section .deliverable-creator-summary span.item-accepted {
   color: #3c763d; }
-.actioncontent .deliverable-section .deliverable-creator-summary span.item-rejected {
+.actioncontent .deliverable-section .deliverable-creator-summary span.item-rejected, #creator-content .deliverable-section .deliverable-creator-summary span.item-rejected {
   color: #a94442; }
-.actioncontent .deliverable-section .deliverable-creator-summary span.item-waiting, .actioncontent .deliverable-section .deliverable-creator-summary span.item-pending {
+.actioncontent .deliverable-section .deliverable-creator-summary span.item-waiting, .actioncontent .deliverable-section .deliverable-creator-summary span.item-pending, #creator-content .deliverable-section .deliverable-creator-summary span.item-waiting, #creator-content .deliverable-section .deliverable-creator-summary span.item-pending {
   color: #8a6d3b; }
 
 .deliverable-group {
   border: solid 1px #ccc;
   padding: 10px;
-  margin-bottom: 10px; }
+  margin-bottom: 10px;
+  margin-top: 10px; }
   .deliverable-group h3 {
     margin-bottom: 0; }
   .deliverable-group .creator_cont .profile-image {
@@ -206,9 +209,9 @@
       clear: both;
       display: block; }
   .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-waiting, .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-pending {
-    border-color: #19B5FE; }
+    border-color: #ffc107; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-waiting .item-status, .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-pending .item-status {
-      color: #19B5FE; }
+      color: #ffc107; }
   .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-accepted {
     border-color: #28a745; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-accepted .item-status {
@@ -611,6 +614,12 @@
     position: absolute;
     right: 0;
     bottom: 0; }
+  #brief-content .project_header .detail {
+    color: #ff0000;
+    display: inline-block;
+    position: relative; }
+  #brief-content .project_header .underline:after {
+    background-color: #ff0000; }
 #brief-content .deliverable {
   font-size: 2rem;
   border-top: solid 1px #ccc;
@@ -630,6 +639,85 @@
   background-size: cover;
   background-position: center center; }
 
+#final-content .completion_item {
+  position: relative;
+  margin-bottom: 5px; }
+  #final-content .completion_item .user_col {
+    width: 70px;
+    float: left; }
+    #final-content .completion_item .user_col .user_profile {
+      width: 50px;
+      height: 50px;
+      background-size: contain;
+      border-radius: 50%; }
+  #final-content .completion_item .perc_col {
+    width: 70px;
+    float: left; }
+    #final-content .completion_item .perc_col h2 {
+      padding: 0;
+      margin: 0;
+      line-height: 50px; }
+  #final-content .completion_item .completion_col {
+    width: calc(100% - 440px);
+    float: left; }
+    #final-content .completion_item .completion_col .items {
+      position: relative;
+      margin-top: 10px;
+      margin-left: 0px;
+      margin-right: 0px;
+      padding-left: 5px;
+      padding-right: 5px; }
+      #final-content .completion_item .completion_col .items .item {
+        width: 30px;
+        float: left;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        padding-left: 0;
+        padding-right: 0; }
+        #final-content .completion_item .completion_col .items .item .icon {
+          width: 30px;
+          height: 30px;
+          background-color: #6c757d;
+          text-align: center;
+          border-radius: 50%; }
+          #final-content .completion_item .completion_col .items .item .icon i {
+            line-height: 30px;
+            color: #fff; }
+      #final-content .completion_item .completion_col .items .item.complete .icon {
+        background-color: #28a745; }
+      #final-content .completion_item .completion_col .items .item.rejected .icon {
+        background-color: #dc3545; }
+      #final-content .completion_item .completion_col .items .item.pending .icon {
+        background-color: #ffc107; }
+      #final-content .completion_item .completion_col .items::after {
+        content: "";
+        display: block;
+        clear: both; }
+    #final-content .completion_item .completion_col .completion_summary {
+      font-size: .8em; }
+  #final-content .completion_item .bounty_col {
+    width: 200px;
+    float: left;
+    text-align: right; }
+    #final-content .completion_item .bounty_col h2.bounty_cont {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+      line-height: 50px; }
+  #final-content .completion_item .action_col {
+    width: 100px;
+    float: left;
+    margin-top: 8px; }
+    #final-content .completion_item .action_col .closed {
+      padding-top: 5px;
+      display: inline-block; }
+  #final-content .completion_item::after {
+    clear: both;
+    content: " ";
+    display: block; }
+
 @media only screen and (max-width: 768px) {
   .modal-custom-xl {
     max-width: 100%; }
@@ -642,6 +730,16 @@
       position: relative;
       right: auto;
       bottom: auto; }
+
+  #final-content .completion_item .perc_col {
+    width: 50px; }
+  #final-content .completion_item .completion_col {
+    display: none; }
+  #final-content .completion_item .bounty_col {
+    width: calc(100% - 180px);
+    text-align: right; }
+  #final-content .completion_item .action_col {
+    width: 60px; }
 
   .submissioncontent .submissionsection .icon_select {
     width: 35px; }
@@ -943,91 +1041,91 @@
 .bottom_panel button.disabled {
   pointer-events: none; }
 
-#newproject .input-group .input-group-append button, #editDialog .input-group .input-group-append button {
+#newproject .input-group .input-group-append button, #editDialog .input-group .input-group-append button, #newDetailModal .input-group .input-group-append button {
   background-color: black; }
-#newproject .icheckbox:after, #newproject .iradio:after, #editDialog .icheckbox:after, #editDialog .iradio:after {
+#newproject .icheckbox:after, #newproject .iradio:after, #editDialog .icheckbox:after, #editDialog .iradio:after, #newDetailModal .icheckbox:after, #newDetailModal .iradio:after {
   pointer-events: none; }
-#newproject .creator-input .selectized, #editDialog .creator-input .selectized {
+#newproject .creator-input .selectized, #editDialog .creator-input .selectized, #newDetailModal .creator-input .selectized {
   display: none !important; }
-#newproject .creator-input .selectize-control, #editDialog .creator-input .selectize-control {
+#newproject .creator-input .selectize-control, #editDialog .creator-input .selectize-control, #newDetailModal .creator-input .selectize-control {
   padding: 0; }
-  #newproject .creator-input .selectize-control .selectize-input, #editDialog .creator-input .selectize-control .selectize-input {
+  #newproject .creator-input .selectize-control .selectize-input, #editDialog .creator-input .selectize-control .selectize-input, #newDetailModal .creator-input .selectize-control .selectize-input {
     box-shadow: none;
     border: none; }
-#newproject .creator-groups, #editDialog .creator-groups {
+#newproject .creator-groups, #editDialog .creator-groups, #newDetailModal .creator-groups {
   margin-top: 10px;
   margin-bottom: 10px; }
-  #newproject .creator-groups .creator-item, #editDialog .creator-groups .creator-item {
+  #newproject .creator-groups .creator-item, #editDialog .creator-groups .creator-item, #newDetailModal .creator-groups .creator-item {
     margin-bottom: 10px;
     position: relative; }
-    #newproject .creator-groups .creator-item .item-inner, #editDialog .creator-groups .creator-item .item-inner {
+    #newproject .creator-groups .creator-item .item-inner, #editDialog .creator-groups .creator-item .item-inner, #newDetailModal .creator-groups .creator-item .item-inner {
       background: rgba(0, 0, 0, 0.05);
       position: relative; }
-      #newproject .creator-groups .creator-item .item-inner .close, #editDialog .creator-groups .creator-item .item-inner .close {
+      #newproject .creator-groups .creator-item .item-inner .close, #editDialog .creator-groups .creator-item .item-inner .close, #newDetailModal .creator-groups .creator-item .item-inner .close {
         position: absolute;
         top: 0;
         right: 4px; }
-      #newproject .creator-groups .creator-item .item-inner::after, #editDialog .creator-groups .creator-item .item-inner::after {
+      #newproject .creator-groups .creator-item .item-inner::after, #editDialog .creator-groups .creator-item .item-inner::after, #newDetailModal .creator-groups .creator-item .item-inner::after {
         content: " ";
         clear: both;
         display: block; }
-    #newproject .creator-groups .creator-item .creator-image, #editDialog .creator-groups .creator-item .creator-image {
+    #newproject .creator-groups .creator-item .creator-image, #editDialog .creator-groups .creator-item .creator-image, #newDetailModal .creator-groups .creator-item .creator-image {
       width: 50px;
       height: 50px;
       float: left;
       background-size: cover; }
-    #newproject .creator-groups .creator-item .creator-description, #editDialog .creator-groups .creator-item .creator-description {
+    #newproject .creator-groups .creator-item .creator-description, #editDialog .creator-groups .creator-item .creator-description, #newDetailModal .creator-groups .creator-item .creator-description {
       float: left;
       margin-left: 10px; }
-      #newproject .creator-groups .creator-item .creator-description h3, #editDialog .creator-groups .creator-item .creator-description h3 {
+      #newproject .creator-groups .creator-item .creator-description h3, #editDialog .creator-groups .creator-item .creator-description h3, #newDetailModal .creator-groups .creator-item .creator-description h3 {
         margin-bottom: .2rem; }
-        #newproject .creator-groups .creator-item .creator-description h3 small, #editDialog .creator-groups .creator-item .creator-description h3 small {
+        #newproject .creator-groups .creator-item .creator-description h3 small, #editDialog .creator-groups .creator-item .creator-description h3 small, #newDetailModal .creator-groups .creator-item .creator-description h3 small {
           font-size: 1rem;
           color: #999; }
-      #newproject .creator-groups .creator-item .creator-description .creator-actions span i.fa, #editDialog .creator-groups .creator-item .creator-description .creator-actions span i.fa {
+      #newproject .creator-groups .creator-item .creator-description .creator-actions span i.fa, #editDialog .creator-groups .creator-item .creator-description .creator-actions span i.fa, #newDetailModal .creator-groups .creator-item .creator-description .creator-actions span i.fa {
         cursor: help; }
-      #newproject .creator-groups .creator-item .creator-description .creator-actions a, #editDialog .creator-groups .creator-item .creator-description .creator-actions a {
+      #newproject .creator-groups .creator-item .creator-description .creator-actions a, #editDialog .creator-groups .creator-item .creator-description .creator-actions a, #newDetailModal .creator-groups .creator-item .creator-description .creator-actions a {
         display: inline-block;
         margin-right: 10px; }
-  #newproject .creator-groups .creator-item::after, #editDialog .creator-groups .creator-item::after {
+  #newproject .creator-groups .creator-item::after, #editDialog .creator-groups .creator-item::after, #newDetailModal .creator-groups .creator-item::after {
     content: " ";
     clear: both;
     display: block; }
-  #newproject .creator-groups::after, #editDialog .creator-groups::after {
+  #newproject .creator-groups::after, #editDialog .creator-groups::after, #newDetailModal .creator-groups::after {
     display: block;
     content: " ";
     clear: both; }
-#newproject .image-groups, #editDialog .image-groups {
+#newproject .image-groups, #editDialog .image-groups, #newDetailModal .image-groups {
   margin-top: 10px;
   margin-bottom: 10px; }
-  #newproject .image-groups .image-item, #editDialog .image-groups .image-item {
+  #newproject .image-groups .image-item, #editDialog .image-groups .image-item, #newDetailModal .image-groups .image-item {
     width: 200px;
     height: 200px;
     float: left;
     margin-right: 10px;
     margin-bottom: 10px;
     position: relative; }
-    #newproject .image-groups .image-item a, #editDialog .image-groups .image-item a {
+    #newproject .image-groups .image-item a, #editDialog .image-groups .image-item a, #newDetailModal .image-groups .image-item a {
       width: 200px;
       height: 200px;
       background-size: cover;
       display: block;
       background-position: center center; }
-    #newproject .image-groups .image-item button, #editDialog .image-groups .image-item button {
+    #newproject .image-groups .image-item button, #editDialog .image-groups .image-item button, #newDetailModal .image-groups .image-item button {
       position: absolute;
       top: 0;
       right: 0;
       background-color: rgba(255, 255, 255, 0.75); }
-      #newproject .image-groups .image-item button span, #editDialog .image-groups .image-item button span {
+      #newproject .image-groups .image-item button span, #editDialog .image-groups .image-item button span, #newDetailModal .image-groups .image-item button span {
         padding: 0 3px; }
-#newproject .image-groups::after, #editDialog .image-groups::after {
+#newproject .image-groups::after, #editDialog .image-groups::after, #newDetailModal .image-groups::after {
   content: " ";
   display: block;
   clear: both; }
-#newproject .form-group .form-width, #editDialog .form-group .form-width {
+#newproject .form-group .form-width, #editDialog .form-group .form-width, #newDetailModal .form-group .form-width {
   margin-top: 5px;
   margin-bottom: 5px; }
-#newproject .form-group .input-group-addon, #editDialog .form-group .input-group-addon {
+#newproject .form-group .input-group-addon, #editDialog .form-group .input-group-addon, #newDetailModal .form-group .input-group-addon {
   pointer-events: none; }
 
 /* selectize loading icon */
@@ -1103,7 +1201,8 @@
         background-color: #f1f3f5; }
 
 #completionDialog .completion_item {
-  position: relative; }
+  position: relative;
+  margin-bottom: 10px; }
   #completionDialog .completion_item .user_col {
     width: 100px;
     float: left; }

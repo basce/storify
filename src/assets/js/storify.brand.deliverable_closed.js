@@ -1,7 +1,7 @@
 var storify = storify || {};
 storify.brand = storify.brand || {};
 
-storify.brand.deliverable = {
+storify.brand.deliverable_closed = {
 	addElementIfNotExist:function(){
 		if( !$("#reject_submission").length ){
 			$("body").append(
@@ -13,7 +13,7 @@ storify.brand.deliverable = {
 								.append($("<button>").addClass("close").attr({type:"button","data-dismiss":"modal","aria-label":"Close"}).append($("<span>").attr({"aria-hidden":"hidden"}).html("&times;")))
 							)
 							.append($("<div>").addClass("modal-body deliverable_items")
-								.append($("<h3>").text("Let us know why the Creator's submission is rejected so that he or she can update the submission accordingly. (Optional)"))
+								.append($("<h3>").text("Provide a reason why the submission is rejected so creator can make amendment according to you comments. (optional)"))
 								.append($("<textarea>").addClass("form-control").attr({rows:4}))
 							)
 							.append($("<div>").addClass("modal-footer")
@@ -23,48 +23,12 @@ storify.brand.deliverable = {
 						)
 					)
 			);
-			$("#reject_submission button.confirmreject").click(storify.brand.deliverable.reject_click);
 		}
 	},
-	_submitting_response:false,
-	response:function($submission_id, $action, $action_remark, callback){
-        if(storify.brand.deliverable._submitting_response) return;
-        storify.brand.deliverable._submitting_response = true;
-
-        $.ajax({
-            type:"POST",
-            dataType:'json',
-            data:{
-                method:"response_submission",
-                submission_id:$submission_id,
-                status:$action,
-                status_remark:$action_remark
-            },
-            error:function(){
-                if( typeof callback === "function" ){
-					callback();
-				}
-            },
-            success:function(res){
-                storify.brand.deliverable._submitting_response = false;
-                if(res.error){
-                    alert(res.msg);
-                }else{
-                    storify.brand.completion.getCompletion(storify.project._project_id);
-                    storify.brand.deliverable.getList(function(){
-                        $("#reject_submission").modal("hide");
-                        if( typeof callback === "function" ){
-							callback();
-						}
-                    });
-                }
-            }
-        });
-    },
     _gettingHistory:false,
     getHistory:function(deliverable_id, user_id, callback){
-        if(storify.brand.deliverable._gettingHistory) return;
-        storify.brand.deliverable._gettingHistory = true;
+        if(storify.brand.deliverable_closed._gettingHistory) return;
+        storify.brand.deliverable_closed._gettingHistory = true;
         $.ajax({
             type:"POST",
             dataType:"json",
@@ -74,10 +38,10 @@ storify.brand.deliverable = {
                 method:"getDeliverableHistory"
             },
             error:function(request, status, error){
-                storify.brand.deliverable._gettingHistory = false;
+                storify.brand.deliverable_closed._gettingHistory = false;
             },
             success:function(rs){
-                storify.brand.deliverable._gettingHistory = false;
+                storify.brand.deliverable_closed._gettingHistory = false;
                 if(rs.error){
                     alert(rs.msg);
                 }else{
@@ -119,8 +83,8 @@ storify.brand.deliverable = {
     },
     _gettingDeliverable:false,
     getList:function(callback){
-    	if(storify.brand.deliverable._gettingDeliverable) return;
-        storify.brand.deliverable._gettingDeliverable = true;
+    	if(storify.brand.deliverable_closed._gettingDeliverable) return;
+        storify.brand.deliverable_closed._gettingDeliverable = true;
         $.ajax({
             type:"POST",
             dataType:'json',
@@ -129,20 +93,20 @@ storify.brand.deliverable = {
                 method:"getDeliverable"
             },
             error:function(request, status, error){
-                storify.brand.deliverable._gettingDeliverable = false;
+                storify.brand.deliverable_closed._gettingDeliverable = false;
             },
             success:function(rs){
-                storify.brand.deliverable._gettingDeliverable = false;
+                storify.brand.deliverable_closed._gettingDeliverable = false;
                 if(rs.error){
                     alert(rs.msg);
                 }else{
-                    storify.brand.deliverable.display(rs, callback);
+                    storify.brand.deliverable_closed.display(rs, callback);
                 }
             }
         });
     },
     createDeliverableItem:function(data){
-    	storify.brand.deliverable.addElementIfNotExist();
+    	storify.brand.deliverable_closed.addElementIfNotExist();
     	var d = $("<div>").addClass("deliverable-creator-item"),
             temp_creator = storify.project.user.getUserDetail(data.creator_id),
             temp_remark = null,
@@ -165,6 +129,7 @@ storify.brand.deliverable = {
                 d.addClass("item-rejected");
             }
         }else{
+            /*
             d.addClass("item-pending");
             temp_action = $("<div>").addClass("bottom_panel")
                 .append(
@@ -185,6 +150,7 @@ storify.brand.deliverable = {
                             $("#reject_submission").modal("show");
                         })
                 );
+            */
         }
         if(data.history_id){
             temp_history = $("<a>").attr({href:"#"}).text("history")
@@ -193,7 +159,7 @@ storify.brand.deliverable = {
                                     var _this = $(this);
                                     storify.brand.deliverable.getHistory(data.deliverable_id, data.user_id, function(data2){
                                          $.each(data2.data, function(index,value){
-                                            _this.parent().append(storify.brand.deliverable.createHistoryBlock(value));
+                                            _this.parent().append(storify.brand.deliverable_closed.createHistoryBlock(value));
                                         });
                                         _this.remove();
                                     });
@@ -223,8 +189,7 @@ storify.brand.deliverable = {
     	$(".deliverable-groups").empty();
         var photo_type = 0,
             video_type = 0;
-            data = odata.data,
-            withData = false;
+            data = odata.data;
 
         var photo_total = 0,
             photo_waiting = 0,
@@ -238,7 +203,6 @@ storify.brand.deliverable = {
             video_submitted = 0;
 
         $.each(data, function(index,value){
-            withData = true;
             photo_total += parseInt(odata.no_of_photo, 10);
             video_total += parseInt(odata.no_of_video, 10);
             $.each(value, function(index2, value2){
@@ -275,19 +239,20 @@ storify.brand.deliverable = {
                 }
             });
         });
-        if(withData){
-            $(".deliverable-groups")
-                .append(
-                    $("<h5>").append($("<i>").addClass("fa fa-camera").css({"margin-right":"5px"}))
-                        .append(document.createTextNode("Total "+photo_submitted+"/"+photo_total+" . Waiting "+photo_waiting+" . Approved "+photo_approved+" . Rejected "+photo_rejected))
-                )
-                .append(
-                $("<h5>").append($("<i>").addClass("fa fa-video-camera").css({"margin-right":"5px"}))
-                        .append(document.createTextNode("Total "+video_submitted+"/"+video_total+" . Waiting "+video_waiting+" . Approved "+video_approved+" . Rejected "+video_rejected))
-                );
-        }else{
-            $(".deliverable-groups").append($("<div>").append($("<p>").text("No Submissions made yet.")));
-        }
+
+        photo_total = ( photo_total ) == 0 ? parseInt(odata.no_of_photo, 10) : photo_total;
+        video_total = ( video_total ) == 0 ? parseInt(odata.no_of_video, 10) : video_total;
+
+        /* <i class="fa fa-camera" style="margin-right: 5px;"></i> */
+        $(".deliverable-groups")
+            .append(
+                $("<h5>").append($("<i>").addClass("fa fa-camera").css({"margin-right":"5px"}))
+                    .append(document.createTextNode("Total "+photo_submitted+"/"+photo_total+" . Waiting "+photo_waiting+" . Approved "+photo_approved+" . Rejected "+photo_rejected))
+            )
+            .append(
+            $("<h5>").append($("<i>").addClass("fa fa-video-camera").css({"margin-right":"5px"}))
+                    .append(document.createTextNode("Total "+video_submitted+"/"+video_total+" . Waiting "+video_waiting+" . Approved "+video_approved+" . Rejected "+video_rejected))
+            );
 
         $.each(data, function(index,value){
         	var a = $("<div>").addClass("deliverable-group"),
@@ -328,7 +293,7 @@ storify.brand.deliverable = {
             			count_pending++;
             		break;
             	}
-            	b.append(storify.brand.deliverable.createDeliverableItem(value2));
+            	b.append(storify.brand.deliverable_closed.createDeliverableItem(value2));
 
 	        	tempuser = tempuser.filter(function(creator){
 	                return creator.user_id != value2.user_id;
@@ -377,12 +342,5 @@ storify.brand.deliverable = {
         if( typeof callback === "function" ){
 			callback();
 		}
-    },
-    reject_click:function(e){
-    	e.preventDefault();
-    	var a = "#reject_submission";
-        if($(a+" button.confirmreject").attr("data-id")){
-            storify.brand.deliverable.response($(a+" button.confirmreject").attr("data-id"), "rejected", $(a+" textarea").val());
-        }
     }
 };
