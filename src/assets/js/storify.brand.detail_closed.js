@@ -187,10 +187,10 @@ storify.brand.detail_closed = {
         }
 
         var div = $("<div>");
-        div.append($("<h5>").text("Do a good job and you will be well-rewarded."))
+        div.append($("<h5>").text("You are going to reward good people well."))
             .append(cashtable)
             .append(gifttable)
-            .append($("<h5>").text("In total, you will receive S$"+storify.project.formatMoney(totalcash)+", and entitlements, if any."));
+            .append($("<h5>").text("Each creator will receive S$"+storify.project.formatMoney(totalcash)+", and entitlements, if any."));
         $("#bounty-content").empty()
             .append(div);
     },

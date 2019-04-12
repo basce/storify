@@ -99,7 +99,7 @@
     }else{
 
         //get ongoing and close number
-        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE a.user_id = %d AND a.status = %s AND b.status = %s";
+        $query = "SELECT COUNT(*) FROM ( SELECT * FROM `".$wpdb->prefix."project_invitation` WHERE user_id = %d ) a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE a.status = %s AND b.status = %s";
         $total_invite = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "pending", "open"));
         $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_status` WHERE user_id = %d AND status = %s";
         $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "open"));
