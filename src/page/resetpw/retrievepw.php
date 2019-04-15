@@ -33,7 +33,6 @@
     <script src="/assets/js/selectize.min.js"></script>
     <script src="/assets/js/masonry.pkgd.min.js"></script>
     <script src="/assets/js/icheck.min.js"></script>
-    <script src="/assets/js/jquery.validate.min.js"></script>
     <script src="/assets/js/scrollreveal.js"></script>
     <script src="/assets/js/custom.js"></script>
     <script src="/assets/js/nc_custom.js"></script>
@@ -112,13 +111,18 @@ include("page/component/header.php"); ?>
     <!--end page-->
     <script type="text/javascript">
         $(function(){
+            function isEmail(b){var a=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;if(a.test(b)){return true}else{return false}}
+            
             $("#retrieveform").submit(function(e){
                 var er = 0;
                 if($("#email").val() == ""){
-                    $("#email").parent().parent().find(".alert").removeClass("hide");
+                    $("#email").parents(".form-group").find(".alert").removeClass("hide").text('This field is required.');
+                    er++;
+                }else if(!isEmail($("#email").val())){
+                    $("#email").parents(".form-group").find(".alert").removeClass("hide").text("This does not appear to be a valid email address. Enter again?");
                     er++;
                 }else{
-                    $("#email").parent().parent().find(".alert").addClass("hide");
+                    $("#email").parents(".form-group").find(".alert").addClass("hide");
                 }
 
                 if(er){

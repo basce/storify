@@ -33,7 +33,7 @@
     <script src="/assets/js/selectize.min.js"></script>
     <script src="/assets/js/masonry.pkgd.min.js"></script>
     <script src="/assets/js/icheck.min.js"></script>
-    <script src="/assets/js/jquery.validate.min.js"></script>
+    
     <script src="/assets/js/scrollreveal.js"></script>
     <script src="/assets/js/custom.js"></script>
     <script src="/assets/js/nc_custom.js"></script>
@@ -462,7 +462,7 @@ include("page/component/header.php"); ?>
                         $(".foremail.error").addClass("hide");
                         //ajax check is email
                         $.ajax({
-                            url:"/register/ajax",
+                            url:"/signup/ajax",
                             method:'POST',
                             data:{
                                 method:"uniqueemail",
@@ -486,7 +486,7 @@ include("page/component/header.php"); ?>
                     if($("#name").val().length < 1){
                         $("#name").parents(".form-group").find(".alert").text("We will like to know how to address you. Enter again?").removeClass("hide");
                     }else{
-                        $("#name").parents(".form-group").find(".alert").removeClass("hide");
+                        $("#name").parents(".form-group").find(".alert").addClass("hide");
                     }
                 });
 
