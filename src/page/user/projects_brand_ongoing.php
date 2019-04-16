@@ -547,12 +547,14 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="creators">Creators To Invite</label>
-                        <div class="input-group mb-3 creator-input">
+                        <div class="input-group creator-input">
                             <select name="creators[]" class="form-control customselect" id="creators" data-placeholder="Select creators for this project." multiple>
                             </select>
+                            <!--
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary addCreatorButton" type="button">Add Creator</button>
                             </div>
+                            -->
                         </div>
                     </div>
                     <div class="creator-groups row">
@@ -628,7 +630,7 @@ include("page/component/header.php"); ?>
                     if(selected.length){
                         $.each(selected, function(index,value){
                             //add invited creator
-                            var tempitem = $("#creators")[0].selectize.options[value]
+                            var tempitem = $("#creators")[0].selectize.options[value];
                             addInvitedCreator(tempitem);
                         });
                     }

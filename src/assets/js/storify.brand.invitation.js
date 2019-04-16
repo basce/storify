@@ -214,7 +214,6 @@ storify.brand.invitation = {
 	_gettingInvitation:false,
 	getList:function(callback){
 		if(storify.brand.invitation._gettingInvitation) return;
-		storify.brand.invitation.resetForm();
 		storify.brand.invitation._gettingInvitation = true;
 		$.ajax({
 			type: "POST",
@@ -228,6 +227,7 @@ storify.brand.invitation = {
 				if(rs.error){
 					alert(rs.msg);
 				}else{
+					storify.brand.invitation.resetForm();
 					storify.brand.invitation.display(rs.data, callback);
 				}
 			}
@@ -236,7 +236,6 @@ storify.brand.invitation = {
 	_sendingInvitation:false,
 	invite_click:function(e){
 		e.preventDefault();
-
 		var a = $("#invite").val();
 		if(a && a.length){
 			if(storify.brand.invitation._sendingInvitation) return;
@@ -258,5 +257,26 @@ storify.brand.invitation = {
                 }
 			});
 		}
+	},
+	_sendingSingleInvitation:false,
+	sendSingleInvitation:function(userid){
+    	if(storify.brand.invitation._sendingSingleInvitation) return;
+    	storify.brand.invitation._sendingSingleInvitation = true;
+    	$.ajax({
+    		type: "POST",
+    		dataType: "json",
+    		data:{
+    			project_id:storify.project._project_id,
+    			userids:userid,
+    			method:"sendInvitation"
+    		},
+    		error:function(request, status, error){
+    			storify.brand.invitation._sendingSingleInvitation = false;
+    		},
+    		success:function(rs){
+    			storify.brand.invitation._sendingSingleInvitation = false;
+    			storify.brand.invitation.getList();
+    		}
+    	});
 	}
 };

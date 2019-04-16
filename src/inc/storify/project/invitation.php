@@ -88,6 +88,9 @@ class invitation{
 		//unlike setInvitation, when detect the user is in the list, it will not set invite regardless the user status.
 		$user_id_added = array();
 		$user_id_fail = array();
+		if(!is_array($userids)){
+			$userids = array($userids);
+		}
 		foreach($userids as $key=>$value){
 
 			$query = "SELECT status FROM `".$this->tbl_invitation."` WHERE project_id = %d AND user_id = %d";

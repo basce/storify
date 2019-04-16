@@ -291,11 +291,24 @@
 			this.updateNavArrows();
 		},
 
+		findHighestZIndex: function(elem)
+		{
+		  var elems = document.getElementsByTagName(elem);
+		  var highest = 0;
+		  for (var i = 0; i < elems.length; i++)
+		  {
+		    var zindex=document.defaultView.getComputedStyle(elems[i],null).getPropertyValue("z-index");
+		    if ((zindex > highest) && (zindex != 'auto'))
+		    {
+		      highest = zindex;
+		    }
+		  }
+		  return highest;
+		},
+
 		place: function(){
 						if(this.isInline) return;
-			var zIndex = parseInt(this.element.parents().filter(function() {
-							return $(this).css('z-index') != 'auto';
-						}).first().css('z-index'))+10;
+			var zIndex = this.findHighestZIndex('div')+10;
 			var offset = this.component ? this.component.offset() : this.element.offset();
 			var height = this.component ? this.component.outerHeight(true) : this.element.outerHeight(true);
 			this.picker.css({
