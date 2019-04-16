@@ -2,9 +2,9 @@
     if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
 
         //get ongoing and close number
-        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE created_by = %d AND status = %s";
-        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "open"));
-        $total_closed = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "close"));
+        $project_stats = $main->getProjectManager()->getProjectStats($current_user->ID);
+        $total_ongoing = $project_stats["open"];
+        $total_closed = $project_stats["closed"];
 
         $left_nav_items = array(
             array(
@@ -98,13 +98,10 @@
 
     }else{
 
-        //get ongoing and close number
-        $query = "SELECT COUNT(*) FROM ( SELECT * FROM `".$wpdb->prefix."project_invitation` WHERE user_id = %d ) a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE a.status = %s AND b.status = %s";
-        $total_invite = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "pending", "open"));
-        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_status` WHERE user_id = %d AND status = %s";
-        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "open"));
-        $total_closed = $wpdb->get_var($wpdb->prepare($query, $current_user->ID, "close"));
-
+        $project_stats = $main->getProjectManager()->getProjectStats($current_user->ID);
+        $total_invite = $project_stats["invite"];
+        $total_ongoing = $project_stats["open"];
+        $total_closed = $project_stats["closed"];
 
         $left_nav_items = array(
             array(

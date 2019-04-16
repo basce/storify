@@ -1074,12 +1074,25 @@ include("page/component/header.php"); ?>
                             alert(rs.msg);
                         }else{
                             //no error
-                            $("#ongoing_grid").attr({"data-sort":"id","data-page":1});
+                            $("#ongoing_grid").attr({"data-sort":"id","data-page":0});
                             $("#ongoing_grid").empty();
 
                             //also need to clear all data
                             resetAddProject();
                             $("#newproject").modal("hide");
+
+                            //update left menu number
+                            if(rs.project_stats){
+                                if(rs.project_stats.hasOwnProperty('invite')){
+                                    $(".left_menu_invite").text("("+rs.project_stats.invite+")");
+                                }
+                                if(rs.project_stats.hasOwnProperty('open')){
+                                    $(".left_menu_ongoing").text("("+rs.project_stats.open+")");
+                                }
+                                if(rs.project_stats.hasOwnProperty('close')){
+                                    $(".left_menu_closed").text("("+rs.project_stats.close+")");
+                                }
+                            }
 
                             storify.brand.projectList.getProject(function(){
                                 storify.brand.detail.viewDetail(rs.project_id);

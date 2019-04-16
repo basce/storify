@@ -98,6 +98,7 @@ if($current_user->ID){
             }
             $obj["msg"] = "";
             $obj["project_id"] = $project_id;
+            $obj["project_stats"] = $main->getProjectManager()->getProjectStats($current_user->ID);
         break;
         case "getProject":
             $obj["error"] = 0;

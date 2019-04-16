@@ -406,25 +406,29 @@ class project{
 	public function getProjectStats($user_id){
 		global $wpdb;
 
-		//get number of open, closed, pending
-		
-		//open 
-		$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE a.user_id = %d AND b.closing_date > NOW()";
-		$total_open = $wpdb->get_var($wpdb->prepare($query, $user_id));
+		if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
+			$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE created_by = %d AND status = %s";
+	        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
+	        $total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
 
-		//closed
-		$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE a.user_id = %d AND b.closing_date <= NOW()";
-		$total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id));		
+	        return array(
+	        	"open"=>$total_ongoing,
+	        	"closed"=>$total_closed
+	        );
+		}else{
+			//get ongoing and close number
+	        $query = "SELECT COUNT(*) FROM ( SELECT * FROM `".$wpdb->prefix."project_invitation` WHERE user_id = %d ) a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE a.status = %s AND b.status = %s";
+	        $total_invite = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", "open"));
+	        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_status` WHERE user_id = %d AND status = %s";
+	        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
+	        $total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
 
-		//pending
-		$query = "SELECT COUNT(*) FROM `".$this->invitation_manager->getInvitationTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE a.user_id = %d AND a.status = %s AND b.closing_date > NOW()";
-		$total_pending = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending"));
-
-		return array(
-			"open"=>$total_open,
-			"closed"=>$total_closed,
-			"pending"=>$total_pending
-		);
+	        return array(
+	        	"invite"=>$total_invite,
+				"open"=>$total_ongoing,
+				"closed"=>$total_closed
+			);
+		}
 	}
 
 	public function getNumberOfClosedCreator($user_id){
