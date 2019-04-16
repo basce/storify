@@ -307,7 +307,7 @@ include("page/component/header.php"); ?>
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
-                    url:'<?=$query[2]?>',
+                    url:'<?=$pathquery[2]?>',
                     data:{
                         method:"updatePosts",
                         iger:_social_data.iger.id,
@@ -367,7 +367,7 @@ include("page/component/header.php"); ?>
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
-                    url:'<?=$query[2]?>',
+                    url:'<?=$pathquery[2]?>',
                     data:{
                         method:"getPosts",
                         iger:_social_data.iger.id,

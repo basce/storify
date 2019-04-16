@@ -130,7 +130,7 @@ include("page/component/header.php"); ?>
                                     $bkgroup4 = $main->getGroup("people", "", 4,1);
                                     if(sizeof($bkgroup4["data"])){
                                         foreach($bkgroup4["data"] as $key=>$value){
-                                            $link = "/".$query[0]."/".$query[1]."/people/".$value["id"];
+                                            $link = "/".$pathquery[0]."/".$pathquery[1]."/people/".$value["id"];
                                             ?> 
                                             <div class="item scrollreveal">
                                                 <div class="wrapper">
@@ -254,7 +254,7 @@ include("page/component/header.php"); ?>
                                     $bkgroup4 = $main->getGroup("story", "", 4,1);
                                     if(sizeof($bkgroup4["data"])){
                                         foreach($bkgroup4["data"] as $key=>$value){
-                                            $link = "/".$query[0]."/".$query[1]."/stories/".$value["id"];
+                                            $link = "/".$pathquery[0]."/".$pathquery[1]."/stories/".$value["id"];
                                             ?> 
                                             <div class="item scrollreveal">
                                                 <div class="wrapper">
@@ -420,7 +420,7 @@ include("page/component/header.php"); ?>
                             if(rs.error){
                                 console.log(rs.msg);
                             }else{
-                                window.location = "/<?=$query[0]."/".$query[1]."/"?>"+linktype+"/"+rs.result;
+                                window.location = "/<?=$pathquery[0]."/".$pathquery[1]."/"?>"+linktype+"/"+rs.result;
                             }
                         }
                     });

@@ -42,10 +42,10 @@ if($current_user->ID){
 			$result = $main->updateUserTags($_REQUEST["countries"],$_REQUEST["language"],$_REQUEST["category"],$query[2]); //$query[2] is the current igusername
 			$obj["error"] = 0;
 			$obj["msg"] = "tags updated.";
-			$obj["social_data"] = $main->getSingleIger($query[2]);
+			$obj["social_data"] = $main->getSingleIger($pathquery[2]);
 		break;
 		case "updatePosts":
-			$posts_result = $main->updateLatest30Posts($query[2], $_REQUEST["iger"]);
+			$posts_result = $main->updateLatest30Posts($pathquery[2], $_REQUEST["iger"]);
 			if($posts_result["error"]){
 				$obj["msg"] = $posts_result["msg"];
 			}else{

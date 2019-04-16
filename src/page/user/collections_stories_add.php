@@ -78,12 +78,12 @@ include("page/component/header.php"); ?>
                                 <p class="normal">
                                     <span class="float-right edit_bar d-inline-block">
                                         <button type="submit" class="btn btn-primary float-right hide" id="add_items"><i class="fa fa-plus-square"></i></button>
-                                        <a href="/user@<?=$current_user->ID?>/collections/<?=$query[2]?>/<?=$query[3]?>" class="btn btn-primary float-right" id="add_new_item"><i class="fa fa-chevron-left"></i></a>
+                                        <a href="/user@<?=$current_user->ID?>/collections/<?=$pathquery[2]?>/<?=$pathquery[3]?>" class="btn btn-primary float-right" id="add_new_item"><i class="fa fa-chevron-left"></i></a>
                                     </span>
                                     <span>Select stories and click <i class="fa fa-plus-square"></i></span>
                                 </p>
                             </div>
-                            <div class="items grid editmode grid-xl-3-items grid-lg-3-items grid-md-3-items" data-page="0" data-sort="<?=$sortBy?>" data-nc_data="post"  data-folder_id="<?=$query[3]?>">
+                            <div class="items grid editmode grid-xl-3-items grid-lg-3-items grid-md-3-items" data-page="0" data-sort="<?=$sortBy?>" data-nc_data="post"  data-folder_id="<?=$pathquery[3]?>">
                                 
                             </div>
                             <div class="center">
@@ -294,7 +294,7 @@ include("page/component/header.php"); ?>
                         if(rs.error){
                             alert(rs.msg);
                         }else{
-                            window.location = "/user@<?=$current_user->ID?>/collections/<?=$query[2]?>/<?=$query[3]?>";
+                            window.location = "/user@<?=$current_user->ID?>/collections/<?=$pathquery[2]?>/<?=$pathquery[3]?>";
                         }
                     }
                 })

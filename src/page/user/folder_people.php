@@ -64,7 +64,7 @@ switch($_REQUEST["order"]){
                     <div class="container">
                         <h1><?=htmlspecialchars($group_detail["name"])?></h1>
                         <?php
-                            $temp_result = $main->getGroupItem($query[3], "people", 1, 1); // only interest on the total item
+                            $temp_result = $main->getGroupItem($pathquery[3], "people", 1, 1); // only interest on the total item
 
                             $temp_total = isset($temp_result["total"]) ? (int) $temp_result["total"] : 0;
 
@@ -94,7 +94,7 @@ switch($_REQUEST["order"]){
                             <div class="section-title clearfix hide" id="emptybox">
                                 <p class="normal">
                                     <span class="float-right edit_bar d-inline-block">
-                                        <a href="/user@<?=$current_user->ID?>/collections/<?=$query[2]?>/<?=$query[3]?>/add" title="Add" class="btn btn-primary float-right" id="add_new_item">Add</a>
+                                        <a href="/user@<?=$current_user->ID?>/collections/<?=$pathquery[2]?>/<?=$pathquery[3]?>/add" title="Add" class="btn btn-primary float-right" id="add_new_item">Add</a>
                                     </span>
                                     <span>No creators on this board yet.</span>
                                 </p>
@@ -111,7 +111,7 @@ switch($_REQUEST["order"]){
                                     </div>
                                     <div class="col-6 edit_bar">
                                         <div class="float-right">
-                                            <a href="/user@<?=$current_user->ID?>/collections/<?=$query[2]?>/<?=$query[3]?>/add" title="Add" class="btn btn-primary float-right" id="add_new_item2"><i class="fa fa-plus-square"></i></a>
+                                            <a href="/user@<?=$current_user->ID?>/collections/<?=$pathquery[2]?>/<?=$pathquery[3]?>/add" title="Add" class="btn btn-primary float-right" id="add_new_item2"><i class="fa fa-plus-square"></i></a>
                                             <a href="#" title="Remove" class="btn btn-primary float-right" id="enter_edit_mode"><i class="fa fa-minus-square"></i></a>
                                             <a href="#" title="Remove" class="btn btn-primary float-right hide" id="remove"><i class="fa fa-check-square"></i></a>
                                             <a href="#" title="Back" class="btn btn-primary float-right hide" id="back"><i class="fa fa-chevron-left"></i></a>
@@ -119,7 +119,7 @@ switch($_REQUEST["order"]){
                                     </div>
                                 </div>
                             </div>
-                            <div class="items grid grid-xl-3-items grid-lg-3-items grid-md-3-items whole-item" data-page=0 data-nc_data="post" data-folder_id="<?=$query[3]?>" data-sort="<?=$sortBy?>">
+                            <div class="items grid grid-xl-3-items grid-lg-3-items grid-md-3-items whole-item" data-page=0 data-nc_data="post" data-folder_id="<?=$pathquery[3]?>" data-sort="<?=$sortBy?>">
                                 
                             </div>
                             <div class="center">

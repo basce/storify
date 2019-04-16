@@ -107,7 +107,7 @@ include("page/component/header.php"); ?>
 
             storify.brand.projectList_closed.getProject(function(){
                 <?php
-                if(sizeof($query) == 4){
+                if(sizeof($pathquery) == 4){
                     ?>
                     storify.brand.detail_closed.viewDetail(<?=$query[3]?>);
                     <?php

@@ -19,7 +19,7 @@ if($current_user->ID){
 		case "getItems":
 			$obj["error"] = 0;
 			$obj["msg"] = "";
-			$obj["result"] = $main->getBookmark("people", $_REQUEST["sort"], 24, $_REQUEST["page"], $query[3]);
+			$obj["result"] = $main->getBookmark("people", $_REQUEST["sort"], 24, $_REQUEST["page"], $pathquery[3]);
 		break;
 		default:
 			$obj["msg"] = "unknown method";

@@ -149,7 +149,7 @@ switch($_REQUEST["order"]){
                                     </div>
                                     <div class="col-5">
                                         <div class="float-right">
-                                            <a href="/<?=$query[0]?>/people" class="change-class-1" title="Creator Boards">
+                                            <a href="/<?=$pathquery[0]?>/people" class="change-class-1" title="Creator Boards">
                                                 <i class="fa fa-file-image-o"></i>
                                             </a>
                                             <span class="change-class-1 active">
@@ -170,7 +170,7 @@ switch($_REQUEST["order"]){
                                         </div>
                                         <div class="col-7">
                                             <div class="float-right">
-                                                <a href="/<?=$query[0]?>/stories" class="change-class-1" title="Creator Boards">
+                                                <a href="/<?=$pathquery[0]?>/stories" class="change-class-1" title="Creator Boards">
                                                     <i class="fa fa-child"></i>
                                                 </a>
                                                 <span class="change-class-1 active">
@@ -378,7 +378,7 @@ switch($_REQUEST["order"]){
                             if(rs.error){
                                 console.log(rs.msg);
                             }else{
-                                window.location = "/<?=$query[0]?>/collections/stories/"+rs.result;
+                                window.location = "/<?=$pathquery[0]?>/collections/stories/"+rs.result;
                             }
                         }
                     });
@@ -572,7 +572,7 @@ switch($_REQUEST["order"]){
             }
 
             function createFolder($folder_obj){
-                var link = '/<?=$query[0]?>/collections/stories/'+$folder_obj.id,
+                var link = '/<?=$pathquery[0]?>/collections/stories/'+$folder_obj.id,
                     bgdiv,i;
                 if($folder_obj.first_four.length == 0){
                     bgdiv = $("<a>").addClass("image-wrapper background-image-empty").attr({href:link});
