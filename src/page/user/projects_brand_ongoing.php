@@ -551,7 +551,7 @@ include("page/component/header.php"); ?>
                             <select name="creators[]" class="form-control customselect" id="creators" data-placeholder="Select creators for this project." multiple>
                             </select>
                             <div class="input-group-append">
-                                <button class="btn btn-outline-secondary addCreatorButton" type="button">Add Creator</button>
+                                <button class="btn btn-outline-secondary addCreatorButton" type="button">Add Creators</button>
                             </div>
                         </div>
                     </div>
