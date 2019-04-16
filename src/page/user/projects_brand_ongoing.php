@@ -547,14 +547,12 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="creators">Creators To Invite</label>
-                        <div class="input-group creator-input">
+                        <div class="input-group mb-3 creator-input">
                             <select name="creators[]" class="form-control customselect" id="creators" data-placeholder="Select creators for this project." multiple>
                             </select>
-                            <!--
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary addCreatorButton" type="button">Add Creator</button>
                             </div>
-                            -->
                         </div>
                     </div>
                     <div class="creator-groups row">
@@ -625,7 +623,7 @@ include("page/component/header.php"); ?>
                     });
                 },
                 onItemAdd: function(value, item){
-
+                    /*
                     var selected = $("#creators")[0].selectize.getValue();
                     if(selected.length){
                         $.each(selected, function(index,value){
@@ -635,7 +633,18 @@ include("page/component/header.php"); ?>
                         });
                     }
                     $("#creators")[0].selectize.clear(true);
+                    */
                 }
+            });
+
+            $(".addCreatorButton").click(function(e){
+                e.preventDefault();
+                var selected = $("#creators")[0].selectize.getValue();
+                $.each(selected, function(index,value){
+                    var tempitem = $("#creators")[0].selectize.options[value];
+                    addInvitedCreator(tempitem);
+                });
+                $("#creators")[0].selectize.clear(true);
             });
 
             function addInvitedCreator(item){

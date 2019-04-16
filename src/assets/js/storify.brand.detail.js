@@ -152,11 +152,11 @@ storify.brand.detail = {
                                                 .append($("<span>").addClass("no_of_invited").text("0"))
                                             )
                                             .append($("<div>").addClass("form-group")
-                                                .append($("<div>").addClass("input-group creator-input")
+                                                .append($("<div>").addClass("input-group mb-3 creator-input")
                                                     .append($("<select>").addClass("form-control customselect").attr({name:"invite[]", id:"invite", "data-placeholder":"Select creators for this project.", multiple:true}))
-                                                    /*.append($("<div>").addClass("input-group-append")
+                                                    .append($("<div>").addClass("input-group-append")
                                                         .append($("<button>").addClass("btn btn-outline-secondary sendInviteButton").attr({type:"button"}).text("Add Creator"))
-                                                    ) */
+                                                    )
                                                 )
                                             )
                                             .append($("<div>").addClass("invite-group"))
@@ -216,6 +216,7 @@ storify.brand.detail = {
                     });
                 },
                 onItemAdd: function( value, item ){
+                    /*
                     var selected = $("#invite")[0].selectize.getValue();
                     if(selected.length){
                         console.log(selected);
@@ -226,8 +227,11 @@ storify.brand.detail = {
                         });
                     }
                     $("#invite")[0].selectize.clear(true);
+                    */
                 }
             });
+
+            $(".sendInviteButton").click(storify.brand.invitation.invite_click);
         }
     },
     _gettingDetail:false,
