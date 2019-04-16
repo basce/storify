@@ -22,7 +22,7 @@ if($image_url){
 $pageSettings["meta"] = array(
     "name"=>$user_info->display_name."'s Collections - Storify",
     "description"=>$temp_description,
-    "canonical"=>"https://storify.me/collections/".$query[1]."/".$query[2]."/".$query[3]
+    "canonical"=>"https://storify.me/collections/".$pathquery[1]."/".$pathquery[2]."/".$pathquery[3]
 );
 $pageSettings["og"] = array(
     "og:type"=>"website",
@@ -112,7 +112,7 @@ switch($_REQUEST["order"]){
                     <div class="container">
                         <h1><?=htmlspecialchars($group_detail["name"])?></h1>
                         <?php
-                            $temp_result = $main->getGroupItem($query[3], "story", 1, 1); // only interest on the total item
+                            $temp_result = $main->getGroupItem($pathquery[3], "story", 1, 1); // only interest on the total item
 
                             $temp_total = isset($temp_result["total"]) ? (int) $temp_result["total"] : 0;
 
@@ -152,7 +152,7 @@ switch($_REQUEST["order"]){
                                     </div>
                                 </div>
                             </div>
-                            <div class="items grid grid-xl-3-items grid-lg-3-items grid-md-3-items" data-page="0" data-nc_data="post" data-folder_id="<?=$query[3]?>" data-sort="<?=$sortBy?>">
+                            <div class="items grid grid-xl-3-items grid-lg-3-items grid-md-3-items" data-page="0" data-nc_data="post" data-folder_id="<?=$pathquery[3]?>" data-sort="<?=$sortBy?>">
                                 
                             </div>
                             <div class="center">
