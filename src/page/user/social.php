@@ -294,10 +294,7 @@ include("page/component/header.php"); ?>
             function upatePostItems(){
                 if(_updatingPosts) return;
                 _updatingPosts = true;
-                var $grid = $(".items.grid"),
-                    cur_page = 0;
-
-                cur_page = cur_page ? cur_page + 1: 1;
+                var $grid = $(".items.grid");
 
                 $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date');
                 $(".post_idle").attr({style:"display:none"});
@@ -310,8 +307,7 @@ include("page/component/header.php"); ?>
                     url:'<?=$pathquery[2]?>',
                     data:{
                         method:"updatePosts",
-                        iger:_social_data.iger.id,
-                        page:cur_page
+                        iger:_social_data.iger.id
                     },
                     success:function(rs){
                         _updatingPosts = false;
@@ -320,6 +316,7 @@ include("page/component/header.php"); ?>
                         if(rs.error){
                             console.log(rs.msg);
                         }else{
+                            $grid.empty();
                             $grid.attr({'data-page':rs.result.page});
                             $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').blur();
                             if(rs.last_update){
@@ -353,7 +350,7 @@ include("page/component/header.php"); ?>
                 if(_pullingPosts) return;
                 _pullingPosts = true;
                 var $grid = $(".items.grid"),
-                    cur_page = 0;
+                    cur_page = $grid.attr("data-page");
 
                 cur_page = cur_page ? cur_page + 1: 1;
 
@@ -371,7 +368,7 @@ include("page/component/header.php"); ?>
                     data:{
                         method:"getPosts",
                         iger:_social_data.iger.id,
-                        page:1
+                        page:cur_page
                     },
                     success:function(rs){
                         _updatingPosts = false;

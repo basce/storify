@@ -39,7 +39,7 @@ if($current_user->ID){
 			}
 		break;
 		case "social_update":
-			$result = $main->updateUserTags($_REQUEST["countries"],$_REQUEST["language"],$_REQUEST["category"],$query[2]); //$query[2] is the current igusername
+			$result = $main->updateUserTags($_REQUEST["countries"],$_REQUEST["language"],$_REQUEST["category"],$pathquery[2]); 
 			$obj["error"] = 0;
 			$obj["msg"] = "tags updated.";
 			$obj["social_data"] = $main->getSingleIger($pathquery[2]);
@@ -48,6 +48,7 @@ if($current_user->ID){
 			$posts_result = $main->updateLatest30Posts($pathquery[2], $_REQUEST["iger"]);
 			if($posts_result["error"]){
 				$obj["msg"] = $posts_result["msg"];
+				$obj["pq"] = $pathquery;
 			}else{
 				$obj["error"] = 0;
 				$obj["msg"] = "";
