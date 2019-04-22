@@ -1252,6 +1252,9 @@ include("page/component/header.php"); ?>
                         checkfooterbutton(pageindex);
                     break;
                 }
+                $(".modal-body:visible").stop().animate({scrollTop:0}, 200, 'linear', function() { 
+
+                });
             }
 
         //initial function
@@ -1301,7 +1304,9 @@ include("page/component/header.php"); ?>
             $('.input-group.date input').each(function(index,value){
                 $(this).datepicker({
                     format: 'dd/mm/yy',
-                    startDate: 0
+                    autoclose: true,
+                    allowInputToggle: true,
+                    startDate: "+0d"
                 });
             });
 

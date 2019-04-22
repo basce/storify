@@ -74,7 +74,7 @@
 		}
 		$(document).on('mousedown', function (e) {
 			// Clicked outside the datepicker, hide it
-			if ($(e.target).closest('.datepicker').length === 0) {
+			if ($(e.target).closest('.datepicker').length === 0 && $(e.target).closest(".date input").length === 0) {
 				that.hide();
 			}
 		});
