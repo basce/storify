@@ -25,7 +25,42 @@ Headers:		'Varela Round', sans-serif;
 -------------------------------------------------------------------*/
 /*1. Classes*/
 .box-3d{
-    /*depth of the elements */
+    height: 250px;
+}
+.box-3d .front, .box-3d .rear{
+    display:flex;
+    align-content:center;
+
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+
+    padding:2rem;
+    background:#FFF;
+}
+.box-3d .front .card-inner h2, .box-3d .rear .card-inner h2{
+    margin-bottom: 0;
+}
+.box-3d .rear{
+    align-items:center;
+    display:none;
+}
+.box-container:hover .box-3d .rear{
+    display:block;
+}
+.box-container:hover .box-3d .front{
+    display:none;
+}
+.box-3d.card1 h1{
+    color: rgba(235, 167, 36, 0.8);
+}
+.box-3d.card2 h1{
+    color: rgba(109, 193, 202, 0.8);
+}
+/*
+.box-3d{
     -webkit-perspective: 800px;
     -moz-perspective: 800px;
     -o-perspective: 800px;
@@ -33,7 +68,6 @@ Headers:		'Varela Round', sans-serif;
 
     height:250px;
 
-    /*transition effects */
     -webkit-transition: -webkit-transform 0.6s;
     -moz-transition: -moz-transform 0.6s;
     -o-transition: -o-transform 0.6s;
@@ -90,6 +124,7 @@ Headers:		'Varela Round', sans-serif;
 .box-3d.card2 h1{
     color: rgba(109, 193, 202, 0.8);
 }
+*/
 /********
 --- A ---
 ********/

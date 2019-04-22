@@ -34,6 +34,10 @@ class main{
 
 	}
 
+	public function getCountriesList(){
+		return staticparam::$user_country_ar;
+	}
+
 	public function getProjectManager(){
 		if(!$this->project_manager){
 			$this->project_manager = new project();

@@ -252,6 +252,12 @@ if(sizeof($pathquery) == 0){
                 header("Location: /user@".$userID."/projects");
                 exit();
             }
+            if($pathquery[1] == "welcomebrand"){
+                $main->changeDefaultRole("brand",$userID);                
+
+                header("Location: /user@".$userID."/collections");
+                exit();
+            }
             if($pathquery[1] == "performance"){
                 $pageSettings = $pageManager->getSettings("performance");
                 //need to check if user login

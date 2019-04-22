@@ -113,7 +113,7 @@ include("page/component/header.php"); ?>
                                                         <label for="citycountry" class="col-form-label required">Country / City</label>
                                                         <select name="citycountry" type="text" class="customselect singleselect form-control" id="citycountry" data-placeholder="Select country..." single>
         <?php
-            foreach($user_country_ar as $key=>$val){
+            foreach($main->getCountriesList() as $key=>$val){
                 $temp_val = ($current_user_meta && $current_user_meta["city_country"] && sizeof($current_user_meta["city_country"]))?$current_user_meta["city_country"][0]:"";
                 if($key == $temp_val){
                     ?><option value="<?=$key?>" selected><?=$val?></option><?php

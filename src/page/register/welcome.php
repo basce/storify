@@ -85,7 +85,7 @@ include("page/component/header.php"); ?>
                                             </ul>
                                             <div class="d-flex justify-content-between align-items-baseline">
                                                 <p></p>
-                                                <a href="/user@<?=$current_user->ID?>/collections" class="btn btn-primary text-caps btn-rounded btn-framed">Go</a>
+                                                <a href="/user@<?=$current_user->ID?>/welcomebrand" class="btn btn-primary text-caps btn-rounded btn-framed">Go</a>
                                             </div>
                                         </div>
                                     </div>
@@ -111,7 +111,7 @@ include("page/component/header.php"); ?>
                                             </ul>
                                             <div class="d-flex justify-content-between align-items-baseline">
                                                 <p></p>
-                                                <a href="/user@<?=$current_user->ID?>/showcase" class="btn btn-primary text-caps btn-rounded btn-framed">Go</a>
+                                                <a href="/user@<?=$current_user->ID?>/collections" class="btn btn-primary text-caps btn-rounded btn-framed">Go</a>
                                             </div>
                                         </div>
                                     </div>
