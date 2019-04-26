@@ -152,7 +152,7 @@ storify.brand.completion_closed = {
 		if(data && data.length){
 			
 		}else{
-			$("#final-content").append($("<div>").append($("<p>").text("No submissions has been made yet.")));
+			$("#final-content").append($("<div>").append($("<p>").text("No submissions have been made, yet.")));
 		}
 	},
 	_gettingCompletion:false,

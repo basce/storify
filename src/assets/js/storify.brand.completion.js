@@ -254,7 +254,7 @@ storify.brand.completion = {
 				);
 			}
 		}else{
-			$("#final-content").append($("<div>").append($("<p>").text("No submissions has been made yet.")));
+			$("#final-content").append($("<div>").append($("<p>").text("No submissions have been made, yet.")));
 			$("#final-content").append(
 					$("<div>").addClass("text-right")
 						.append(

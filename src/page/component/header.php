@@ -109,7 +109,7 @@
                 "icon"=>"fa-briefcase",
                 "group"=>array(
                     array(
-                        "label"=>"Invited",
+                        "label"=>"Invites",
                         "link"=>"/user@".$current_user->ID."/projects/invited",
                         "icon"=>"fa-envelope",
                         "query_item"=>"invited"

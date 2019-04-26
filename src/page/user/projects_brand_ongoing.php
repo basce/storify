@@ -942,8 +942,8 @@ include("page/component/header.php"); ?>
                         pageReady = false;
                         msg = "Please fill in the number or photo / video required to deliver";
                         if(!silence){
-                            $("#number_of_photo").parents(".form-group").find(".alert").text("Please fill in the number or photo / video required to deliver").removeClass("hide");
-                            $("#number_of_video").parents(".form-group").find(".alert").text("Please fill in the number or photo / video required to deliver").removeClass("hide");
+                            $("#number_of_photo").parents(".form-group").find(".alert").text("Required field - please enter the number of photos to be produced by the Creator.").removeClass("hide");
+                            $("#number_of_video").parents(".form-group").find(".alert").text("Required field - please enter the number of videos you want the Creator to produce.").removeClass("hide");
                         }
                     }
                 }else if(pageindex == 3){

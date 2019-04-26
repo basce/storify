@@ -115,7 +115,7 @@ if(sizeof($pathquery) == 0){
 
             include_once("page/login/func-login.php");
             if($login_success){
-                header("Location: /user@".$user_ID."/performance");
+                header("Location: /user@".$user_ID."/collections");
                 exit();
             }else{
                 include_once("page/login/index.php");
@@ -237,19 +237,19 @@ if(sizeof($pathquery) == 0){
         }
         if(sizeof($pathquery) == 1){
             //user exist
-            header("Location: /user@".$userID."/performance");
+            header("Location: /user@".$userID."/collections");
             exit();
         }else{
             if($pathquery[1] == "viewascreator"){
                 $main->changeDefaultRole("creator",$userID);
 
-                header("Location: /user@".$userID."/projects");
+                header("Location: /user@".$userID."/collections");
                 exit();
             }
             if($pathquery[1] == "viewasbrand"){
                 $main->changeDefaultRole("brand",$userID);
 
-                header("Location: /user@".$userID."/projects");
+                header("Location: /user@".$userID."/collections");
                 exit();
             }
             if($pathquery[1] == "welcomebrand"){

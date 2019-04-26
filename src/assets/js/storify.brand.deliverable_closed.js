@@ -189,7 +189,8 @@ storify.brand.deliverable_closed = {
     	$(".deliverable-groups").empty();
         var photo_type = 0,
             video_type = 0;
-            data = odata.data;
+            data = odata.data,
+            withData = false;
 
         var photo_total = 0,
             photo_waiting = 0,
@@ -203,6 +204,7 @@ storify.brand.deliverable_closed = {
             video_submitted = 0;
 
         $.each(data, function(index,value){
+            widthData = true;
             photo_total += parseInt(odata.no_of_photo, 10);
             video_total += parseInt(odata.no_of_video, 10);
             $.each(value, function(index2, value2){
@@ -240,19 +242,23 @@ storify.brand.deliverable_closed = {
             });
         });
 
-        photo_total = ( photo_total ) == 0 ? parseInt(odata.no_of_photo, 10) : photo_total;
-        video_total = ( video_total ) == 0 ? parseInt(odata.no_of_video, 10) : video_total;
+        photo_total = ( photo_total ) == 0 ? 0 : photo_total;
+        video_total = ( video_total ) == 0 ? 0 : video_total;
 
-        /* <i class="fa fa-camera" style="margin-right: 5px;"></i> */
-        $(".deliverable-groups")
-            .append(
-                $("<h5>").append($("<i>").addClass("fa fa-camera").css({"margin-right":"5px"}))
-                    .append(document.createTextNode("Total "+photo_submitted+"/"+photo_total+" . Waiting "+photo_waiting+" . Approved "+photo_approved+" . Rejected "+photo_rejected))
-            )
-            .append(
-            $("<h5>").append($("<i>").addClass("fa fa-video-camera").css({"margin-right":"5px"}))
-                    .append(document.createTextNode("Total "+video_submitted+"/"+video_total+" . Waiting "+video_waiting+" . Approved "+video_approved+" . Rejected "+video_rejected))
-            );
+        if(withData){
+            /* <i class="fa fa-camera" style="margin-right: 5px;"></i> */
+            $(".deliverable-groups")
+                .append(
+                    $("<h5>").append($("<i>").addClass("fa fa-camera").css({"margin-right":"5px"}))
+                        .append(document.createTextNode("Total "+photo_submitted+"/"+photo_total+" . Waiting "+photo_waiting+" . Approved "+photo_approved+" . Rejected "+photo_rejected))
+                )
+                .append(
+                $("<h5>").append($("<i>").addClass("fa fa-video-camera").css({"margin-right":"5px"}))
+                        .append(document.createTextNode("Total "+video_submitted+"/"+video_total+" . Waiting "+video_waiting+" . Approved "+video_approved+" . Rejected "+video_rejected))
+                );
+        }else{
+            $(".deliverable-groups").append($("<div>").append($("<p>").text("No submissions have been made, yet.")));
+        }
 
         $.each(data, function(index,value){
         	var a = $("<div>").addClass("deliverable-group"),

@@ -8,7 +8,7 @@
                         <ul class="right">
 <?php if($current_user->ID){ ?>
                             <li>
-                                <a href="\user@<?=$current_user->ID?>\performance">
+                                <a href="\user@<?=$current_user->ID?>\collections">
                                     <i class="fa fa-user"></i><?=$current_user->display_name?>
                                 </a>
                             </li>

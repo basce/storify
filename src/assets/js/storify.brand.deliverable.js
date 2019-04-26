@@ -286,7 +286,7 @@ storify.brand.deliverable = {
                         .append(document.createTextNode("Total "+video_submitted+"/"+video_total+" . Waiting "+video_waiting+" . Approved "+video_approved+" . Rejected "+video_rejected))
                 );
         }else{
-            $(".deliverable-groups").append($("<div>").append($("<p>").text("No submissions has been made yet.")));
+            $(".deliverable-groups").append($("<div>").append($("<p>").text("No submissions have been made, yet.")));
         }
 
         $.each(data, function(index,value){
