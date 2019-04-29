@@ -802,7 +802,7 @@ include("page/component/header.php"); ?>
                     return "";
                 }
                 var date = str.split(" ")[0].split("-");
-                return date[2]+"/"+date[1]+"/"+date[0];
+                return date[2]+"/"+date[1]+"/"+date[0].slice(2);
             }
 
             function convertToArray(input){
