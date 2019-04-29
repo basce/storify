@@ -323,7 +323,116 @@ storify.brand.detail = {
             .append(div);
     },
     createDetail:function(data){
-         //bramd
+        //update item in list.
+        var list_item = $('.project-item[id="'+data.detail.id+'"]');
+        if(list_item){
+            var ribbon = $("<div>").addClass("ribbon-featured")
+                        .append($("<div>").addClass("ribbon-start"))
+                        .append($("<div>").addClass("ribbon-content").text("Due Soon"))
+                        .append($("<div>").addClass("ribbon-end")
+                            .append($("<figure>").addClass("ribbon-shadow"))
+                            ),
+            list_brand_tags = $("<div>").addClass("tags"),
+            list_title = $("<h3>"),
+            list_summary = data.summary,
+            list_div_image = $("<div>").addClass("image"),
+            list_div_location = null,
+            list_div_description = $("<p>");
+            //update title
+        
+            list_item.empty();
+
+            $.each(list_summary.brand, function(index,value){
+                list_brand_tags.append($("<span>").text(value.name).attr({"data-term_id":value.term_id}))
+            });
+
+            list_title.text(data.name)
+                .prepend($("<div>").addClass("meta")
+                        .append(
+                            $("<figure>").append($("<i>").addClass("fa fa-calendar-o"))
+                                        .append(document.createTextNode(" Created "+list_summary.formatted_created_date2))
+                        )
+                        .append(
+                            $("<figure>").append($("<i>").addClass("fa fa-calendar-o"))
+                                        .append(document.createTextNode(" Accept "+list_summary.formatted_invitation_closing_date2))
+                        )
+                        .append(
+                            $("<figure>").append($("<i>").addClass("fa fa-calendar-o"))
+                                        .append(document.createTextNode(" Deliver "+list_summary.formatted_closing_date2))
+                        )
+                    );
+            $.each(list_summary.tag, function(index,value){
+                list_title.append($("<span>").addClass("tag").text(value.name).attr({"data-term_id":value.term_id}))
+            });
+
+            var list_bountytext = "";
+            if(list_summary.bounty.length == 2){
+                list_bountytext = "$" + list_summary.bounty[0].value + " & " + list_summary.bounty[1].value;
+            }else{
+                if(list_summary.bounty[0].type == "cash"){
+                    list_bountytext = "$" + list_summary.bounty[0].value;
+                }else{
+                    list_bountytext = list_summary.bounty[0].value;
+                }
+            }
+
+            if(data.duesoon){
+                list_item.append(ribbon);
+            }
+
+            if(list_summary.location.length){
+                list_div_location = $("<h4>").addClass("location");
+                $.each(list_summary.location, function(index,value){
+                    if(index != 0){
+                        list_div_location.append(document.createTextNode(", "));
+                    }
+                    list_div_location.append($("<span>").attr({"data-term_id":value.term_id}).text(value.name));
+                });
+            }
+
+            if(list_summary.display_image){
+                div_image.css({"background-image":"url("+list_summary.display_image+")"});
+            }
+
+            $.each(list_summary.deliverables_ar, function(index,value){
+                if(index != 0){
+                    list_div_description.append(document.createTextNode(" | "+value.amount+" "));
+                }else{
+                    list_div_description.append(document.createTextNode(value.amount+" "));
+                }
+                if(value.type == "photo"){
+                    list_div_description.append($("<i>").addClass("fa fa-camera").attr({"aria-hidden":"true"}));
+                }else{
+                    list_div_description.append($("<i>").addClass("fa fa-video-camera").attr({"aria-hidden":"true"}));
+                }
+            });
+
+            list_div_description.append($("<br>"));
+            list_div_description.append(document.createTextNode(list_summary.description));
+
+            list_item.append($("<div>").addClass("wrapper")
+                .append(list_div_image
+                    .append(list_brand_tags)
+                    .append($("<div>").attr({title:list_bountytext}).addClass("price").text(list_bountytext))
+                )
+                .append($("<div>").addClass("content")
+                    .append(list_title)
+                    .append(list_div_location)
+                    .append($("<div>").addClass("description")
+                        .append(list_div_description)
+                    )
+                    .append($("<div>").addClass("actions")
+                        .append($("<a>").attr({href:"#"}).text("Details")
+                            .click(function(e){
+                                e.preventDefault();
+                                storify.brand.detail.viewDetail(data.detail.id);
+                            })
+                        )
+                    )
+                )
+            )
+        }
+        //bramd
         var brandtext = [];
         if(data.summary.brand && data.summary.brand.length){
             $.each(data.summary.brand, function(index, value){
@@ -386,8 +495,8 @@ storify.brand.detail = {
                             .append($("<a>").attr({href:"#"}).addClass("detail text-caps underline").text("Edit")
                                     .click(function(e){
                                         e.preventDefault();
-                                        $("#editDialog .modal-body").scrollTop(0);
                                         $("#editDialog").modal("show");
+                                        $("#editDialog .modal-body").scrollTop(0);
                                     })
                                 )
                         )

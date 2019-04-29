@@ -535,6 +535,7 @@ class project{
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
+			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["invitation_closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
 		}
 
@@ -605,7 +606,7 @@ class project{
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
-
+			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
 		}
 
@@ -675,6 +676,7 @@ class project{
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
+			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
 		}
 
@@ -736,6 +738,9 @@ class project{
 			foreach($project["summary"] as $key=>$value){
 				$project["summary"]["formatted_invitation_closing_date"] = date("d-m-y", strtotime($project["summary"]["invitation_closing_date"]));
 				$project["summary"]["formatted_closing_date"] = date("d-m-y", strtotime($project["summary"]["closing_date"]));
+				$project["summary"]["formatted_invitation_closing_date2"] = date('d-m-y',strtotime($project["summary"]["invitation_closing_date"]));
+				$project["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($project["summary"]["created_date"]));
+				$project["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($project["summary"]["closing_date"]));
 			}
 
 			//get delviery
@@ -760,7 +765,45 @@ class project{
 			//get User
 			$project["users"] = $this->user_manager->getUsers($project_id);
 
-			//get Invitation Stats ( exist in summary )
+			//get duesoon
+			$project["duesoon"] = ( strtotime($project["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
+
+			//get bounty
+			$details = $this->detail_manager->getDetail($project_id);
+			if($details["bounty_type"] == "cash"){
+				$photo_cost = $details["no_of_photo"] * $details["cost_per_photo"];
+				$video_cost = $details["no_of_video"] * $details["cost_per_video"];
+				
+				$bounty = array(
+					array(
+						"type"=>"cash",
+						"value"=>$photo_cost + $video_cost
+					)
+				);
+			}else if($details["bounty_type"] == "gift"){
+				$bounty = array(
+					array(
+						"type"=>"gift",
+						"value"=>$details["reward_name"]
+					)
+				);
+			}else{
+				//both
+				$photo_cost = $details["no_of_photo"] * $details["cost_per_photo"];
+				$video_cost = $details["no_of_video"] * $details["cost_per_video"];
+				
+				$bounty = array(
+					array(
+						"type"=>"cash",
+						"value"=>$photo_cost + $video_cost
+					),
+					array(
+						"type"=>"gift",
+						"value"=>$details["reward_name"]
+					)	
+				);
+			}
+			$project["summary"]["bounty"] = $bounty;
 
 			return array(
 				"data"=>$project,
