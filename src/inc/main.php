@@ -647,7 +647,7 @@ class main{
 		$original_categorise = $pod->field('instagrammer_tag');
 
 		//remove if got any
-		if(sizeof($original_countries)){
+		if($original_countries && sizeof($original_countries)){
 			foreach($original_countries as $key=>$value){
 				$pod->remove_from('instagrammer_country', $value["term_id"]);
 			}
