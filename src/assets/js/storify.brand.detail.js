@@ -391,7 +391,7 @@ storify.brand.detail = {
             }
 
             if(list_summary.display_image){
-                div_image.css({"background-image":"url("+list_summary.display_image+")"});
+                list_div_image.css({"background-image":"url("+list_summary.display_image+")"});
             }
 
             $.each(list_summary.deliverables_ar, function(index,value){
