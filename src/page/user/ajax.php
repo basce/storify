@@ -44,6 +44,22 @@ if($current_user->ID){
 			$obj["msg"] = "tags updated.";
 			$obj["social_data"] = $main->getSingleIger($pathquery[2]);
 		break;
+		case "updatePostsAsync":
+			$result = $main->updateLatest30PostsAsync($pathquery[2], $_REQUEST["iger"]);
+			if($result["error"]){
+				$obj["error"] = 1;
+				$obj["msg"] = $result["msg"];
+			}else{
+				$obj["error"] = 0;
+				$obj["msg"] = $result["msg"];
+				$obj["status"] = 1;
+			}
+		break;
+		case "checkPostsStatus":
+			$obj["error"] = 0;
+			$obj["msg"] = "";
+			$obj["status"] = $main->checkUpdatingRecord($pathquery[2]);
+		break;
 		case "updatePosts":
 			$posts_result = $main->updateLatest30Posts($pathquery[2], $_REQUEST["iger"]);
 			if($posts_result["error"]){

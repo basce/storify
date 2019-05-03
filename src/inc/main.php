@@ -523,7 +523,7 @@ class main{
 	}
 
 	//============================================================================================================
-	private function getCache(){
+	public function getCache(){
 		if(!$this->cache){
 			$this->cache = new \memcached;
 			$this->cache->addServer('localhost', 11211) or die ("Could not connect");
@@ -546,6 +546,51 @@ class main{
 			return array(
 				"error"=>0,
 				"posts"=>$this->getPosts($userid, 30, 1, "latest", true)
+			);
+		}
+	}
+
+	public function checkUpdatingRecord($igusername){
+
+		return $this->getCache()->get("nc_igplatform_post_updating_".$igusername);
+		/*
+		global $wpdb;
+
+		//update data that is exceed 30 mins
+		$query = "UPDATE `".$wpdb->prefix."_postupdating` SET done = %d, msg = %s WHERE done = %d AND tt < ( NOW() - INTERVAL 30 MINUTE )";
+		$wpdb->query($wpdb->prepare($query, 1, "exceed 30 mins, terminate process" , 0));
+
+		//check if the data we want is pulling
+		$query = "SELECT done, msg FROM `".$wpdb->prefix."_postupdating` WHERE igusername = %s ORDER BY id DESC";
+		$result = $wpdb->get_row($wpdb->prepare($query, $igusername), ARRAY_A);
+
+		return $result;
+		*/
+	}
+
+	public function updateLatest30PostsAsync($igusername, $userid){
+		if(!$this->checkUpdatingRecord($igusername)){
+			//is not pulling
+			
+			$obj = array(
+				"error"=>0,
+				"msg"=>$this->getCache()->get("nc_igplatform_post_updating_error")
+			);
+
+			try{
+				exec('php '.dirname(__DIR__).'/async_pulling.php '.$igusername.' '.$userid.' >/dev/null &');
+			}catch(Exception $e){
+				$obj = array(
+					"error"=>1,
+					"msg"=>$e->getMessage()
+				);
+			}
+
+			return $obj;
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>"Account is under pulling, please try again later"
 			);
 		}
 	}

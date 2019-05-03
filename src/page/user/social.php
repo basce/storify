@@ -189,7 +189,7 @@ include("page/component/header.php"); ?>
                                 <p class="post_idle" style="display:none">Last pulled on <span class="last_update_datetime"></span></p>
                                 <p class="post_empty" style="display:none">No stories yet, pull stories from your Instagram account now.</p>
                                 <p class="post_waiting" style="display:none">No stories yet, update passions and country before you can pull stories from your Instagram account.</p>
-                                <p class="post_pulling" style="display:none">System is working hard to uncover your stories. This will take a few minutes...</p>
+                                <p class="post_pulling" style="display:none">Working hard to uncover your stories. This will take a few minutes, so you can go explore other pages and come back later...</p>
                             </section>
                             <div class="items grid grid-xl-3-items grid-lg-3-items grid-md-3-items" data-page="0" data-nc_data="post">
                             </div>
@@ -290,6 +290,27 @@ include("page/component/header.php"); ?>
                 return item;
             }
 
+            var _updatingPostsAsync = false;
+            function updatePostsAsync(){
+                if(_updatingPostsAsync) return;
+                _updatingPostsAsync = true;
+
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url:'<?=$pathquery[2]?>',
+                    data:{
+                        method:"updatePostsAsync",
+                        iger:_social_data.iger.id
+                    },
+                    success:function(rs){
+                        _updatingPostsAsync = false;
+
+                        checkUpdate();
+                    }
+                });
+            }
+
             var _updatingPosts = false;
             function upatePostItems(){
                 if(_updatingPosts) return;
@@ -345,6 +366,48 @@ include("page/component/header.php"); ?>
                 });
             }
 
+            var _checkUpdating = false;
+            function checkUpdate(){
+                if(_checkUpdating) return;
+                _checkUpdating = true;
+
+                $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
+                $(".post_idle").attr({style:"display:none"});
+                $(".post_empty").attr({style:"display:none"});
+                $(".post_waiting").attr({style:"display:none"});
+                $(".post_pulling").removeAttr("style");
+
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url:'<?=$pathquery[2]?>',
+                    data:{
+                        method:"checkPostsStatus",
+                        iger:_social_data.iger.id
+                    },
+                    success:function(rs){
+                        _checkUpdating = false;
+                        if(rs.status == 1){
+                            $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
+                            $(".post_idle").attr({style:"display:none"});
+                            $(".post_empty").attr({style:"display:none"});
+                            $(".post_waiting").attr({style:"display:none"});
+                            $(".post_pulling").removeAttr("style");
+
+                            setTimeout(function(){
+                                checkUpdate();
+                            },5000);
+                        }else{
+                            var $grid = $(".items.grid");
+                            $grid.empty();
+                            $grid.attr({'data-page':0});
+
+                            pullPosts();
+                        }
+                    }
+                })
+            }
+
             var _pullingPosts = false;
             function pullPosts(){
                 if(_pullingPosts) return;
@@ -354,7 +417,7 @@ include("page/component/header.php"); ?>
 
                 cur_page = cur_page ? cur_page + 1: 1;
 
-                $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date');
+                $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
 
                 $(".post_idle").attr({style:"display:none"});
                 $(".post_empty").attr({style:"display:none"});
@@ -371,11 +434,11 @@ include("page/component/header.php"); ?>
                         page:cur_page
                     },
                     success:function(rs){
-                        _updatingPosts = false;
+                        _pullingPosts = false;
                         if(rs.error){
                             console.log(rs.msg);
                         }else{
-                            $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').blur();
+                            $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').removeClass("disabled").blur();
                             $grid.attr({'data-page':rs.result.page});
                             if(rs.last_update){
                                 $(".last_update_datetime").text(rs.last_update);
@@ -404,7 +467,9 @@ include("page/component/header.php"); ?>
             }
 
             $("#post_pull").click(function(e){
-                upatePostItems();
+                if(!$(this).hasClass("disabled")){
+                    updatePostsAsync();
+                }
             });
 
             function availableForPostPulling(){
@@ -461,7 +526,7 @@ include("page/component/header.php"); ?>
 
             if(_social_data && _social_data.iger && _social_data.iger.id){
                 if(availableForPostPulling()){
-                    pullPosts();
+                    checkUpdate();
                 }
             }
         });
