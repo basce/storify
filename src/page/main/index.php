@@ -235,6 +235,7 @@ include("page/component/header.php"); ?>
                             <select name="order" id="order" class="small width-200px" data-placeholder="Default Sorting" >
                                 <option value="latest" <?php if($sortBy == "latest"){ echo "selected";}?>>Newest</option>
                                 <option value="likes" <?php if($sortBy == "likes"){ echo "selected";}?>>Popular</option>
+                                <option value="verified" <?php if($sortBy == "verified"){ echo "selected";}?>>Verified</option>
                             </select>
                         </div>
                     </div>

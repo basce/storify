@@ -275,8 +275,8 @@ $(document).ready(function($) {
         }
         */
         h3.append($("<span>").addClass("tag")
-                                    .append($("<i>").addClass("fa fa-clock-o"))
-                                    .append(document.createTextNode($obj.modified)));
+                        .append($("<i>").addClass("fa fa-clock-o"))
+                        .append(document.createTextNode($obj.modified)));
 
         var h4 = $("<h4>").addClass("location");
 

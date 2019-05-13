@@ -1571,6 +1571,9 @@ class main{
 			case "likes":
 				$igers = $this->array_orderby($igers, "follows_by_count", SORT_DESC);
 			break;
+			case "verified":
+				$igers = $this->array_orderby($igers, "verified", SORT_DESC);
+			break;
 			case "latest":
 			default:
 				$igers = $this->array_orderby($igers, "unformatted_modified", SORT_DESC);
