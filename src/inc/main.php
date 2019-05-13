@@ -209,7 +209,8 @@ class main{
 	                "average_likes"=>$igers_pods->field('average_likes'),
 	                "average_comments"=>$igers_pods->field('average_comments'),
                 	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+                	"verified"=>$igers_pods->field('verified') 
 	            );
 	            $igers[] = $tempobj;
 			}
@@ -689,7 +690,7 @@ class main{
 		$pod = pods("instagrammer_fast", $instagrammer_id);
 		$original_countries = $pod->field('instagrammer_country');
 		$original_languages = $pod->field('instagrammer_language');
-		$original_categorise = $pod->field('instagrammer_tag');
+		$original_categories = $pod->field('instagrammer_tag');
 
 		//remove if got any
 		if($original_countries && sizeof($original_countries)){
@@ -704,8 +705,47 @@ class main{
 			}
 		}
 		*/
-		if($original_categorise && sizeof($original_categorise)){
-			foreach($original_categorise as $key=>$value){
+	
+		//check if any tag change
+		$category_changed = false;
+		if(sizeof($original_categories) == sizeof($categories)){
+			foreach($original_categories as $key=>$value){
+				$exist = false;
+				foreach($categories as $key2=>$value2){
+					if($value["term_id"] == $value2){
+						$exist = true;
+					}
+				}
+				if(!$exist){
+					$category_changed = true;
+					break;
+				}
+			}
+		}else{
+			$category_changed = true;
+		}
+
+		//check if any tag change
+		$country_changed = false;
+		if(sizeof($original_countries) == sizeof($countries)){
+			foreach($original_countries as $key=>$value){
+				$exist = false;
+				foreach($countries as $key2=>$value2){
+					if($value["term_id"] == $value2){
+						$exist = true;
+					}
+				}
+				if(!$exist){
+					$country_changed = true;
+					break;
+				}
+			}
+		}else{
+			$country_changed = true;
+		}
+		
+		if($original_categories && sizeof($original_categories)){
+			foreach($original_categories as $key=>$value){
 				$pod->remove_from('instagrammer_tag', $value["term_id"]);
 			}
 		}
@@ -725,6 +765,11 @@ class main{
 				$pod->add_to('instagrammer_tag', $value);
 			}
 		}
+
+		return array(
+			"country_changed"=>$country_changed,
+			"category_changed"=>$category_changed
+		);
 	}
 
 	public function IGAccountBelongToUser($igname, $userID){
@@ -849,7 +894,8 @@ class main{
 	                "average_comments"=>$igers_pods->field('average_comments'),
 	                "created"=>strtotime($igers_pods->field('created')),
                 	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+                	"verified"=>$igers_pods->field("verified")
 	            );
 	            $igers[] = $tempobj;
 			}
@@ -971,7 +1017,8 @@ class main{
 	                "average_comments"=>$igers_pods->field('average_comments'),
 	                "created"=>strtotime($igers_pods->field('created')),
 	                "modified"=>date('j M y H:i', strtotime($igers_pods->field('modified'))),
-	                "unformatted_modified"=>strtotime($igers_pods->field('modified'))
+	                "unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                "verified"=>$igers_pods->field("verified")
 	            );
 			}
 		}else{
@@ -1004,7 +1051,8 @@ class main{
 		                "average_comments"=>$igers_pods->field('average_comments'),
 		                "created"=>strtotime($igers_pods->field('created')),
 	                	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-	                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+	                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                	"verified"=>$igers_pods->field("verified")
 		            );
 				}
 			}
@@ -1306,7 +1354,6 @@ class main{
 				}
 			}
 
-
 			$this->getCache()->set("nc_user_".$id, $posts, $this->cache_duration); // 1 day
 		}
 
@@ -1364,7 +1411,7 @@ class main{
 	public function getCreator($searchname){
 		global $wpdb, $current_user;
 
-		$query = "SELECT * FROM ( SELECT a.userid as `userid`, b.name as `name`, b.igusername as `igusername`, REPLACE(d.guid, 'https://storify.me','https://cdn.storify.me') as `image_url`, ( CASE WHEN g.item_id IS NULL THEN 0 ELSE 1 END ) as `bookmark_item_id` FROM `wp_igaccounts` a LEFT JOIN `wp_pods_instagrammer_fast` b ON a.igusername = b.igusername LEFT JOIN `wp_podsrel` c ON ( b.id = c.item_id AND c.field_id = %d ) LEFT JOIN `wp_posts` d ON c.related_item_id = d.ID LEFT JOIN ( SELECT item_id FROM `wp_bookmark_people` WHERE userid = %d ) g ON b.id = g.item_id ) h WHERE LOWER(name) LIKE '%s' OR LOWER(igusername) LIKE '%s' ORDER BY bookmark_item_id DESC, name ASC";
+		$query = "SELECT * FROM ( SELECT a.userid as `userid`, b.name as `name`, b.igusername as `igusername`, b.verified as `verified`,REPLACE(d.guid, 'https://storify.me','https://cdn.storify.me') as `image_url`, ( CASE WHEN g.item_id IS NULL THEN 0 ELSE 1 END ) as `bookmark_item_id` FROM `wp_igaccounts` a LEFT JOIN `wp_pods_instagrammer_fast` b ON a.igusername = b.igusername LEFT JOIN `wp_podsrel` c ON ( b.id = c.item_id AND c.field_id = %d ) LEFT JOIN `wp_posts` d ON c.related_item_id = d.ID LEFT JOIN ( SELECT item_id FROM `wp_bookmark_people` WHERE userid = %d ) g ON b.id = g.item_id ) h WHERE LOWER(name) LIKE '%s' OR LOWER(igusername) LIKE '%s' ORDER BY bookmark_item_id DESC, name ASC";
 
 		return $wpdb->get_results($wpdb->prepare($query, 43, $current_user->ID, "%".strtolower($searchname)."%","%".strtolower($searchname)."%"), ARRAY_A);
 	}
@@ -1472,7 +1519,8 @@ class main{
 		                "average_comments"=>$igers_pods->field('average_comments'),
 		                "created"=>strtotime($igers_pods->field('created')),
 	                	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-	                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+	                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                	"verified"=>$igers_pods->field('verified')
 		            );
 		            $igers[] = $tempobj;
 				}

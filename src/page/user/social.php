@@ -119,7 +119,7 @@ include("page/component/header.php"); ?>
                                     <p>Help us discover your best stories.</p>
                                     <div class="author-description">
                                         <div class="form-group">
-                                            <select name="category[]" id="category" data-placeholder="Select passion" class="customselect" data-enable-input=true nc-method="addCategory" multiple>
+                                            <select name="category[]" id="category" data-placeholder="Select passion" class="customselect" data-maxitems=5 data-enable-input=true nc-method="addCategory" multiple>
                                                 <option value="">Select passion</option>
                                                 <?php
                                                     $language_tags = $main->getAllTags();
@@ -149,7 +149,7 @@ include("page/component/header.php"); ?>
                                     </div>
                                     <div class="author-description">
                                         <div class="form-group">
-                                            <select name="country[]" id="country" data-placeholder="Select country/city" class="customselect" data-enable-input=true multiple nc-method="addCountry">
+                                            <select name="country[]" id="country" data-placeholder="Select country/city" class="customselect" data-maxitems=5 data-enable-input=true multiple nc-method="addCountry">
                                                 <option value="">Select country/city</option>
                                                 <?php
                                                     $category_tags = $main->getAllCountries();
@@ -259,7 +259,6 @@ include("page/component/header.php"); ?>
                     });
                 }
 
-
                 var item = $("<div>").addClass("item")
                     .append($("<div>").addClass("wrapper")
                         .append($("<div>").addClass("image")
@@ -340,8 +339,8 @@ include("page/component/header.php"); ?>
                             $grid.empty();
                             $grid.attr({'data-page':rs.result.page});
                             $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').blur();
-                            if(rs.last_update){
-                                $(".last_update_datetime").text(rs.last_update);
+                            if(rs.social_data && rs.social_data.iger && rs.social_data.iger.modified){
+                                $(".last_update_datetime").text(rs.social_data.iger.modified);
                             }
                             if(rs.result.data && rs.result.data.length){
                                 //got result
@@ -405,7 +404,7 @@ include("page/component/header.php"); ?>
                             pullPosts();
                         }
                     }
-                })
+                });
             }
 
             var _pullingPosts = false;
@@ -440,8 +439,8 @@ include("page/component/header.php"); ?>
                         }else{
                             $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').removeClass("disabled").blur();
                             $grid.attr({'data-page':rs.result.page});
-                            if(rs.last_update){
-                                $(".last_update_datetime").text(rs.last_update);
+                            if(rs.social_data && rs.social_data.iger && rs.social_data.iger.modified){
+                                $(".last_update_datetime").text(rs.social_data.iger.modified);
                             }
                             if(rs.result.data && rs.result.data.length){
                                 //got result
@@ -456,6 +455,7 @@ include("page/component/header.php"); ?>
                                 $(".post_pulling").attr({style:"display:none"});
                                 $(".post_waiting").attr({style:"display:none"});
                             }
+
                             $.each(rs.result.data, function(index,value){
                                 var $temp = createPostGridItem(value);
                                 $grid.append( $temp );
@@ -512,10 +512,32 @@ include("page/component/header.php"); ?>
                                 alert("data.msg");
                             }else{
                                 _social_data = data.social_data;
+
+                                if(data.category_changed){
+                                    var a = $("#category").parents(".form-group").find(".alert");
+                                    a.text("Passion tags updated successfully.").removeClass("hide alert-danger").addClass("alert-success");
+                                    setTimeout(function() {
+                                        a.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
+                                    },1000);
+                                }
+                                if(data.country_changed){
+                                    var a = $("#country").parents(".form-group").find(".alert");
+                                    a.text("Country tags updated successfully.").removeClass("hide alert-danger").addClass("alert-success");
+                                    setTimeout(function() {
+                                        a.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
+                                    },1000);
+                                }
                                 availableForPostPulling();
-                                $('html, body').animate({
-                                    scrollTop: $("#post_pull").offset().top
-                                }, 500);
+                                if(data.social_data && data.social_data.iger && data.social_data.iger.modified){
+                                    $(".last_update_datetime").text(data.social_data.iger.modified);
+                                }
+                                if(data.category_changed || data.country_changed){
+                                    setTimeout(function(){
+                                        $('html, body').animate({
+                                            scrollTop: $("#post_pull").offset().top
+                                        }, 500);
+                                    },1000);
+                                }
                             }
                         }
                     })

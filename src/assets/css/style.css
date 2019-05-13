@@ -257,7 +257,7 @@ Headers:		'Varela Round', sans-serif;
     margin-left: 8rem;
 }
 .author.big {
-    padding-bottom: 5rem;
+    padding-bottom: 1rem;
 }
 .author.big .author-image {
     width: 26rem;
@@ -313,6 +313,7 @@ Headers:		'Varela Round', sans-serif;
     margin-bottom: 2rem;
 }
 .author.big .author-description .additional-info a.tag, .author-description .additional-info .tag{
+    display:inline-block;
     margin: 3px;
     padding: 2px 6px;
     color: inherit;
@@ -1022,6 +1023,22 @@ Headers:		'Varela Round', sans-serif;
     transition: none;
     text-shadow: 0 0.1rem 0.2rem rgba(0,0,0,.6);
     display: block;
+}
+.items:not(.selectize-input) .item h3 a.title .verified {
+    /*content: "✔";*/
+    font-size: 1rem;
+    background-color: green;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-block;
+    text-align: center;
+    border-radius: 50%;
+    line-height: 1.78rem;
+    /* float: right; */
+    margin-left: .5rem;
+    position: relative;
+    top: -0.25rem;
+    cursor:help;
 }
 .items:not(.selectize-input) .item h3 a:hover {
     text-decoration: underline;

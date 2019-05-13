@@ -39,47 +39,81 @@ $(document).ready(function($) {
     });
 
     $("[data-enable-input=true]").each(function(){
-        var _this = $(this);
-        var a = _this.selectize({
-            plugins:['restore_on_backspace'],
-            delimiter:',',
-            onDropdownOpen: dropdownOpen,
-            onDropdownClose: dropdownClose,
-            create:function(input, callback){
-                $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    data:{
-                       input:input,
-                       method:_this.attr("nc-method")
-                    },
-                    success:function(data){
-                        if(data.data){
-                            callback({
-                                value:data.data.term_id,
-                                text:data.data.text
-                            });
-                        }else{
-                            alert(data.msg);
-                        }
-                    },
-                    fail:function(xhr, textStatus, errorThrown){
+        var a, _this = $(this);
+        if(+_this.attr("data-maxitems")){
+            var a = _this.selectize({
+                plugins:['restore_on_backspace','remove_button'],
+                delimiter:',',
+                onDropdownOpen: dropdownOpen,
+                onDropdownClose: dropdownClose,
+                maxItems:+_this.attr("data-maxitems"),
+                create:function(input, callback){
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        data:{
+                           input:input,
+                           method:_this.attr("nc-method")
+                        },
+                        success:function(data){
+                            if(data.data){
+                                callback({
+                                    value:data.data.term_id,
+                                    text:data.data.text
+                                });
+                            }else{
+                                alert(data.msg);
+                            }
+                        },
+                        fail:function(xhr, textStatus, errorThrown){
 
-                    }
-                })
-            },
-            allowEmptyOption: false
-        });
+                        }
+                    })
+                },
+                allowEmptyOption: false
+            });
+        }else{
+            var a = _this.selectize({
+                plugins:['restore_on_backspace'],
+                delimiter:',',
+                onDropdownOpen: dropdownOpen,
+                onDropdownClose: dropdownClose,
+                create:function(input, callback){
+                    $.ajax({
+                        type: 'POST',
+                        dataType: 'json',
+                        data:{
+                           input:input,
+                           method:_this.attr("nc-method")
+                        },
+                        success:function(data){
+                            if(data.data){
+                                callback({
+                                    value:data.data.term_id,
+                                    text:data.data.text
+                                });
+                            }else{
+                                alert(data.msg);
+                            }
+                        },
+                        fail:function(xhr, textStatus, errorThrown){
+
+                        }
+                    })
+                },
+                allowEmptyOption: false
+            });
+        }
     });
 
     var select = $("select:not(.customselect)");
     select.each(function(){
-        var _this = $(this);
-        var a = _this.selectize({
-            onDropdownOpen: dropdownOpen,
-            onDropdownClose: dropdownClose,
-            allowEmptyOption: true,        
-        });
+        var a, _this = $(this);
+            a = _this.selectize({
+                onDropdownOpen: dropdownOpen,
+                onDropdownClose: dropdownClose,
+                allowEmptyOption: true
+            });
     });
 
     select = $("select.singleselect");

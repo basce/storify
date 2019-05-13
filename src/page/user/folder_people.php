@@ -187,7 +187,14 @@ switch($_REQUEST["order"]){
                     h3.append(tag_group);
                 }
 
-                h3.append($("<a>").addClass("title").attr({href:"/"+$obj.igusername+"/",target:"_blank"}).text($obj.igusername));
+                if(+$obj.verified){
+                    h3.append(
+                        $("<a>").addClass("title").attr({href:"/"+$obj.igusername+"/"}).text($obj.igusername)
+                                .append($("<span>").attr({title:"verified"}).addClass("verified").text("✔"))
+                    );
+                }else{
+                    h3.append($("<a>").addClass("title").attr({href:"/"+$obj.igusername+"/"}).text($obj.igusername));
+                }
 
                 /*
                 if($obj.instagrammer_language && $obj.instagrammer_language.length){

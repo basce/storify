@@ -72,11 +72,11 @@ if(isset($_GET["error"])){
                 "follows_count"=>$account["followsCount"],
                 "follows_by_count"=>$account["followedByCount"],
                 "external_url"=>$account["externalUrl"],
+                "verified"=>"1",
                 "ig_profile_pic"=>array(
                     "id"=>$result["media_id"],
                     "title"=>$fullName
-                ),
-                "hidden"=>1
+                )
             );
 
             // get country name
@@ -124,6 +124,7 @@ if(isset($_GET["error"])){
                     "id"=>$result["media_id"],
                     "title"=>$fullName
                 );
+                $data["hidden"] = 1;
                 $instagrammer_id = $pod->add($data);
             }
 
