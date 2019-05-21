@@ -47,6 +47,7 @@ storify.project.user = {
 			success: function(rs){
 				storify.project.user._gettingUsers = false;
 				storify.project.user.data = rs.data;
+				console.log(rs.data);
 				if( typeof callback === "function" ){
 					callback();
 				}

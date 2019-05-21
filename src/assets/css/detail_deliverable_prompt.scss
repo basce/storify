@@ -38,6 +38,12 @@
   }
   pre{
     white-space: pre-wrap;
+    .linkified{
+      text-decoration:underline;
+    }
+    .linkified:hover{
+      text-decoration:none; 
+    }
   }
   .sample_groups{
     a{

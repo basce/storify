@@ -53,6 +53,8 @@
     <script src="/assets/js/storify.brand.deliverable.js"></script>
     <script src="/assets/js/storify.brand.completion.js"></script>
     <script src="/assets/js/SendBird.min.js"></script>
+    <script src="/assets/js/linkify.min.js"></script>
+    <script src="/assets/js/linkify-jquery.min.js"></script>
 <?=get_option("custom_settings_header_js")?>
 </head>
 <body>
@@ -184,7 +186,7 @@ include("page/component/header.php"); ?>
                             <div class="form-group">
                                 <label for="edit_closing_date" class="required">Submission Closing Date</label>
                                 <div class="input-group date">
-                                    <input type="text" class="form-control" id="edit_closing_date" placeholder="dd/mm/yy" required>
+                                    <input type="text" class="form-control" id="edit_closing_date" placeholder="dd/mm/yy" autoComplete="off" required>
                                     <span class="input-group-addon">
                                         <span class="fa fa-calendar"></span>
                                     </span>
@@ -196,7 +198,7 @@ include("page/component/header.php"); ?>
                             <div class="form-group">
                                 <label for="edit_invitation_closing_date" class="required">Invitation closing date</label>
                                 <div class="input-group date">
-                                    <input type="text" class="form-control" id="edit_invitation_closing_date" placeholder="dd/mm/yy" required>
+                                    <input type="text" class="form-control" id="edit_invitation_closing_date" placeholder="dd/mm/yy" autoComplete="off" required>
                                     <span class="input-group-addon">
                                         <span class="fa fa-calendar"></span>
                                     </span>
@@ -207,7 +209,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="edit_project_name" class="required">Title</label>
-                                <input type="text" class="form-control" id="edit_project_name" placeholder="Enter a name for this project." required>
+                                <input type="text" class="form-control" id="edit_project_name" placeholder="Enter a name for this project." autoComplete="off" required>
                                 <div class="form-width">
                                     <div class="alert alert-danger hide">Some error message</div>
                                 </div>
@@ -228,13 +230,13 @@ include("page/component/header.php"); ?>
                                 <select name="brand[]" id="edit_brand" data-placeholder="Select Brand." class="customselect" data-enable-input=true nc-method="addBrand" multiple>
                                     <option value="">Select Brand</option>
                             <?php
-                                $brands = $main->getAllBrands();
+                                $brands = $main->getAllBrands(true);
                                 foreach($brands as $key=>$value){
-                                    if(!$value["hidden"]){
+                                    
                                     ?>
                                     <option value="<?=$value["term_id"]?>"><?=$value["name"]?></option>
                                     <?php
-                                    }
+                                    
                                 }
                             ?>
                                 </select>
@@ -244,7 +246,7 @@ include("page/component/header.php"); ?>
                                 <select name="location[]" id="edit_location" data-placeholder="Select Location." class="customselect" data-enable-input=true nc-method="addLocation" multiple>
                                     <option value="">Select Location</option>
                             <?php
-                                $country_tags = $main->getAllCountriesInUsed();
+                                $country_tags = $main->getAllCountriesInUsed(true);
                                 $default_country_id = 0;
                                 foreach($country_tags as $key=>$value){
                                     //auto add the user current country
@@ -273,7 +275,7 @@ include("page/component/header.php"); ?>
                                 <select name="tag[]" id="edit_tag" data-placeholder="Select Passions." class="customselect" data-enable-input=true nc-method="addTag" multiple>
                                     <option value="">Select Passions</option>
                             <?php
-                                $category_tags = $main->getAllTagsInUsed();
+                                $category_tags = $main->getAllTagsInUsed(true);
                                 foreach($category_tags as $key=>$value){
                                     if(!$value["hidden"]){
                                     ?>
@@ -287,7 +289,7 @@ include("page/component/header.php"); ?>
                             <div class="form-group">
                                 <label for="samples">Moodboard</label>
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" id="edit_samples" placeholder="Insert a link to your image.">
+                                    <input type="text" class="form-control" id="edit_samples" placeholder="Insert a link to your image." autoComplete="off">
                                     <div class="input-group-append">
                                         <button class="btn btn-outline-secondary edit_addSampleButton" type="button">Add Image</button>
                                     </div>
@@ -356,7 +358,7 @@ include("page/component/header.php"); ?>
                 <div class="col-md-10 offset-md-1" id="add_project_page_1" style="display:none;">
                     <div class="form-group">
                         <label for="project_name" class="required">Title</label>
-                        <input type="text" class="form-control" id="project_name" placeholder="Enter a name for this project." required>
+                        <input type="text" class="form-control" id="project_name" placeholder="Enter a name for this project." autoComplete="off" required>
                         <!-- <input type="text" class="form-control" id="project_name" aria-describedby="projectNameHelp" placeholder="Enter Project Name">
                         <small id="projectNameHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
                         <div class="form-width">
@@ -365,14 +367,14 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="project_description" class="required">Details</label>
-                        <textarea class="form-control" id="project_description" rows="4" required placeholder="Please provide details to your campaign."></textarea>
+                        <textarea class="form-control" id="project_description" rows="4" required autoComplete="off" placeholder="Please provide details to your campaign."></textarea>
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="project_short_description">Summary</label>
-                        <textarea class="form-control" id="project_short_description" rows="2" placeholder="Please include a short line to describe your project."></textarea>
+                        <textarea class="form-control" id="project_short_description" rows="2" autoComplete="off" placeholder="Please include a short line to describe your project."></textarea>
                     </div>
                     <div class="form-group">
                         <labal for="project_brand">Brand</labal>
@@ -440,7 +442,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="closing_date">Submission Closing Date</label>
                         <div class="input-group date">
-                            <input type="text" class="form-control" placeholder="dd/mm/yy" id="closing_date">
+                            <input type="text" class="form-control" placeholder="dd/mm/yy" autoComplete="off" id="closing_date">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -451,21 +453,21 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="number_of_photo">No. Of Photos Per Creator</label>
-                        <input type="number" class="form-control" id="number_of_photo" placeholder="Enter number of photos." value="">
+                        <input type="number" class="form-control" id="number_of_photo" placeholder="Enter number of photos." autoComplete="off" value="">
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="number_of_video">No. Of Videos Per Creator</label>
-                        <input type="number" class="form-control" id="number_of_video" placeholder="Enter number of videos." value="">
+                        <input type="number" class="form-control" id="number_of_video" placeholder="Enter number of videos." autoComplete="off" value="">
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="video_length">Video Length</label>
-                        <input type="number" class="form-control" id="video_length" placeholder="Enter length of videos in seconds.">
+                        <input type="number" class="form-control" id="video_length" autoComplete="off" placeholder="Enter length of videos in seconds.">
                         <small id="videoLengthHelp" class="form-text text-muted">Video length in seconds</small>
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
@@ -474,7 +476,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="samples">Moodboard</label>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="samples" placeholder="Insert a link to your image.">
+                            <input type="text" class="form-control" id="samples" autoComplete="off" placeholder="Insert a link to your image.">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary addSampleButton" type="button">Add Image</button>
                             </div>
@@ -485,7 +487,7 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="deliverable_brief">Instructions to Creators</label>
-                        <textarea class="form-control" id="deliverable_brief" row="4" placeholder="Provide further details about style, creative angle and other expectations."></textarea>
+                        <textarea class="form-control" id="deliverable_brief" row="4" autoComplete="off" placeholder="Provide further details about style, creative angle and other expectations."></textarea>
                     </div>
                 </div>
                 <div class="col-md-10 offset-md-1" id="add_project_page_3" style="display:none">
@@ -509,7 +511,7 @@ include("page/component/header.php"); ?>
                             <span class="input-group-addon">
                                 <span class="fa fa-dollar"></span>
                             </span>
-                            <input type="number" class="form-control" id="cost_per_photo" placeholder="Amount you will pay for each photo. If on sponsorship arrangement, leave this field blank.">
+                            <input type="number" class="form-control" id="cost_per_photo" autoComplete="off" placeholder="Amount you will pay for each photo. If on sponsorship arrangement, leave this field blank.">
                         </div>
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
@@ -521,7 +523,7 @@ include("page/component/header.php"); ?>
                             <span class="input-group-addon">
                                 <span class="fa fa-dollar"></span>
                             </span>
-                            <input type="number" class="form-control" id="cost_per_video" placeholder="Amount you will pay for each video. If on sponsorship arrangement, leave this field blank.">
+                            <input type="number" class="form-control" id="cost_per_video" autoComplete="off" placeholder="Amount you will pay for each video. If on sponsorship arrangement, leave this field blank.">
                         </div>
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
@@ -529,7 +531,7 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="gift_name">Sponsorship</label>
-                        <input type="text" class="form-control" id="gift_name" placeholder="Specify vouchers, products and sponsorship-in-kind items. If not applicable, leave this field blank." value="">
+                        <input type="text" class="form-control" id="gift_name" autoComplete="off" placeholder="Specify vouchers, products and sponsorship-in-kind items. If not applicable, leave this field blank." value="">
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
@@ -539,7 +541,7 @@ include("page/component/header.php"); ?>
                     <div class="form-group">
                         <label for="invitation_closing_date">Invitation closing date</label>
                         <div class="input-group date">
-                            <input type="text" class="form-control" placeholder="dd/mm/yy" id="invitation_closing_date">
+                            <input type="text" class="form-control" autoComplete="off" placeholder="dd/mm/yy" id="invitation_closing_date">
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -574,7 +576,21 @@ include("page/component/header.php"); ?>
             
             var APP_ID = '68CE9863-C07D-4505-A659-F384AB1DE478';
             var sb = new SendBird({appId: APP_ID});
-            var _project_id = 0;
+<?php
+            if(sizeof($pathquery) == 4 ){
+?>          var _project_id = <?=$pathquery[3]?>;
+            var _creator = null;
+<?php
+            }else if(sizeof($pathquery) == 5){
+?>          var _project_id = 0;
+            var _creator = <?=json_encode($main->getCreatorSingle($pathquery[4]))?>;
+<?php
+            }else{
+?>          var _project_id = 0;
+            var _creator = null;
+<?php
+            }
+?>            
             var _project_users = null;
             var _default_country_id = <?=$default_country_id?>;
             var _baseurl = "/user@<?=$current_user->ID?>/projects/closed/";
@@ -817,6 +833,20 @@ include("page/component/header.php"); ?>
                 return a;
             }
 
+            function convertToOption(input){
+                var a = [];
+                if(input.length){
+                    $.each(input, function(index,value){
+                        a.push({
+                            value:value.term_id,
+                            text:value.name
+                        });
+                    });
+                }
+
+                return a;
+            }
+
             function updateEditProject(data){
                 $("#edit_project_name").val(data.detail.name);
 
@@ -826,6 +856,15 @@ include("page/component/header.php"); ?>
                 $("#edit_closing_date").datepicker("update", changeDateTime(data.closing_date));
                 $("#edit_invitation_closing_date").datepicker("update", changeDateTime(data.invitation_closing_date));
 
+                if(data.location && data.location.length){
+                    $("#edit_location")[0].selectize.addOption(convertToOption(data.location));
+                }
+                if(data.brand && data.brand.length){
+                    $("#edit_brand")[0].selectize.addOption(convertToOption(data.brand));
+                }
+                if(data.tag && data.tag.length){
+                    $("#edit_tag")[0].selectize.addOption(convertToOption(data.tag));
+                }
                 $("#edit_location")[0].selectize.setValue(convertToArray(data.location));
                 $("#edit_brand")[0].selectize.setValue(convertToArray(data.brand));
                 $("#edit_tag")[0].selectize.setValue(convertToArray(data.tag));
@@ -1335,6 +1374,13 @@ include("page/component/header.php"); ?>
 
             if($("#ongoingloadmore").length){
                 $("#ongoingloadmore").click();
+            }
+
+            if(_project_id){
+                storify.brand.detail.viewDetail(_project_id);
+            }else if(_creator){
+                addInvitedCreator(_creator);
+                $("#newproject").modal("show");
             }
         });
     </script>

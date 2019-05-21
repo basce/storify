@@ -30,7 +30,7 @@ if($current_user->ID){
         case "getUsers":
             $obj["error"] = 0;
             $obj["msg"] = "";
-            $obj["data"] = $main->getProjectManager()->getUsers($_POST["project_id"]);
+            $obj["data"] = $main->getProjectManager()->getUsersByAdmin($_POST["project_id"]);
         break;
         case "getDeliverableHistory":
             $result = $main->getProjectManager()->getDeliverablesHistory($_POST["deliverable_id"], $_POST["user_id"]);

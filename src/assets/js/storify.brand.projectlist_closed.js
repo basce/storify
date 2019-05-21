@@ -15,7 +15,7 @@ storify.brand.projectList_closed = {
             summary = data.summary,
             div_image = $("<div>").addClass("image"),
             div_location = null,
-            div_description = $("<p>");
+            div_description = $("<p>").addClass("linkify");
 
         $.each(summary.brand, function(index,value){
             brand_tags.append($("<span>").text(value.name).attr({"data-term_id":value.term_id}))
@@ -51,9 +51,11 @@ storify.brand.projectList_closed = {
             }
         }
 
+        /*
         if(data.duesoon){
             div.append(ribbon);
         }
+        */
 
         if(summary.location.length){
             div_location = $("<h4>").addClass("location");
@@ -174,6 +176,9 @@ storify.brand.projectList_closed = {
                         var $temp = storify.brand.projectList_closed.createProjectItem(value, value.id);
                         $grid.append($temp);
                         ScrollReveal().reveal($temp, storify.slideUp);
+                    });
+                    $(".linkify").linkify({
+                        target: "_blank"
                     });
                     if(onComplete)onComplete();
                 }

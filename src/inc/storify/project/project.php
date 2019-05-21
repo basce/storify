@@ -339,7 +339,7 @@ class project{
 		SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `wp_project_invitation` a LEFT JOIN ( SELECT m1.* FROM `wp_project_invitation_response` m1 LEFT JOIN `wp_project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL) b ON a.id = b.invitation_id WHERE project_id = 1
 		 */
 		
-		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, action, remark, REPLACE(REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/'), 'https://staging.storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g ON f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
+		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, user_email, action, remark, REPLACE(REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/'), 'https://staging.storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, b.user_email, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g ON f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
 
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43, "removed", "closed"), ARRAY_A); // field_id 43 is the profile image for instagrammer_fast
 
@@ -394,12 +394,32 @@ class project{
 		return $this->invitation_manager->removeInvitation($invitation_id);
 	}
 
+	public function getUsersByAdmin($project_id){
+		global $wpdb;
+
+		/*
+		$query = "SELECT f.*, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM  ( SELECT d.*, e.id FROM ( SELECT a.user_id, a.role, b.display_name, b.user_email, c.igusername FROM ( SELECT user_id, role FROM `".$this->user_manager->getTable()."` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g on f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID";
+
+		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43), ARRAY_A);
+		*/
+	
+		$query = "SELECT f.*, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM  ( SELECT d.*, e.id FROM ( SELECT a.user_id, a.role, b.display_name, b.user_email, c.igusername FROM ( SELECT user_id, role FROM `".$this->user_manager->getTable()."` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT meta_value, user_id FROM `".$wpdb->prefix."usermeta` WHERE meta_key = %s ) g ON f.ID = g.user_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.meta_value = h.ID";
+		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 'profile_pic'), ARRAY_A);
+		return $data;
+	}
+
 	public function getUsers($project_id){
 		global $wpdb;
 
+		/*
 		$query = "SELECT f.*, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM  ( SELECT d.*, e.id FROM ( SELECT a.user_id, a.role, b.display_name, c.igusername FROM ( SELECT user_id, role FROM `".$this->user_manager->getTable()."` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g on f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID";
 
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43), ARRAY_A);
+		*/
+	
+		$query = "SELECT f.*, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.* FROM ( SELECT a.user_id, a.role, b.ID, b.display_name, c.igusername FROM ( SELECT user_id, role FROM `".$wpdb->prefix."project_user` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT meta_value, user_id FROM `".$wpdb->prefix."usermeta` WHERE meta_key = %s ) g ON f.ID = g.user_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.meta_value = h.ID";
+
+		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 'profile_pic'), ARRAY_A);
 		return $data;
 	}
 

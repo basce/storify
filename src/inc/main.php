@@ -8,12 +8,14 @@ include_once(__DIR__.'/../ao/wp-admin/includes/image.php' );
 require_once(__DIR__.'/storify/bookmark.php');
 require_once(__DIR__.'/storify/pagesettings.php');
 require_once(__DIR__.'/storify/project/project.php');
+include_once(__DIR__.'/noisycrayons/phpemail/mailer.php');
 
 use storify\project as project;
 use storify\bookmark as bookmark;
 use storify\pagesettings as pagesettings;
 use storify\staticparam as staticparam;
-
+use noisycrayons\phpemail\mailer as mailer;
+ 
 class main{
 	private $nc_tags = NULL;
 	private $nc_brands = NULL;
@@ -29,9 +31,17 @@ class main{
 	private $bookmark_people = NULL;
 
 	private $project_manager = NULL;
+	private $mail_manager = NULL;
 
 	function __construct(){
 
+	}
+
+	public function getMailManager(){
+		if(!$this->mail_manager){
+			$this->mail_manager = new mailer();
+		}
+		return $this->mail_manager;
 	}
 
 	public function getCountriesList(){
@@ -209,7 +219,8 @@ class main{
 	                "average_likes"=>$igers_pods->field('average_likes'),
 	                "average_comments"=>$igers_pods->field('average_comments'),
                 	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                "verified"=>$igers_pods->field('verified')
 	            );
 	            $igers[] = $tempobj;
 			}
@@ -849,7 +860,8 @@ class main{
 	                "average_comments"=>$igers_pods->field('average_comments'),
 	                "created"=>strtotime($igers_pods->field('created')),
                 	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                "verified"=>$igers_pods->field('verified')
 	            );
 	            $igers[] = $tempobj;
 			}
@@ -971,7 +983,8 @@ class main{
 	                "average_comments"=>$igers_pods->field('average_comments'),
 	                "created"=>strtotime($igers_pods->field('created')),
 	                "modified"=>date('j M y H:i', strtotime($igers_pods->field('modified'))),
-	                "unformatted_modified"=>strtotime($igers_pods->field('modified'))
+	                "unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                "verified"=>$igers_pods->field('verified')
 	            );
 			}
 		}else{
@@ -1004,7 +1017,8 @@ class main{
 		                "average_comments"=>$igers_pods->field('average_comments'),
 		                "created"=>strtotime($igers_pods->field('created')),
 	                	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-	                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+	                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                	"verified"=>$igers_pods->field('verified')
 		            );
 				}
 			}
@@ -1361,12 +1375,32 @@ class main{
 		);
 	}
 
+	public function getCreatorSingle($userid){
+		global $wpdb;
+
+		$query = "SELECT b.ID as `userid`, c.igusername, c.verified as `verified`, c.name, REPLACE(e.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `image_url` FROM `wp_igaccounts` a LEFT JOIN `wp_users` b ON a.userid = b.ID LEFT JOIN `wp_pods_instagrammer_fast` c ON a.igusername = c.igusername LEFT JOIN ( SELECT meta_value, user_id FROM `wp_usermeta` WHERE meta_key = %s) d ON b.ID = d.user_id LEFT JOIN `wp_posts` e ON d.meta_value = e.ID WHERE c.id = %d";
+
+		return $wpdb->get_row($wpdb->prepare($query, 'profile_pic', $userid), ARRAY_A);
+	}
+
 	public function getCreator($searchname){
 		global $wpdb, $current_user;
+
+		//userid, name, igusername, image_url, bookmark_item_id
+		/*
+		SELECT b.ID as `userid`, c.igusername, c.name, REPLACE(e.guid, 'https://storify.me', 'https://cdn.storify.me/') as `image_url`, ( CASE WHEN g.item_id IS NULL THEN 0 ELSE 1 END ) as `bookmark` FROM `wp_igaccounts` a LEFT JOIN `wp_users` b ON a.userid = b.ID LEFT JOIN `wp_pods_instagrammer_fast` c ON a.igusername = c.igusername LEFT JOIN ( SELECT meta_value, user_id FROM `wp_usermeta` WHERE meta_key = 'profile_pic' ) d ON b.ID = d.user_id LEFT JOIN `wp_posts` e ON d.meta_value = e.ID LEFT JOIN ( SELECT item_id FROM `wp_bookmark_people` WHERE userid = 1 ) g ON b.ID = g.item_id
+		
+		$query = "SELECT b.ID as `userid`, c.igusername, c.name, REPLACE(e.guid, 'https://storify.me', 'https://cdn.storify.me/') as `image_url`, ( CASE WHEN g.item_id IS NULL THEN 0 ELSE 1 END ) as `bookmark` FROM `wp_igaccounts` a LEFT JOIN `wp_users` b ON a.userid = b.ID LEFT JOIN `wp_pods_instagrammer_fast` c ON a.igusername = c.igusername LEFT JOIN ( SELECT meta_value, user_id FROM `wp_usermeta` WHERE meta_key = 'profile_pic' ) d ON b.ID = d.user_id LEFT JOIN `wp_posts` e ON d.meta_value = e.ID LEFT JOIN ( SELECT item_id FROM `wp_bookmark_people` WHERE userid = 1 ) g ON b.ID = g.item_id";
 
 		$query = "SELECT * FROM ( SELECT a.userid as `userid`, b.name as `name`, b.igusername as `igusername`, REPLACE(d.guid, 'https://storify.me','https://cdn.storify.me') as `image_url`, ( CASE WHEN g.item_id IS NULL THEN 0 ELSE 1 END ) as `bookmark_item_id` FROM `wp_igaccounts` a LEFT JOIN `wp_pods_instagrammer_fast` b ON a.igusername = b.igusername LEFT JOIN `wp_podsrel` c ON ( b.id = c.item_id AND c.field_id = %d ) LEFT JOIN `wp_posts` d ON c.related_item_id = d.ID LEFT JOIN ( SELECT item_id FROM `wp_bookmark_people` WHERE userid = %d ) g ON b.id = g.item_id ) h WHERE LOWER(name) LIKE '%s' OR LOWER(igusername) LIKE '%s' ORDER BY bookmark_item_id DESC, name ASC";
 
 		return $wpdb->get_results($wpdb->prepare($query, 43, $current_user->ID, "%".strtolower($searchname)."%","%".strtolower($searchname)."%"), ARRAY_A);
+		*/
+	
+		$query = "SELECT * FROM ( SELECT b.ID as `userid`, c.igusername, c.verified as `verified`, c.name, REPLACE(e.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `image_url`, ( CASE WHEN g.item_id IS NULL THEN 0 ELSE 1 END ) as `bookmark` FROM `wp_igaccounts` a LEFT JOIN `wp_users` b ON a.userid = b.ID LEFT JOIN `wp_pods_instagrammer_fast` c ON a.igusername = c.igusername LEFT JOIN ( SELECT meta_value, user_id FROM `wp_usermeta` WHERE meta_key = %s) d ON b.ID = d.user_id LEFT JOIN `wp_posts` e ON d.meta_value = e.ID LEFT JOIN ( SELECT item_id FROM `wp_bookmark_people` WHERE userid = %d ) g ON b.ID = g.item_id ) h WHERE LOWER(name) LIKE %s OR LOWER(igusername) LIKE %s ORDER BY bookmark DESC, name ASC";
+
+		return $wpdb->get_results($wpdb->prepare($query, 'profile_pic', $current_user->ID, "%".strtolower($searchname)."%","%".strtolower($searchname)."%"), ARRAY_A);
+		
 	}
 
 	function getIger($categories, $countries, $languages, $pagesize=24, $page=1, $orderby="", $forceRefresh=false){
@@ -1472,7 +1506,8 @@ class main{
 		                "average_comments"=>$igers_pods->field('average_comments'),
 		                "created"=>strtotime($igers_pods->field('created')),
 	                	"modified"=>date('j M y H:i',strtotime($igers_pods->field('modified'))),
-	                	"unformatted_modified"=>strtotime($igers_pods->field('modified'))
+	                	"unformatted_modified"=>strtotime($igers_pods->field('modified')),
+	                	"verified"=>$igers_pods->field('verified')
 		            );
 		            $igers[] = $tempobj;
 				}

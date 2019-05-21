@@ -44,6 +44,10 @@
   margin-bottom: 1rem; }
 .detailcontent pre {
   white-space: pre-wrap; }
+  .detailcontent pre .linkified {
+    text-decoration: underline; }
+  .detailcontent pre .linkified:hover {
+    text-decoration: none; }
 .detailcontent .sample_groups a {
   display: block;
   width: 200px;

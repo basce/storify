@@ -252,6 +252,7 @@ include("page/component/header.php"); ?>
                                             <figure><i class="fa fa-image"></i><?=number_format($iger["media_count"])?></figure>
                                         </div>
                                         <div class="text-align-right social">
+                                            <a class="fa add_project <?=$iger["verified"]?'active':''?>" href="#" o="<?=$iger["id"]?>"></a>
                                             <a class="fa bookmark bookmarkpeople <?=$iger["bookmark"]?'active':''?>" href="#" o="<?=$iger["id"]?>" c="people"></a>
                                             <a href="https://instagram.com/<?=$iger["igusername"]?>" target="_blank">
                                                 <i class="fa fa-instagram"></i>

@@ -257,7 +257,7 @@ Headers:		'Varela Round', sans-serif;
     margin-left: 8rem;
 }
 .author.big {
-    padding-bottom: 5rem;
+    padding-bottom: 2rem;
 }
 .author.big .author-image {
     width: 26rem;
@@ -281,6 +281,17 @@ Headers:		'Varela Round', sans-serif;
 }
 .author.big .author-description .bookmark.active:before{
     content: "\f02e";
+}
+.author.big .author-description .add_project{
+    margin-right:.2em;
+    font-size:1.8rem;
+    display:none;
+}
+.author.big .author-description .add_project.active{
+    display: inline-block;
+}
+.author.big .author-description .add_project:before{
+    content: "\f196";
 }
 .author.big .author-description h2, .author-description h2 {
     font-size: 3rem;
@@ -320,6 +331,7 @@ Headers:		'Varela Round', sans-serif;
     border-radius: 5px;
     box-shadow: 0 0.2rem 1rem 0rem rgba(0,0,0, .1);
     border: .1rem solid rgba(0,0,0, .15);
+    display:inline-block;
 }
 .author.big .author-description .additional-info ul li, .author-description .additional-info ul li {
     display: inline-block;
@@ -1151,6 +1163,20 @@ Headers:		'Varela Round', sans-serif;
 }
 .items:not(.selectize-input) .item .meta .bookmark.active:before{
     content: "\f02e";
+}
+.items:not(.selectize-input) .item .meta .add_project{
+    position:absolute;
+    right:3rem;
+    top:1.8rem;
+    z-index:2;
+    font-size:1.8rem;
+    display:none;
+}
+.items:not(.selectize-input) .item .meta .add_project.active{
+    display: inline-block;
+}
+.items:not(.selectize-input) .item .meta .add_project:before{
+    content: "\f196";
 }
 /*------ Description ------*/
 .items:not(.selectize-input) .item .description {
@@ -3836,6 +3862,17 @@ textarea.form-control {
     }
     .author.big .author-description .bookmark.active:before{
         content: "\f02e";
+    }
+    .author.big .author-description .add_project{
+        margin-right:.2em;
+        font-size:1.8rem;
+        display:none;
+    }
+    .author.big .author-description .add_project.active{
+        display: inline-block;
+    }
+    .author.big .author-description .add_project:before{
+        content: "\f196";
     }
     .blog-posts-navigation .prev, .blog-posts-navigation .next {
         display: block;

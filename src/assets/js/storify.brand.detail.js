@@ -513,8 +513,8 @@ storify.brand.detail = {
                     )
             )
             .append(deliverable_block)
-            .append($("<pre>").html(data.detail.description_brief))
-            .append($("<pre>").html(data.detail.deliverable_brief))
+            .append($("<pre>").addClass("linkify").html(data.detail.description_brief))
+            .append($("<pre>").addClass("linkify").html(data.detail.deliverable_brief))
             ;
         cont.append(owlImages);
 
@@ -551,6 +551,10 @@ storify.brand.detail = {
                 }
             }, 50);
         }
+
+        $(".linkify").linkify({
+            target: "_blank"
+        });
         return cont;
 
         /*

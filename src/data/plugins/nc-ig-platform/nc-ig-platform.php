@@ -335,6 +335,8 @@ function NgICPlatform_i18n_dashboard_widget_function( $post, $callback_args ) {
   //get instagrammer
   $instagrammer_pods = pods('instagrammer_fast');
   $instagrammer_pods->find(array(
+    "limit"=>-1,
+    "orderby"=>"id DESC",
     "where"=>'hidden = 1'
   ));
   if($instagrammer_pods->total()){
@@ -354,7 +356,9 @@ function NgICPlatform_i18n_dashboard_widget_function( $post, $callback_args ) {
   //get Country
   $country_pods = pods('instagrammer_country');
   $country_pods->find(array(
-    'where'=>'hidden.meta_value = 1'
+    'where'=>'hidden.meta_value = 1',
+    "orderby"=>"id DESC",
+    "limit"=>-1
   ));
 
   if($country_pods->total()){
@@ -391,7 +395,9 @@ function NgICPlatform_i18n_dashboard_widget_function( $post, $callback_args ) {
   //get Category
   $category_pods = pods('instagrammer_tag');
   $category_pods->find(array(
-    'where'=>'hidden.meta_value = 1'
+    'where'=>'hidden.meta_value = 1',
+    "orderby"=>"id DESC",
+    "limit"=>-1
   ));
 
   if($category_pods->total()){

@@ -48,6 +48,8 @@
     <script src="/assets/js/storify.project.users.js"></script>
     <script src="/assets/js/storify.brand.projectlist_closed.js"></script>
     <script src="/assets/js/SendBird.min.js"></script>
+    <script src="/assets/js/linkify.min.js"></script>
+    <script src="/assets/js/linkify-jquery.min.js"></script>
 <?=get_option("custom_settings_header_js")?>
 </head>
 <body>

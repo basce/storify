@@ -869,8 +869,8 @@ storify.creator.detail_closed = {
                     )
             )
             .append(deliverable_block)
-            .append($("<pre>").html(data.detail.description_brief))
-            .append($("<pre>").html(data.detail.deliverable_brief))
+            .append($("<pre>").addClass("linkify").html(data.detail.description_brief))
+            .append($("<pre>").addClass("linkify").html(data.detail.deliverable_brief))
             ;
         cont.append(owlImages);
 
@@ -905,6 +905,9 @@ storify.creator.detail_closed = {
                 clearInterval(_interval);
             }
         }, 50);
+        $(".linkify").linkify({
+            target: "_blank"
+        });
         return cont;
     }
 };

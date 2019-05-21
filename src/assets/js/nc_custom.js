@@ -42,6 +42,40 @@ $(document).ready(function($) {
         }
     });
 
+    var _adding_to_project = false;
+    function addNewProject(itemid, obj){
+        if(_adding_to_project) return;
+        _adding_to_project = true;
+        $.ajax({
+            url:"/json",
+            method:"POST",
+            data:{
+                method:"add_new_project",
+                item_id:itemid
+            },
+            success:function(rs){
+                _adding_to_project = false;
+                console.log(rs);
+                if(rs.error){
+                    updateMemberOnlyModal(rs.title, rs.content);
+                }else{
+                    window.location.href = rs.redirect;
+                }
+            },
+            dataType: "json"
+        })
+    }
+
+    function updateMemberOnlyModal(title, content){
+        if($("#memberonlymodal").length){
+            $("#memberonlymodal .modal-header .modal-title").text(title);
+            $("#memberonlymodal .modal-body .form-group").html(content);
+            $("#memberonlymodal").modal();
+        }else{
+            alert(title);
+        }
+    }
+
     function bookmarkTrigger(itemid, type, obj){
         var bookmark;
         if(obj.hasClass("active")){
@@ -61,13 +95,7 @@ $(document).ready(function($) {
             success:function(rs){
                 if(rs.error){
                     console.log(rs.msg); //error
-                    if(rs.msg == "require login"){
-                        if($("#memberonlymodal").length){
-                            $("#memberonlymodal").modal();
-                        }else{
-                            alert("bookmark function only for logged in user.");
-                        }
-                    }
+                    updateMemberOnlyModal(rs.title, rs.content)
                 }else{
                     if(parseInt(rs.bookmark)){
                         obj.addClass("active");
@@ -84,6 +112,11 @@ $(document).ready(function($) {
     $(".bookmarkpeople").click(function(e){
         e.preventDefault();
         bookmarkTrigger($(this).attr("o"),$(this).attr("c"),$(this));
+    });
+
+    $(".add_project").click(function(e){
+        e.preventDefault();
+        addNewProject($(this).attr("o"),$(this));
     });
 
     function format1(n) {
@@ -316,6 +349,14 @@ $(document).ready(function($) {
                                     .click(function(e){
                                         e.preventDefault();
                                         bookmarkTrigger($(this).attr("o"), $(this).attr("c"), $(this));
+                                    })
+                                )
+                                .append($("<a>")
+                                    .addClass("fa add_project " + (+$obj.verified ? "active":""))
+                                    .attr({href:"#", o:$obj.id})
+                                    .click(function(e){
+                                        e.preventDefault();
+                                        addNewProject($(this).attr("o"), $(this));
                                     })
                                 )
                             )
