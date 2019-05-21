@@ -243,7 +243,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="project_location">Location</label>
-                                <select name="location[]" id="edit_location" data-placeholder="Please selection up to 5 countries." class="customselect" data-enable-input=true nc-method="addLocation" multiple>
+                                <select name="location[]" id="edit_location" data-placeholder="Select Location." class="customselect" data-enable-input=true nc-method="addLocation" multiple>
                                     <option value="">Select Location</option>
                             <?php
                                 $country_tags = $main->getAllCountriesInUsed(true);
@@ -272,7 +272,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="project_tag">Passions</label>
-                                <select name="tag[]" id="edit_tag" data-placeholder="Please selection up to 5 passions." class="customselect" data-enable-input=true nc-method="addTag" multiple>
+                                <select name="tag[]" id="edit_tag" data-placeholder="Select Passions." class="customselect" data-enable-input=true nc-method="addTag" multiple>
                                     <option value="">Select Passions</option>
                             <?php
                                 $category_tags = $main->getAllTagsInUsed(true);

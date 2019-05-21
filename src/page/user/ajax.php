@@ -42,6 +42,8 @@ if($current_user->ID){
 			$result = $main->updateUserTags($_REQUEST["countries"],$_REQUEST["language"],$_REQUEST["category"],$pathquery[2]); 
 			$obj["error"] = 0;
 			$obj["msg"] = "tags updated.";
+			$obj["country_changed"] = $result["country_changed"];
+			$obj["category_changed"] = $result["category_changed"];
 			$obj["social_data"] = $main->getSingleIger($pathquery[2]);
 		break;
 		case "updatePostsAsync":
@@ -70,15 +72,7 @@ if($current_user->ID){
 				$obj["msg"] = "";
 				$obj["result"] = $posts_result["posts"];
 				//get last udpate time
-				$last_update_datetime = 0;
-				if(isset($posts_result["posts"]["data"]) && sizeof($posts_result["posts"]["data"])){
-					foreach($posts_result["posts"]["data"] as $key=>$value){
-						if( $value["last_updated_time"] > $last_update_datetime){
-							$last_update_datetime = $value["last_updated_time"];
-						}
-					}
-				}
-				$obj["last_update"] = $last_update_datetime ? date("j M y H:i" , $last_update_datetime) : NULL;
+				$obj["social_data"] = $main->getSingleIger($pathquery[2]);	
 			}
 		break;
 		case "getPosts":
@@ -87,15 +81,7 @@ if($current_user->ID){
 			$obj["msg"] = "";
 			$obj["result"] = $posts;
 			//get last udpate time
-			$last_update_datetime = 0;
-			if(isset($posts["data"]) && sizeof($posts["data"])){
-				foreach($posts["data"] as $key=>$value){
-					if( $value["last_updated_time"] > $last_update_datetime){
-						$last_update_datetime = $value["last_updated_time"];
-					}
-				}
-			}
-			$obj["last_update"] = $last_update_datetime ? date("j M y H:i" , $last_update_datetime) : NULL;
+			$obj["social_data"] = $main->getSingleIger($pathquery[2]);	
 		break;
 		default:
 			$obj["msg"] = "unknown method";
