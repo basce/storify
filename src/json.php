@@ -17,6 +17,43 @@ switch($_REQUEST["method"]){
 		}else{
 			$obj["error"] = 1;
 			$obj["msg"] = "require login";
+			$obj["title"] = "Uh-oh, Members Only!";
+			$obj["content"] = '<a href="/signin">Sign in</a> to add this creator or story to your collection.';
+		}
+	break;
+	case "add_new_project":
+		if(isset($current_user) && $current_user->ID){
+			if($_SESSION["role_view"] == "brand"){
+				if($main->isBrandVerified($current_user->ID)){
+					//check userid exist
+					$result = $main->getCreatorSingle($_POST["item_id"]);
+					if(sizeof($result)){
+						$obj["error"] = 0;
+						$obj["msg"] = "";
+						$obj["redirect"] = "/user@".$current_user->ID."/projects/ongoing/new/".$_POST["item_id"];
+					}else{
+						$obj["error"] = 1;
+						$obj["msg"] = "id not exist";
+						$obj["title"] = "Unknown";
+						$obj["content"] = 'Unknown error.';	
+					}
+				}else{
+					$obj["error"] = 1;
+					$obj["msg"] = "unauthorized brand";
+					$obj["title"] = "Uh oh, verified brands only!";
+					$obj["content"] = 'You have not been verified yet. To verify your brand, send an email to <a href="mailto:hello@storify.me">hello@storify.me</a>';	
+				}
+			}else{
+				$obj["error"] = 1;
+				$obj["msg"] = "incorrect role";
+				$obj["title"] = "Uh oh, brands only!";
+				$obj["content"] = 'Switch to Brand role in Settings to start a project with this Creator.';	
+			}
+		}else{
+			$obj["error"] = 1;
+			$obj["msg"] = "require login";
+			$obj["title"] = "Uh-oh, Members Only!";
+			$obj["content"] = '<a href="/signin">Sign in</a> to start a project with this Creator.';
 		}
 	break;
 	case "getPosts":

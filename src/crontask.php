@@ -16,8 +16,24 @@ include("inc/main.php");
 
 $main = new main();
 
+if($print_log){ 
+            
+        }
+
+$beginningTime = time();
+function printLog($log){
+	global $beginningTime;
+	if(php_sapi_name() == "cli"){
+		print_r("||". (time() - $beginningTime )." ".$log."\n");
+	}
+}
+
+printLog("get 50 IG account");
+
 //get all id and igusername
+//
 $query = "SELECT id, igusername, ig_id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE hidden = %d ORDER BY last_automodified ASC LIMIT 50"; // 50 each time
+//$query = "SELECT id, igusername, ig_id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE igusername = 'leodoesalot' ORDER BY last_automodified ASC LIMIT 50"; 
 $items = $wpdb->get_results($wpdb->prepare($query, 0), ARRAY_A);
 
 $instagram = new Instagram();
@@ -46,6 +62,8 @@ foreach($items as $key=>$value){
 	$igusername = $value["igusername"];
 	$ig_id = $value["ig_id"];
 	$instagrammer_id = $value["id"];
+
+	printLog("Start Getting ".$igusername. "(".($key+1).")");
 	try{	
 		//update account data
 		$account = $instagram->getAccount($igusername);
@@ -63,14 +81,17 @@ foreach($items as $key=>$value){
 	if(!$account){
 		//account is NULL, try get media by id, then username by media
 		
+		printLog($igusername." is null, get new media with stored media data");
 		try{
 			
 			$oldigusername = $igusername;
 			$medias = $instagram->getMediasByUserId($ig_id);
 			if($medias && sizeof($medias)){
 				$media_id = $medias[0]->getId();
+				printLog("get username by media");
 				$igusername = $instagram->getMediaById($media_id)->getOwner()->getUsername();
 				
+				printLog("Start Getting ".$igusername);	
 				$account = $instagram->getAccount($igusername);
 
 				//account exist
@@ -118,8 +139,9 @@ foreach($items as $key=>$value){
 		$fullName = $account["fullName"] ? $account["fullName"] : $igusername;
 		$profileImage = isset($account["profilePicUrlHd"]) && $account["profilePicUrlHd"] ? $account["profilePicUrlHd"] : $account["profilePicUrl"];
 
+		printLog("copy user profile image to AWS s3");	
 		$result = $main->copyFileToWP($profileImage, $fullName, $igusername);
-
+		printLog("copy done");
 
 		$data = array(
 			"name"=>$fullName,
@@ -138,8 +160,12 @@ foreach($items as $key=>$value){
 
 		$pod->save($data, null, $instagrammer_id);
 
+		printLog("save done");
+
 		//update all posts and update
 		$main->updateLatest30Posts($igusername, $instagrammer_id);
+
+		printLog("update Posts Done");
 
 		$query = "INSERT INTO `".$wpdb->prefix."stats_no_followers` ( instagrammer_id, amount ) VALUES ( %d, %d )";
         $wpdb->query($wpdb->prepare($query, $instagrammer_id, $account["followedByCount"]));
@@ -150,6 +176,8 @@ foreach($items as $key=>$value){
         //update last_automodified
 		$query = "UPDATE `".$wpdb->prefix."pods_instagrammer_fast` SET last_automodified = NOW() WHERE id = %d";
 		$wpdb->query($wpdb->prepare($query, $instagrammer_id));
+
+		printLog("update metric number Done");
 
 		//update msg
 		
@@ -164,6 +192,8 @@ foreach($items as $key=>$value){
 		);	
 	}
 }
+
+printLog("all Complete");
 
 $wpdb->update(
 	$wpdb->prefix."crontask",
