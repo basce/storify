@@ -18,7 +18,7 @@ class mailer{
         self::$storedvalue = array(
             "sender_name"=>$sender_name,
             "sender_email"=>$sender_email,
-            "use_SMTP"=>$user_SMTP,
+            "use_SMTP"=>$use_SMTP,
             "SMTP_ENDPOINT"=>$SMTP_ENDPOINT,
             "SMTP_PORT"=>$SMTP_PORT,
             "SMTP_USERNAME"=>$SMTP_USERNAME,
@@ -56,6 +56,10 @@ class mailer{
         if(sizeof(self::$storedvalue) == 0){
             die("please setup sender and DKIM with setSenderAndDKIM");
         }
+
+        $debug_msg = array();
+
+        $debug_msg[] = self::$storedvalue;
 
         if(self::$storedvalue["use_SMTP"]){
             $this->mail->IsSMTP(); 
@@ -111,10 +115,18 @@ class mailer{
             }
         }
 
-        if($this->mail->Send()) {
-            return array("error"=>0, "msg"=>"email sent to ".$receiver["email"]." bcc :".$bcc." cc:".$cc);
-        }else{
-            return array("error"=>1, "msg"=>$this->mail->ErrorInfo);
+        print_r($debug_msg);
+        try{
+            if($this->mail->Send()) {
+                return array("error"=>0, "msg"=>"email sent to ".$receiver["email"]." bcc :".$bcc." cc:".$cc." Debug :".json_encode($debug_msg));
+            }else{
+                return array("error"=>1, "msg"=>$this->mail->ErrorInfo." Debug :".json_encode($debug_msg));
+            }
+        }catch(Exception $e){
+            return array(
+                $debug_msg,
+                $e
+            );
         }
     }
 }

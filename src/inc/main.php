@@ -40,6 +40,19 @@ class main{
 	public function getMailManager(){
 		if(!$this->mail_manager){
 			$this->mail_manager = new mailer();
+			mailer::setSenderAndDKIM(
+				"no-reply",
+				"no-reply@storify.me",
+				TRUE,
+				AWS_SMTP_ENDPOINT,
+				AWS_PORT,
+				AWS_SMTP_USERNAME,
+				AWS_SMTP_PASSWORD,
+				"",
+				"",
+				"",
+				""
+			);
 		}
 		return $this->mail_manager;
 	}
@@ -700,7 +713,7 @@ class main{
 		$pod = pods("instagrammer_fast", $instagrammer_id);
 		$original_countries = $pod->field('instagrammer_country');
 		$original_languages = $pod->field('instagrammer_language');
-		$original_categorise = $pod->field('instagrammer_tag');
+		$original_categories = $pod->field('instagrammer_tag');
 
 		//remove if got any
 		if($original_countries && sizeof($original_countries)){
@@ -715,8 +728,47 @@ class main{
 			}
 		}
 		*/
-		if($original_categorise && sizeof($original_categorise)){
-			foreach($original_categorise as $key=>$value){
+	
+		//check if any tag change
+		$category_changed = false;
+		if(sizeof($original_categories) == sizeof($categories)){
+			foreach($original_categories as $key=>$value){
+				$exist = false;
+				foreach($categories as $key2=>$value2){
+					if($value["term_id"] == $value2){
+						$exist = true;
+					}
+				}
+				if(!$exist){
+					$category_changed = true;
+					break;
+				}
+			}
+		}else{
+			$category_changed = true;
+		}
+
+		//check if any tag change
+		$country_changed = false;
+		if(sizeof($original_countries) == sizeof($countries)){
+			foreach($original_countries as $key=>$value){
+				$exist = false;
+				foreach($countries as $key2=>$value2){
+					if($value["term_id"] == $value2){
+						$exist = true;
+					}
+				}
+				if(!$exist){
+					$country_changed = true;
+					break;
+				}
+			}
+		}else{
+			$country_changed = true;
+		}
+		
+		if($original_categories && sizeof($original_categories)){
+			foreach($original_categories as $key=>$value){
 				$pod->remove_from('instagrammer_tag', $value["term_id"]);
 			}
 		}
@@ -736,6 +788,11 @@ class main{
 				$pod->add_to('instagrammer_tag', $value);
 			}
 		}
+
+		return array(
+			"country_changed"=>$country_changed,
+			"category_changed"=>$category_changed
+		);
 	}
 
 	public function IGAccountBelongToUser($igname, $userID){

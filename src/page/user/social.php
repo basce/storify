@@ -119,7 +119,7 @@ include("page/component/header.php"); ?>
                                     <p>Help us discover your best stories.</p>
                                     <div class="author-description">
                                         <div class="form-group">
-                                            <select name="category[]" id="category" data-placeholder="Select passion" class="customselect" data-enable-input=true nc-method="addCategory" multiple>
+                                            <select name="category[]" id="category" data-placeholder="Please selection up to 5 passions." class="customselect" data-enable-input=true nc-method="addCategory" multiple>
                                                 <option value="">Select passion</option>
                                                 <?php
                                                     $language_tags = $main->getAllTags();
@@ -149,7 +149,7 @@ include("page/component/header.php"); ?>
                                     </div>
                                     <div class="author-description">
                                         <div class="form-group">
-                                            <select name="country[]" id="country" data-placeholder="Select country/city" class="customselect" data-enable-input=true multiple nc-method="addCountry">
+                                            <select name="country[]" id="country" data-placeholder="Please selection up to 5 countries." class="customselect" data-enable-input=true multiple nc-method="addCountry">
                                                 <option value="">Select country/city</option>
                                                 <?php
                                                     $category_tags = $main->getAllCountries();
