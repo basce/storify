@@ -2,6 +2,8 @@
 namespace noisycrayons\phpemail;
 
 include_once("inc/class.phpmailer.php");
+include_once("inc/class.smtp.php");
+include_once("inc/class.pop3.php");
 
 class mailer{
 

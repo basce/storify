@@ -2,28 +2,30 @@
 include("inc/main.php");
 
 use storify\main as main;
+use noisycrayons\phpemail\mailer as mailer;
 
 $main = new main();
 
-//test send email
-$mailer = $main->getMailManager();
 
-try{
-$result = $mailer->sendEmail(array(
-	"name"=>"Cheewei",
-	"email"=>"cheewei.yong@noisycrayons.com"
-),
+//test send email
+/*
+mailer::echoStoredValue();
+$mailer = $main->getEmailer();
+
+
+$result = $mailer->sendEmail(
+	array(
+		"name"=>"Cheewei",
+		"email"=>"cheewei.yong@noisycrayons.com"
+	),
 	"email test template",
 	array(),
 	__dir__."/emailtemplates/testingtemplate.html"
 );
-}catch(Exception $e){
-	print_r($e);
-}
 
 print_r($result);
+*/
 
-/*
 $query = "SELECT a.*, d.related_item_id FROM `".$wpdb->prefix."users` a LEFT JOIN `".$wpdb->prefix."igaccounts` b ON a.ID = b.userid LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` c ON b.igusername = c.igusername LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) d ON c.ID = d.item_id";
 $result = $wpdb->get_results($wpdb->prepare($query, 43), ARRAY_A);
 
@@ -32,7 +34,7 @@ foreach($result as $key=>$value){
 		update_user_meta($value["ID"], "profile_pic", $value["related_item_id"]);
 	}
 }
-*/
+
 //print_r(update_user_meta($current_user->ID, "profile_pic", 548669));
 
 //$main->getProjectManager()->getCreatorInvitationList(20);
