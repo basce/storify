@@ -664,7 +664,7 @@ class main{
 	public function setUserIGAccount($userID, $igusername){
 		global $wpdb;
 
-		$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."igaccounts` WHERE userid = %s AND igusername = %s";
+		$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d AND igusername = %s";
 		$prepare = $wpdb->prepare($query, $userID, $igusername);
 		if($wpdb->get_var($prepare)){
 			//already connect, nothing happen
@@ -674,7 +674,7 @@ class main{
 			$query = "DELETE FROM `".$wpdb->prefix."igaccounts` WHERE igusername = %s";
 			$wpdb->query($wpdb->prepare($query, $igusername));
 
-			$query = "INSERT INTO `".$wpdb->prefix."igaccounts` ( userid, igusername ) VALUES ( %s, %s )";
+			$query = "INSERT INTO `".$wpdb->prefix."igaccounts` ( userid, igusername ) VALUES ( %d, %s )";
 			$wpdb->query($wpdb->prepare($query, $userID, $igusername));
 			return $igusername;
 		}
