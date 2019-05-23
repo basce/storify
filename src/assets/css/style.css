@@ -3888,6 +3888,9 @@ textarea.form-control {
         -o-transform: rotateY( 0deg );
         transform: rotateY( 0deg );
     }
+    .box-container:hover .box-3d .front{
+        display:block;
+    }
     .box-3d{
         height:auto;
         padding:0;

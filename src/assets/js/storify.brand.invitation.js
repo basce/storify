@@ -124,7 +124,7 @@ storify.brand.invitation = {
 			b = $(a+" .modal-body .status"),
 			c = $(a+" .modal-footer button");
 		$(a+" .profile-image").css({"background-image":"url("+data.profile_image+")"});
-        $(a+" .modal-body strong").text(data.display_name+" ( "+data.user_email+ " ) ");
+        $(a+" .modal-body strong").text(data.display_name+" ("+data.user_email+ ")");
         switch(data.invitation_status){
         	case "pending":
         		b.addClass("item-pending").text("Waiting");
