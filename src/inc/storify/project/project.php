@@ -530,7 +530,7 @@ class project{
 
 			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
-			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", 0, "open", ($page-1).$pagesize, $pagesize), ARRAY_A);
+			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", 0, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 		}else{
 
 			$query = "SELECT COUNT(*) FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s";

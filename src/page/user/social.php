@@ -527,7 +527,6 @@ include("page/component/header.php"); ?>
                                         b.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
                                     },1000);
                                 }
-                                availableForPostPulling();
                                 if(data.social_data && data.social_data.iger && data.social_data.iger.modified){
                                     $(".last_update_datetime").text(data.social_data.iger.modified);
                                 }
@@ -537,6 +536,10 @@ include("page/component/header.php"); ?>
                                             scrollTop: $("#post_pull").offset().top
                                         }, 500);
                                     },1000);
+                                }else{
+                                    $('html, body').animate({
+                                        scrollTop: $("#post_pull").offset().top
+                                    }, 500);
                                 }
                             }
                         }

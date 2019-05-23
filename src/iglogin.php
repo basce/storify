@@ -74,7 +74,8 @@ if(isset($_GET["error"])){
                     "id"=>$result["media_id"],
                     "title"=>$fullName
                 ),
-                "hidden"=>1
+                "hidden"=>1,
+                "verified"=>1
             );
 
             update_user_meta($current_user->ID, 'profile_pic', $result["media_id"]);
