@@ -29,7 +29,7 @@ $obj = array(
 			}
 		break;
 		case "submitcreator":
-			$igname = $_REQUEST["igusername"];
+			$igname = strtolower($_REQUEST["igusername"]);
 			$instagram = new Instagram();
 			try{
 				$account = $instagram->getAccount($igname);

@@ -37,7 +37,7 @@ foreach($result as $key=>$value){
 }
 */
 
-
+//$query = "UPDATE `wp_pods_instagrammer_fast` SET verified = 1 WHERE igusername IN ( SELECT igusername WHERE `wp_igaccounts`)";
 
 //print_r(update_user_meta($current_user->ID, "profile_pic", 548669));
 

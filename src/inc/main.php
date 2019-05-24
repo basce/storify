@@ -687,17 +687,17 @@ class main{
 	public function setUserIGAccount($userID, $igusername){
 		global $wpdb;
 
-		$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d AND igusername = %s";
+		$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d AND LOWER( igusername ) = LOWER( %s )";
 		$prepare = $wpdb->prepare($query, $userID, $igusername);
 		if($wpdb->get_var($prepare)){
 			//already connect, nothing happen
 			return $igusername;
 		}else{
 			//remove all other connection
-			$query = "DELETE FROM `".$wpdb->prefix."igaccounts` WHERE igusername = %s";
+			$query = "DELETE FROM `".$wpdb->prefix."igaccounts` WHERE LOWER(igusername) = LOWER(%s)";
 			$wpdb->query($wpdb->prepare($query, $igusername));
 
-			$query = "INSERT INTO `".$wpdb->prefix."igaccounts` ( userid, igusername ) VALUES ( %d, %s )";
+			$query = "INSERT INTO `".$wpdb->prefix."igaccounts` ( userid, igusername ) VALUES ( %d, LOWER( %s ) )";
 			$wpdb->query($wpdb->prepare($query, $userID, $igusername));
 			return $igusername;
 		}
@@ -706,7 +706,7 @@ class main{
 	public function updateUserTags($countries, $languages, $categories, $igusernmae){
 		global $wpdb;
 
-		$query = "SELECT id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE igusername = %s";
+		$query = "SELECT id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE LOWER( igusername ) = LOWER( %s )";
 		$prepare = $wpdb->prepare($query, $igusernmae);
 		$instagrammer_id = $wpdb->get_var($prepare);
 

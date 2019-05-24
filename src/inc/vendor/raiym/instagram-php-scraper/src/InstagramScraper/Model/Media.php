@@ -141,6 +141,11 @@ class Media extends AbstractModel
     protected $comments = [];
 
     /**
+     * @var Comment[]
+     */
+    protected $previewComments = [];
+
+    /**
      * @var bool
      */
     protected $hasMoreComments = false;
@@ -154,6 +159,11 @@ class Media extends AbstractModel
      * @var Media[]|array
      */
     protected $sidecarMedias = [];
+
+    /**
+     * @var string
+     */
+    protected $locationSlug;
 
     /**
      * @param string $code
@@ -396,6 +406,14 @@ class Media extends AbstractModel
     }
 
     /**
+     * @return Comment[]
+     */
+    public function getPreviewComments()
+    {
+        return $this->previewComments;
+    }
+
+    /**
      * @return bool
      */
     public function hasMoreComments()
@@ -417,6 +435,14 @@ class Media extends AbstractModel
     public function getSidecarMedias()
     {
         return $this->sidecarMedias;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocationSlug()
+    {
+        return $this->locationSlug;
     }
 
     /**
@@ -515,6 +541,7 @@ class Media extends AbstractModel
             case 'location':
                 $this->locationId = $arr[$prop]['id'];
                 $this->locationName = $arr[$prop]['name'];
+                $this->locationSlug = $arr[$prop]['slug'];
                 break;
             case 'user':
                 $this->owner = Account::create($arr[$prop]);
@@ -543,7 +570,18 @@ class Media extends AbstractModel
                 $this->shortCode = $value;
                 $this->link = Endpoints::getMediaPageLink($this->shortCode);
                 break;
+            case 'edge_media_preview_comment':
+                if (isset($arr[$prop]['count'])) {
+                    $this->commentsCount = (int) $arr[$prop]['count'];
+                }
+                if (isset($arr[$prop]['edges']) && is_array($arr[$prop]['edges'])) {
+                    foreach ($arr[$prop]['edges'] as $commentData) {
+                        $this->previewComments[] = Comment::create($commentData['node']);
+                    }
+                }
+                break;
             case 'edge_media_to_comment':
+            case 'edge_media_to_parent_comment':
                 if (isset($arr[$prop]['count'])) {
                     $this->commentsCount = (int) $arr[$prop]['count'];
                 }
