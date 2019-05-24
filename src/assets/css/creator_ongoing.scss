@@ -1,0 +1,41 @@
+.history_block{
+	padding:10px;
+	.history_item{
+		margin:10px;
+		padding:10px;
+		border-bottom:solid 1px #CCC;
+		.item_row{
+			.label{
+				color:#666;
+				width:100px;
+				margin-right:10px;
+				float:left;
+			}
+			.value{
+				color:#000;
+				float:left;
+			}
+		}
+		.item_row::after{
+			display:block;
+			content:" ";
+			clear:both;
+		}
+	}
+	.history_item:first-child{
+		border-top:solid 1px #CCC;
+	}
+}
+
+.prototype_item{
+	label{
+		font-weight: 700;
+		margin-bottom: 0;
+		padding-bottom: 0;
+		margin-right:1rem;
+	}
+	label::after{
+		content:":";
+		padding-left:1rem;
+	}
+}

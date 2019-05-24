@@ -1,0 +1,18 @@
+.history_block {
+  padding: 10px; }
+  .history_block .history_item {
+    margin: 10px;
+    padding: 10px;
+    border-bottom: solid 1px #CCC; }
+    .history_block .history_item .label {
+      color: #666;
+      width: 100px;
+      margin-right: 10px;
+      display: inline-block; }
+    .history_block .history_item .value {
+      color: #000;
+      display: inline-block; }
+  .history_block .history_item:first-child {
+    border-top: solid 1px #CCC; }
+
+/*# sourceMappingURL=creator_ongoing.css.map */

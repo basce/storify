@@ -1,0 +1,32 @@
+@import 'form';
+@import 'detail_deliverable_prompt';
+@import 'project_list';
+@import 'creator_ongoing';
+@import 'add_project_prompt';
+@import 'completion_prompt';
+@import 'loading';
+@import 'collection';
+@import 'owlcarousel/owl.carousel';
+@import 'owlcarousel/owl.theme.default';
+
+.elementNeedFocus{
+	position:relative;
+	&::after{
+		content:" ";
+		display:block;
+		position:absolute;
+		top:0;
+		bottom:0;
+		left:0;
+		right:0;
+		background-color:yellow;
+		pointer-events: none;
+		animation: fadeOut 1s forwards;
+	}
+}
+
+@keyframes fadeOut{
+	0% {opacity: 0.5}
+	33% {opacity: 0.5}
+	100% {opacity: 0}
+}

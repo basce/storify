@@ -1,0 +1,117 @@
+/* Here comes your own styling */
+.selectize-dropdown [data-selectable],
+.selectize-dropdown .optgroup-header,
+.selectize-dropdown .no-results {
+  padding: 5px 8px;
+}
+.selectize-dropdown .active.create,
+.selectize-dropdown .active.no-results {
+  color: #495c68;
+}
+.selectize-dropdown .create,
+.selectize-dropdown .no-results {
+  color: rgba(48, 48, 48, 0.5);
+}
+.collection-items .item .wrapper .image.background-empty{
+	background-image: url(https://cdn.storify.me/data/uploads/2018/12/rsz_1shutterstock_605954480.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50%;
+    overflow: hidden;
+}
+.collection-items .item .wrapper .image .background-image-empty{
+	width: 100%;
+    height: 100%;
+}
+.modal-dialog label.error{
+  position: relative;
+  left: auto;
+  top: 0;
+  width: 100%;
+  padding: .3rem 1rem;
+  bottom: -3rem;
+  background-color: red;
+  color: #fff;
+}
+.hide{
+  display:none !important;
+}
+
+p.normal{
+  opacity: 1;
+}
+p.normal .opacity{
+  opacity: .65;
+}
+button.width-180{
+  width:180px !important;
+}
+
+#project_grid .item h4 span{
+  transition: none;
+}
+
+#project_grid .item h4.location span{
+  margin-left:0.5em;
+  display:inline-block;
+}
+
+#project_grid .item h4 span{
+  color:#000;
+}
+
+#project_grid .item .price .fa{
+  margin-right:0;
+}
+
+#project_grid .item h3 span.title{
+  text-decoration: none;
+  transition: none;
+  color: #000;
+  text-shadow: none;
+  display: inline-block;
+}
+
+#project_grid.list .item h3 .tag_group{
+  left: -20.3rem;
+  top: -1rem;
+  bottom: auto;
+  position: absolute;
+}
+
+#project_grid.list .item h3 .tag_group span.tag.category{
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+@media (max-width: 767px){
+  #project_grid.list .item h3 span.title{
+    color:#fff;
+  }
+
+  #project_grid.list .item h4 span, #project_grid.list.compact .item h4 span{
+    color: #fff;
+  }
+
+  #project_grid.list .item h4.location, #project_grid.list .item h4.location{
+    top: 22rem;
+  }
+
+  #project_grid.list .item h3, #project_grid.list .item h3{
+    bottom: 6rem;
+  }
+
+  #project_grid.list .item h3 .tag:not(.category), #project_grid.list .item h3 .tag:not(.category){
+    top: -17rem;
+  }
+
+  #project_grid.list .item h4.location, #project_grid.list .item h4.location{
+    top: 22rem;
+  }
+
+  #project_grid.list .item .description, #project_grid.list .item .description{
+    height: 9.5rem;
+  }
+}
+
