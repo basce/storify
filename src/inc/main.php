@@ -9,6 +9,7 @@ require_once(__DIR__.'/storify/bookmark.php');
 require_once(__DIR__.'/storify/pagesettings.php');
 require_once(__DIR__.'/storify/project/project.php');
 require_once(__DIR__."/noisycrayons/phpemail/mailer.php");
+require_once(__DIR__."/vendor/autoload.php");
 
 use storify\project as project;
 use storify\bookmark as bookmark;
@@ -731,7 +732,7 @@ class main{
 	
 		//check if any tag change
 		$category_changed = false;
-		if(sizeof($original_categories) == sizeof($categories)){
+		if($original_categories && sizeof($original_categories) && (sizeof($original_categories) == sizeof($categories))){
 			foreach($original_categories as $key=>$value){
 				$exist = false;
 				foreach($categories as $key2=>$value2){
@@ -750,7 +751,7 @@ class main{
 
 		//check if any tag change
 		$country_changed = false;
-		if(sizeof($original_countries) == sizeof($countries)){
+		if($original_countries && sizeof($original_countries) && (sizeof($original_countries) == sizeof($countries))){
 			foreach($original_countries as $key=>$value){
 				$exist = false;
 				foreach($countries as $key2=>$value2){
