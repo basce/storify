@@ -209,7 +209,8 @@
                 "label"=>"Sign Out",
                 "link"=>"/signout",
                 "icon"=>"fa-sign-out",
-                "query_item"=>"signout"  
+                "query_item"=>"signout",
+                "query_index"=>1
             )
         );
     }
@@ -227,7 +228,7 @@
 <?php
             foreach($value["group"] as $key2=>$value2){
                 if($value2["link"]){
-                    if($value2["query_item"] == $pathquery[$value2["query_index"]]){
+                    if((sizeof($pathquery) > $value2["query_index"]) && $value2["query_item"] == $pathquery[$value2["query_index"]]){
                         $a_class = "nav-link sub-nav-link active icon";
                     }else{
                         $a_class = "nav-link sub-nav-link icon";
@@ -244,7 +245,7 @@
 <?php            
         }else{
             if($value["link"]){
-                if($value["query_item"] == $pathquery[$value["query_index"]]){
+                if((sizeof($pathquery) > $value["query_index"]) && $value["query_item"] == $pathquery[$value["query_index"]]){
                     $a_class = "nav-link active icon";
                 }else{
                     $a_class = "nav-link icon";

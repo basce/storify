@@ -152,6 +152,29 @@ storify.creator.detail_closed = {
                     )
             );
         }
+        if (!$("#downloadLinkModal").length) {
+            $("body").append(
+                $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
+                .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
+                    .append($("<div>").addClass("modal-content")
+                        .append($("<div>").addClass("modal-header")
+                            .append($("<h5>").addClass("modal-title").text(""))
+                            .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
+                        )
+                        .append($("<div>").addClass("modal-body")
+                            .append($("<div>").addClass("filename"))
+                            .append($("<div>").addClass("filesize"))
+                            .append($("<div>").addClass("filemime"))
+                        )
+                        .append($("<div>").addClass("modal-footer")
+                            .append(
+                                $("<a>").addClass("btn btn-primary small download").text("download").attr({ target:"_blank", href:""})
+                            )
+                        )
+                    )
+                )
+            );
+        }
     },
     createBountyTable:function(detail){
         var cashtable = $("<div>").addClass("bountycash2"),
@@ -636,7 +659,29 @@ storify.creator.detail_closed = {
             break;
         }
 
-        div = $("<div>").addClass("submission "+mainClass).attr({o:data.id})
+        if(+data.file_id){
+            div = $("<div>").addClass("submission " + mainClass).attr({ o: data.id })
+                .append($("<i>").addClass("submission-icon fa " + iconClass))
+                .append($("<div>").addClass("urlrow")
+                    .append($("<div>").addClass("urlinput")
+                        .append($("<div>").addClass("file")
+                            .append($("<div>").text('file name : '+ data.filename))
+                            .append($("<div>").text('file size : '+ data.size))
+                            .append($("<div>").text('file type : '+ data.mime))
+                            .append($("<div>").text('Click here to download'))
+                            .click(function(e){
+                                e.preventDefault();
+                                storify.creator.detail_closed._showDownloadDialog(data.file_id);
+                            })
+                        )
+                    )
+                    .append(actiondiv)
+                )
+                .append($("<div>").addClass("urldescription")
+                    .append($("<p>").text(data.remark ? data.remark : "no caption given."))
+                );
+        }else{
+            div = $("<div>").addClass("submission "+mainClass).attr({o:data.id})
                 .append($("<i>").addClass("submission-icon fa fa-camera"))
                     .append($("<div>").addClass("urlrow")
                         .append($("<div>").addClass("urlinput")
@@ -647,7 +692,32 @@ storify.creator.detail_closed = {
                     .append($("<div>").addClass("urldescription")
                         .append($("<p>").text(data.remark ? data.remark : "no caption given."))
                     );
+        }
         return div;
+    },
+    _showDownloadDialog:function(id){
+        storify.loading.show();
+        $.ajax({
+            method: "POST",
+            dataType: "json",
+            data: {
+                method: "getDownloadLink",
+                id:id
+            },
+            success: function(rs){
+                storify.loading.hide();
+                if(rs.error){
+                    alert(rs.msg);
+                } else {
+                    $("#downloadLinkModal").find(".filename").text(rs.filename);
+                    $("#downloadLinkModal").find(".filesize").text(rs.filesize);
+                    $("#downloadLinkModal").find(".filemime").text(rs.filemime);
+                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
+                    $("#downloadLinkModal").modal("show");
+                }
+            }
+
+        })
     },
     updatelistnotification:function(type){
         

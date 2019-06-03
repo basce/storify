@@ -60,8 +60,8 @@ class deliverable{
 			//amount remain the same, no action needed
 		}
 
-		//update deliverable details
-		$this->updateDeliverableWithoutID($deliverable_details, $project_id);
+		//update deliverable details, nolonger in use
+		//$this->updateDeliverableWithoutID($deliverable_details, $project_id);
 	}
 
 	public function updateDeliverableWithoutID($deliverables_ar, $project_id){

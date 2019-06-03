@@ -524,6 +524,12 @@
         .submissioncontent .submissionsection .submission_form .submission_form_bottom .form-width {
           width: calc(100% - 100px);
           margin-bottom: 5px; }
+        .submissioncontent .submissionsection .submission_form .submission_form_bottom .progressbar {
+          background: lightgray;
+          border: solid 1px gray; }
+          .submissioncontent .submissionsection .submission_form .submission_form_bottom .progressbar .progressbar-inner {
+            height: 5px;
+            background: blue; }
     .submissioncontent .submissionsection::after {
       clear: both;
       display: block;

@@ -299,7 +299,7 @@ if(sizeof($pathquery) == 0){
                 $pageSettings = $pageManager->getSettings("projects");
                 if($_SESSION["role_view"] == "brand"){
                     //check if verified.
-                    if($main->isBrandVerified($current_user->ID)){
+                    if(!$main->isBrandVerified($current_user->ID)){
                         include_once("page/user/projects_brand_not_approve.php");
                         exit();
                     }
@@ -407,7 +407,7 @@ if(sizeof($pathquery) == 0){
             }
             if($pathquery[1] == "collections"){
                 $pageSettings = $pageManager->getSettings("collections");
-                if($pathquery[2] == "stories" || $pathquery[2] == "people"){
+                if(sizeof($pathquery) > 2 ){
                     if(sizeof($pathquery) == 3){
                         if($pathquery[2] == "people"){
                             $pageSettings = $pageManager->getSettings("people_bookmark");

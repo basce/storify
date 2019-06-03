@@ -111,7 +111,7 @@ include("page/component/header.php"); ?>
                 <?php
                 if(sizeof($pathquery) == 4){
                     ?>
-                    storify.brand.detail_closed.viewDetail(<?=$query[3]?>);
+                    storify.brand.detail_closed.viewDetail(<?=$pathquery[3]?>);
                     <?php
                 }
                 ?>

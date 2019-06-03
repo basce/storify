@@ -294,6 +294,17 @@ include("page/component/header.php"); ?>
                                         <button class="btn btn-outline-secondary edit_addSampleButton" type="button">Add Image</button>
                                     </div>
                                 </div>
+                                <!--
+                                <div class="input-group mb-3">
+                                    <input type="file" class="form-control" id="edit_samples_file" autoComplete="off" placeholder="Upload File.">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary addSampleButton" type="button">Add File</button>
+                                    </div>
+                                </div>
+                                <div class="progressbar hide" style="position:relative;top:-1rem;">
+                                    <div class='progressbar-inner'></div>
+                                </div>
+                                -->
                             </div>
                             <div class="image-groups">
                                 
@@ -481,6 +492,17 @@ include("page/component/header.php"); ?>
                                 <button class="btn btn-outline-secondary addSampleButton" type="button">Add Image</button>
                             </div>
                         </div>
+                        <!--
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="samples_file" autoComplete="off" placeholder="Upload File.">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary addSampleButton" type="button">Add File</button>
+                            </div>
+                        </div>
+                        <div class="progressbar hide" style="position:relative;top:-1rem;">
+                            <div class='progressbar-inner'></div>
+                        </div>
+                        -->
                     </div>
                     <div class="image-groups">
                         
@@ -594,6 +616,31 @@ include("page/component/header.php"); ?>
             var _project_users = null;
             var _default_country_id = <?=$default_country_id?>;
             var _baseurl = "/user@<?=$current_user->ID?>/projects/closed/";
+
+
+            if (!$("#downloadLinkModal").length) {
+                $("body").append(
+                    $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
+                    .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
+                        .append($("<div>").addClass("modal-content")
+                            .append($("<div>").addClass("modal-header")
+                                .append($("<h5>").addClass("modal-title").text(""))
+                                .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
+                            )
+                            .append($("<div>").addClass("modal-body")
+                                .append($("<div>").addClass("filename"))
+                                .append($("<div>").addClass("filesize"))
+                                .append($("<div>").addClass("filemime"))
+                            )
+                            .append($("<div>").addClass("modal-footer")
+                                .append(
+                                    $("<a>").addClass("btn btn-primary small download").text("download").attr({ target:"_blank", href:""})
+                                )
+                            )
+                        )
+                    )
+                );
+            }
 
         //add project related
         
@@ -722,6 +769,56 @@ include("page/component/header.php"); ?>
                             )
                 );
             }
+
+            /*
+            var _editUploadingFile = false;
+            function editUploadFile(){
+                if($("#edit_samples_file").val()){
+                    console.log("file is empty");
+                    return;
+                }
+
+                var file = $("#edit_samples_file")[0].files[0];
+
+                if(_editUploadingFile) return;
+                _editUploadingFile = true;
+                $.ajax({
+                    method: "POST",
+                    dataType: 'json',
+                    data: {
+                        method: "uploadTempoaryFile",
+                        type: selectType,
+                        file_name:file.name,
+                        file_size:file.size,
+                        file_mime:file.type,
+                        remark: $("#submission-content .submission_file .submission_description").val()
+                    },
+                    success: function(rs) {
+                        storify.creator.detail._submitting = false;
+                        if (rs.error) {
+                            storify.loading.hide();
+                            if (rs.msg == "cap reached") {
+                                error_alert.text("You cannot submit any more.");
+                            }
+                        } else {
+                            if(rs.success){
+                                //upload file
+                                storify.creator.detail._S3Upload(file, rs.url, function(){
+                                    storify.creator.detail._updateFileStatus(rs.id, caption, selectType, function(){
+                                        storify.creator.detail.resetSubmission();
+                                        storify.creator.detail.getSubmission(selectType);
+                                    }, function(str){
+                                        error_alert.text(str);
+                                    });
+                                });
+                            }else{
+                                error_alert.text(rs.msg);   
+                            }
+                        }
+                    }
+                })
+            }
+            */
 
             function isEditPageReady(silence){
                 var pageReady = true,

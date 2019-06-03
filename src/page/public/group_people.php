@@ -96,16 +96,20 @@ $pageSettings["breadcrumb"] = array(
 <?php 
 $header_without_toggle_button = true;
 include("page/component/header.php"); 
-switch($_REQUEST["order"]){
-    case "oldest":
-        $sortBy = "oldest";
-    break;
-    case "latest":
-        $sortBy = "latest";
-    break;
-    default:
-        $sortBy = "default";
-    break;
+if(isset($_REQUEST["order"])){
+    switch($_REQUEST["order"]){
+        case "oldest":
+            $sortBy = "oldest";
+        break;
+        case "latest":
+            $sortBy = "latest";
+        break;
+        default:
+            $sortBy = "default";
+        break;
+    }
+}else{
+    $sortBy = "default";
 }
 ?>
                 <!--============ Page Title =========================================================================-->

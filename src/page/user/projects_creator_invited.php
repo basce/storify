@@ -61,7 +61,9 @@ include("page/component/header.php"); ?>
                         <h1>Invites received</h1>
                         <h2>
 <?php
-                        $total_invites = $main->getProjectManager()->getNumberOfInvitationCreator($current_user->ID);
+                        //$total_invites = $main->getProjectManager()->getNumberOfInvitationCreator($current_user->ID);
+                        $stats = $main->getProjectManager()->getProjectStats($current_user->ID);
+                        $total_invites = $stats["invite"] ? $stats["invite"] : 0;
                         if($total_invites == 0){
                             echo "You have not received any invitations.";
                         }else if($total_invites == 1){

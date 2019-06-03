@@ -8,7 +8,7 @@ if($current_user->ID){
         case "getProject":
             $obj["error"] = 0;
             $obj["msg"] = "";
-            $obj["result"] = $main->getProjectManager()->getBrandProjectList($current_user->ID, $_PORT["sort"], $_POST["filter"], 24, $_POST["page"]);
+            $obj["result"] = $main->getProjectManager()->getBrandProjectList($current_user->ID, $_POST["sort"], $_POST["filter"], 24, $_POST["page"]);
         break;
         case "getDetail":
             $result = $main->getProjectManager()->getProjectDetail($_POST["project_id"], $current_user->ID);
@@ -66,6 +66,26 @@ if($current_user->ID){
                 $obj["error"] = 0;
                 $obj["msg"] = "";
                 $obj["data"] = $result["data"];
+            }
+        break;
+        case "getDownloadLink":
+            if($main->getProjectManager()->checkFileAdminAccess($_POST["id"], $current_user->ID)){
+                $file_data = $main->getProjectManager()->getFile($_POST["id"]);
+                $url_result = $main->getS3presignedLink($file_data["file_url"]);
+                if($url_result["error"]){
+                    $obj["error"] = 1;
+                    $obj["msg"] = $url_result["msg"];
+                }else{
+                    $obj["error"] = 0;
+                    $obj["filelink"] = $url_result["url"];
+                    $obj["filename"] = $file_data["filename"];
+                    $obj["filesize"] = $file_data["size"];
+                    $obj["filemime"] = $file_data["mime"];
+                    $obj["msg"] = "";
+                }
+            }else{
+                $obj["error"] = 1;
+                $obj["msg"] = "Invalid ownership";
             }
         break;
         default:

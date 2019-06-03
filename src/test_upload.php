@@ -14,21 +14,40 @@ include("inc/main.php");
     <body>
         <form id="upload_form" enctype="multipart/form-data" method="post">
             <input type="file" name="file1" id="file1"><br>
-            <input type="button" value="Upload File" onclick="uploadFile();">
+            <input type="button" value="Upload File">
         </form>
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <script type="text/javascript">
-            function uploadFile(){
-                var file = $("#file1")[0].files[0];
+            function uploadFile(file, url){
+                /*
                 var formdata = new FormData();
-                formdata.append("file1", file);
+                formdata.append("file", file);
+
                 var ajax = new XMLHttpRequest();
                 ajax.upload.addEventListener("progress", progressHandler, false);
                 ajax.addEventListener("load", completeHandler, false);
                 ajax.addEventListener("error", errorHandler, false);
                 ajax.addEventListener("abort", abortHandler, false);
-                ajax.open("POST", "test_upload_receiver.php");
-                ajax.send(formdata);
+                ajax.open('PUT', url, true);
+                ajax.setRequestHeader("Content-Type", file.type);
+                ajax.send(file);
+                */
+                
+                $.ajax({
+                    xhr: function() {
+                       var xhr = new window.XMLHttpRequest();
+                       xhr.upload.addEventListener("progress", progressHandler, false);
+                       xhr.addEventListener("progress", progressHandler, false);
+                       return xhr;
+                    },
+                    url:url,
+                    type:"PUT",
+                    data:file,
+                    processData:false,
+                    contentType:false,
+                    success:completeHandler,
+                    error:errorHandler
+                });
             }
 
             function progressHandler(event){
@@ -38,14 +57,44 @@ include("inc/main.php");
             function completeHandler(event){
                 console.log("upload complete");
             }
+
             function errorHandler(event){
                 console.log("upload error");
             }
+
             function abortHandler(event){
                 console.log("upload abort");
             }
+
+            function getPresignedURL(filename, type, onComplete){
+                $.ajax({
+                    url:"get_presigned_url.php",
+                    type:"POST",
+                    data:{
+                        filename:filename,
+                        mime:type
+                    },
+                    success:function(rs){
+                        console.log(rs);
+                        if(onComplete){
+                            onComplete(rs.url)
+                        }
+                    },
+                    error:function(xhr, status, errorThrown){
+                        console.log("error");
+                    },
+                    dataType:"json"
+                });
+            }
+
             jQuery(function(){
-                
+                $("#file1").change(function(e){
+                    if($("#file1")[0].files.length){
+                        getPresignedURL($("#file1")[0].files[0].name, $("#file1")[0].files[0].type, function(url){
+                            uploadFile($("#file1")[0].files[0], url);
+                        });
+                    }
+                });
             });
         </script>
     </body>

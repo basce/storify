@@ -1659,6 +1659,7 @@ class main{
 	}
 
 	function isBrandVerified($user_id){
+		global $current_user;
 		return get_user_meta($current_user->ID, "brand_verified", true);
 	}
 
@@ -1883,6 +1884,80 @@ class main{
 			echo '</ul></nav></div>';
 		}else{
 
+		}
+	}
+
+	function getS3UploadPresignedLink($filekey, $filemime){
+		$s3 = new \Aws\S3\S3Client(array(
+			"region"=>"ap-southeast-1",
+			"version"=>"latest",
+			"credentials"=>array(
+				"key"=>AS3CF_AWS_ACCESS_KEY_ID,
+				"secret"=>AS3CF_AWS_SECRET_ACCESS_KEY
+			)
+		));
+
+		try{
+			$cmd = $s3->getCommand(
+				'putObject',
+				array(
+					'Bucket' => 'ncstorifymeprivate',
+					"Key" => $filekey,
+					"ContentType" => $filemime
+				)
+			);
+
+			$request = $s3->createPresignedRequest($cmd, "+10minutes");
+
+			$url = (string)$request->getUri();
+
+			return array(
+				"error"=>0,
+				"url"=>$url,
+				"key"=>$filekey
+			);
+		}catch( Exception $e ){
+
+			return array(
+				"error"=>1,
+				"msg"=>$e->getMessage()
+			);
+		}
+	}
+
+	function getS3presignedLink($filekey){
+		$s3 = new \Aws\S3\S3Client(array(
+			"region"=>"ap-southeast-1",
+			"version"=>"latest",
+			"credentials"=>array(
+				"key"=>AS3CF_AWS_ACCESS_KEY_ID,
+				"secret"=>AS3CF_AWS_SECRET_ACCESS_KEY
+			)
+		));
+
+		try{
+			$cmd = $s3->getCommand(
+				'GetObject',
+				array(
+					"Bucket" => 'ncstorifymeprivate',
+					"Key" => $filekey
+				)
+			);
+
+			$request = $s3->createPresignedRequest($cmd, '+20minutes');
+
+			$url = (string)$request->getUri();
+
+			return array(
+				"error"=>0,
+				"url"=>$url
+			);
+		}catch( Exception $e ){
+
+			return array(
+				"error"=>1,
+				"msg"=>$e->getMessage()
+			);
 		}
 	}
 }

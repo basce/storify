@@ -699,6 +699,14 @@
           width:calc(100% - 100px);
           margin-bottom:5px;
         }
+        .progressbar{
+          background:lightgray;
+          border:solid 1px gray;
+          .progressbar-inner{
+            height:5px;
+            background:blue;
+          }
+        }
       }
     }
     &::after{

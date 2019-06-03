@@ -47,16 +47,20 @@
 <?php 
 $header_without_toggle_button = true;
 include("page/component/header.php"); 
-switch($_REQUEST["order"]){
-    case "oldest":
-        $sortBy = "oldest";
-    break;
-    case "latest":
-        $sortBy = "latest";
-    break;
-    default:
-        $sortBy = "sort_index";
-    break;
+if(isset($_REQUEST["order"])){
+    switch($_REQUEST["order"]){
+        case "oldest":
+            $sortBy = "oldest";
+        break;
+        case "latest":
+            $sortBy = "latest";
+        break;
+        default:
+            $sortBy = "sort_index";
+        break;
+    }
+}else{
+    $sortBy = "sort_index";
 }
 ?>
                 <!--============ Page Title =========================================================================-->
