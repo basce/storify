@@ -941,6 +941,12 @@ class project{
 			$submissions = $wpdb->get_results($wpdb->prepare($query, $project_id), ARRAY_A);
 			//group all together
 
+			$query = "SELECT COUNT(*) FROM `wp_project_user` WHERE project_id = %d AND role = %s";
+			$total_creator = $wpdb->get_var($wpdb->prepare($query, $project_id, 'creator'));
+
+			$total_photo = $task["no_of_photo"] * $total_creator;
+			$total_video = $task["no_of_video"] * $total_creator;
+
 			usort($submissions, function($a, $b){
 				if($a["status"] == "" || $a["status"] == "pending"){
 					$a_sort_weight = 2;
@@ -981,8 +987,8 @@ class project{
 			return array(
 				"error"=>0,
 				"data"=>$submissions,
-				"no_of_photo"=>$task["no_of_photo"],
-				"no_of_video"=>$task["no_of_video"],
+				"no_of_photo"=>$total_photo,
+				"no_of_video"=>$total_video,
 				"msg"=>""
 			);
 		}else{
@@ -1585,7 +1591,7 @@ class project{
 		$wpdb->query($wpdb->prepare($query, "expired", "pending", "0000-00-00 00:00:00"));
 
 		//expired project
-		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) - 28800 ) < UNIX_TIMESTAMP() AND status = %s";
+		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 576000 ) < UNIX_TIMESTAMP() AND status = %s";
 		$ids = $wpdb->get_col($wpdb->prepare($query, "open"));
 
 		if(sizeof($ids)){

@@ -407,6 +407,7 @@ storify.brand.detail = {
                 }
             });
 
+            list_div_description.append(" / creator");
             list_div_description.append($("<br>"));
             list_div_description.append(document.createTextNode(list_summary.description));
 
@@ -466,6 +467,7 @@ storify.brand.detail = {
                 .append(document.createTextNode(data.detail.no_of_video+" "))
                 .append($("<i>").addClass("fa fa-video-camera"));
         }
+        deliverable_block.append(" / creator");
 
         //sample block
         var owlImages = null;

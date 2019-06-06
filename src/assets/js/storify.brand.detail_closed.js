@@ -229,7 +229,7 @@ storify.brand.detail_closed = {
                 .append(document.createTextNode(data.detail.no_of_video+" "))
                 .append($("<i>").addClass("fa fa-video-camera"));
         }
-
+        deliverable_block.append(" / creator");
         //sample block
         var owlImages = null;
 

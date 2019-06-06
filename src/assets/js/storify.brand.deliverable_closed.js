@@ -273,10 +273,11 @@ storify.brand.deliverable_closed = {
             video_rejected = 0,
             video_submitted = 0;
 
+        photo_total += parseInt(odata.no_of_photo, 10);
+        video_total += parseInt(odata.no_of_video, 10);
+
         $.each(data, function(index,value){
             withData = true;
-            photo_total += parseInt(odata.no_of_photo, 10);
-            video_total += parseInt(odata.no_of_video, 10);
             $.each(value, function(index2, value2){
                 if(value2.type == "photo"){
                     switch(value2.status){

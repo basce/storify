@@ -97,7 +97,7 @@ storify.creator.projectList = {
             .append($("<div>").addClass("content")
                 .append(title)
                 .append(div_location)
-                .append($("<div>").addClass("description")
+                .append($("<div>").addClass("description one-button")
                     .append(div_description)
                 )
                 .append($("<div>").addClass("actions")
