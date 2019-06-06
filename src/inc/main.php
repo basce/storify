@@ -1,6 +1,8 @@
 <?php
 namespace storify;
 
+date_default_timezone_set('Asia/Singapore');
+
 define('WP_USE_THEMES', false);
 require_once(__DIR__.'/storify/staticparam.php');
 require_once(__DIR__.'/../ao/wp-load.php');
