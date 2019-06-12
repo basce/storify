@@ -208,6 +208,30 @@ if(isset($_REQUEST["order"])){
               });
             }
 
+            var _adding_to_project = false;
+            function addNewProject(itemid, obj){
+                if(_adding_to_project) return;
+                _adding_to_project = true;
+                $.ajax({
+                    url:"/json",
+                    method:"POST",
+                    data:{
+                        method:"add_new_project",
+                        item_id:itemid
+                    },
+                    success:function(rs){
+                        _adding_to_project = false;
+                        console.log(rs);
+                        if(rs.error){
+                            updateMemberOnlyModal(rs.title, rs.content);
+                        }else{
+                            window.location.href = rs.redirect;
+                        }
+                    },
+                    dataType: "json"
+                })
+            }
+
             function bookmarkTrigger(itemid, type, obj){
                 var bookmark;
                 if(obj.hasClass("active")){
@@ -324,6 +348,14 @@ if(isset($_REQUEST["order"])){
                                             .click(function(e){
                                                 e.preventDefault();
                                                 bookmarkTrigger($(this).attr("o"), $(this).attr("c"), $(this));
+                                            })
+                                        )
+                                        .append($("<a>")
+                                            .addClass("fa add_project " + (+$obj.verified ? "active":""))
+                                            .attr({href:"#", o:$obj.id})
+                                            .click(function(e){
+                                                e.preventDefault();
+                                                addNewProject($(this).attr("o"), $(this));
                                             })
                                         )
                                     )

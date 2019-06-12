@@ -1027,7 +1027,8 @@ Headers:		'Varela Round', sans-serif;
     bottom: 6rem;
     padding-right: 1.8rem;
     margin-bottom: .5rem;
-    min-width:100%;
+    min-width:90%;
+    word-break: break-word;
 }
 .items:not(.selectize-input) .item h3 a {
     color: #fff;

@@ -162,7 +162,7 @@ storify.creator.detail_closed = {
                             .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
                         )
                         .append($("<div>").addClass("modal-body")
-                            .append($("<div>").addClass("filename"))
+                            .append($("<a>").addClass("filename"))
                             .append($("<div>").addClass("filesize"))
                             .append($("<div>").addClass("filemime"))
                         )
@@ -664,15 +664,14 @@ storify.creator.detail_closed = {
                 .append($("<i>").addClass("submission-icon fa " + iconClass))
                 .append($("<div>").addClass("urlrow")
                     .append($("<div>").addClass("urlinput")
-                        .append($("<div>").addClass("file")
-                            .append($("<div>").text('file name : '+ data.filename))
-                            .append($("<div>").text('file size : '+ data.size))
-                            .append($("<div>").text('file type : '+ data.mime))
-                            .append($("<div>").text('Click here to download'))
-                            .click(function(e){
-                                e.preventDefault();
-                                storify.creator.detail_closed._showDownloadDialog(data.file_id);
-                            })
+                        .append($("<div>").addClass("file-container")
+                            .append($("<div>").addClass("file-download-link").text(storify.creator.detail_closed.shortenFileName(data.filename))
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                            .click(function(e){
+                                                e.preventDefault();
+                                                storify.creator.detail_closed._showDownloadDialog(data.file_id);
+                                            })
+                                )
                         )
                     )
                     .append(actiondiv)
@@ -709,9 +708,12 @@ storify.creator.detail_closed = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
-                    $("#downloadLinkModal").find(".filename").text(rs.filename);
-                    $("#downloadLinkModal").find(".filesize").text(rs.filesize);
-                    $("#downloadLinkModal").find(".filemime").text(rs.filemime);
+                    $("#downloadLinkModal").find(".filename")
+                                                .attr({href:rs.filelink, target:"_blank"})
+                                                .text(storify.creator.detail_closed.shortenFileName(rs.filename))
+                                                .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
+                    $("#downloadLinkModal").find(".filesize").text("");
+                    $("#downloadLinkModal").find(".filemime").text();
                     $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
                     $("#downloadLinkModal").modal("show");
                 }
@@ -979,5 +981,15 @@ storify.creator.detail_closed = {
             target: "_blank"
         });
         return cont;
+    },
+    shortenFileName:function(input){
+        var a = input.slice(0, input.lastIndexOf(".")),
+            b = input.slice(input.lastIndexOf("."));
+
+        if(a.length > 27){
+            return a.slice(0,24)+"..."+b;
+        }else{
+            return input;
+        }
     }
 };

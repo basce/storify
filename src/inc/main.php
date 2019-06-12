@@ -1,6 +1,8 @@
 <?php
 namespace storify;
 
+date_default_timezone_set('Asia/Singapore');
+
 define('WP_USE_THEMES', false);
 require_once(__DIR__.'/storify/staticparam.php');
 require_once(__DIR__.'/../ao/wp-load.php');
@@ -58,6 +60,25 @@ class main{
 			$this->email_manager = new mailer();
 		}
 		return $this->email_manager;
+	}
+
+	public function gen_string($string,$max=20) {
+	    $tok = strtok($string,' ');
+	    $sub = '';
+	    while($tok !== false && mb_strlen($sub) < $max) {
+	        if(strlen($sub) + mb_strlen($tok) <= $max) {
+	            $sub .= $tok.' ';
+	        } else {
+	            break;
+	        }
+	        $tok = strtok(' ');
+	    }
+	    $sub = trim($sub);
+	    if(mb_strlen($sub) == 0){
+	    	$sub = mb_substr($string, 0, $max-1);
+	    }
+	    if(mb_strlen($sub) < mb_strlen($string)) $sub .= '&hellip;';
+	    return $sub;
 	}
 
 	public function getCountriesList(){

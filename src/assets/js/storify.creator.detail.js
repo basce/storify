@@ -75,16 +75,16 @@ storify.creator.detail = {
                                             .append($("<ul>").addClass("nav nav-tabs").attr({ role: "tablist", id: "tab_control3" })
                                                 .append($("<li>").addClass("nav-item")
                                                     .append($("<a>").addClass("nav-link active").attr({ id: "submission-file-tab", "data-toggle": "tab", href: "#submission-file", role: "tab", "aria-controls": "submission-file", "aria-expanded": true })
-                                                        .append($("<span>").text("File"))
+                                                        .append($("<span>").text("Upload"))
                                                         .append(document.createTextNode(" "))
-                                                        .append($("<i>").addClass("fa fa-file"))
+                                                        .append($("<i>").addClass("fa fa-file-image-o"))
                                                     )
                                                 )
                                                 .append($("<li>").addClass("nav-item")
                                                     .append($("<a>").addClass("nav-link").attr({ id: "submission-text-tab", "data-toggle": "tab", href: "#submission-text", role: "tab", "aria-controls": "submission_text", "aria-expanded": true })
-                                                        .append($("<span>").text("Text"))
+                                                        .append($("<span>").text("Link"))
                                                         .append(document.createTextNode(" "))
-                                                        .append($("<i>").addClass("fa fa-commenting"))
+                                                        .append($("<i>").addClass("fa fa-link"))
                                                     )
                                                 )
                                             )
@@ -93,7 +93,17 @@ storify.creator.detail = {
                                                     .append($("<div>").addClass("submission_form submission_file")
                                                         .append($("<div>").addClass("submission_form_top")
                                                             .append($("<div>").addClass("form-width")
-                                                                .append($("<input>").addClass("form-control submission-file").attr({ type: "file" }))
+                                                                .append($("<input>").addClass("form-control submission-file hide").attr({ id:"creator-submit-file", type: "file" })
+                                                                                .change(function(e){
+                                                                                    if(e.target.files && e.target.files.length){
+                                                                                        $("label[for='creator-submit-file']").find(".file-comment").text(e.target.files[0].name);
+                                                                                    }
+                                                                                })
+                                                                )
+                                                                .append($("<label>").attr({for:"creator-submit-file"}).addClass("submission-label")
+                                                                    .append($("<span>").addClass("button").text("Choose File"))
+                                                                    .append($("<span>").addClass("file-comment").text("No file selected."))
+                                                                )
                                                             )
                                                             .append($("<div>").addClass("form-width")
                                                                 .append($("<textarea>").addClass("form-control submission_description").attr({ rows: 3, placeholder: "Enter your caption here." }))
@@ -110,7 +120,7 @@ storify.creator.detail = {
                                                             .append($("<div>").addClass("form-width")
                                                                 .append($("<div>").addClass("alert alert-danger hide").text("Please enter URL"))
                                                             )
-                                                            .append($("<div>").addClass("form-width progressbar")
+                                                            .append($("<div>").addClass("form-width progressbar hide")
                                                                 .append($("<div>").addClass("progressbar-inner"))
                                                             )
                                                         )
@@ -120,7 +130,7 @@ storify.creator.detail = {
                                                     .append($("<div>").addClass("submission_form submission_text")
                                                         .append($("<div>").addClass("submission_form_top")
                                                             .append($("<div>").addClass("form-width")
-                                                                .append($("<textarea>").addClass("form-control submission_url").attr({ rows: 2, placeholder: "Place link to your asset here" }))
+                                                                .append($("<textarea>").addClass("form-control submission_url").attr({ rows: 2, placeholder: "Place link to your asset here." }))
                                                             )
                                                             .append($("<div>").addClass("form-width")
                                                                 .append($("<textarea>").addClass("form-control submission_description").attr({ rows: 3, placeholder: "Enter your caption here." }))
@@ -240,7 +250,7 @@ storify.creator.detail = {
                             .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
                         )
                         .append($("<div>").addClass("modal-body")
-                            .append($("<div>").addClass("filename"))
+                            .append($("<a>").addClass("filename"))
                             .append($("<div>").addClass("filesize"))
                             .append($("<div>").addClass("filemime"))
                         )
@@ -510,7 +520,7 @@ storify.creator.detail = {
                 remark: $("#submission-content .submission_file .submission_description").val()
             },
             success: function(rs) {
-                storify.creator.detail._submitting = false;
+                storify.creator.detail._submittingfile = false;
                 if (rs.error) {
                     storify.loading.hide();
                     if (rs.msg == "cap reached") {
@@ -590,6 +600,7 @@ storify.creator.detail = {
             contentType:false,
             success:function(evt){
                 storify.creator.detail._progress(0);
+                storify.creator.detail._S3Uploading = false;
                 if(onComplete){
                     onComplete();
                 }
@@ -602,9 +613,10 @@ storify.creator.detail = {
         });
     },
     //submit submission
+    _submitting:false,
     submitSubmision: function() {
         var selectType = "",
-            error_alert = $("#submission_text .submission_form_bottom .alert");
+            error_alert = $("#submission-text .submission_form_bottom .alert");
 
         error_alert.addClass("hide");
 
@@ -614,12 +626,12 @@ storify.creator.detail = {
             selectType = "video";
         }
 
-        if (!$("#submission_text .submission_url").val()) {
+        if (!$("#submission-text .submission_url").val()) {
             error_alert.text("Please enter submission file link").removeClass("hide");
             return;
         }
 
-        if ($("#submission_text .submission_description").val() && $("#submission_text .submission_description").val().length >= 800) {
+        if ($("#submission-text .submission_description").val() && $("#submission-text .submission_description").val().length >= 800) {
             error_alert.text("You have exceeded the character limit. Please shorten your caption.").removeClass("hide");
             return;
         }
@@ -633,8 +645,8 @@ storify.creator.detail = {
                 method: "makeSubmission",
                 project_id: storify.project._project_id,
                 type: selectType,
-                URL: $("#submission_text .submission_url").val(),
-                remark: $("#submission_text .submission_description").val()
+                URL: $("#submission-text .submission_url").val(),
+                remark: $("#submission-text .submission_description").val()
             },
             success: function(rs) {
                 storify.creator.detail._submitting = false;
@@ -654,6 +666,7 @@ storify.creator.detail = {
     //resetSubmission
     resetSubmission: function() {
         $("#submission-content .submission-file").val("");
+        $("#submission-content .file-comment").text("No file selected.");
         $("#submission-content .submission_url").val("");
         $("#submission-content .submission_description").val("");
         $("#submission-content .progressbar").addClass("hide");
@@ -714,15 +727,14 @@ storify.creator.detail = {
                 .append($("<i>").addClass("submission-icon fa " + iconClass))
                 .append($("<div>").addClass("urlrow")
                     .append($("<div>").addClass("urlinput")
-                        .append($("<div>").addClass("file")
-                            .append($("<div>").text('file name : '+ data.filename))
-                            .append($("<div>").text('file size : '+ data.size))
-                            .append($("<div>").text('file type : '+ data.mime))
-                            .append($("<div>").text('Click here to download'))
-                            .click(function(e){
-                                e.preventDefault();
-                                storify.creator.detail._showDownloadDialog(data.file_id);
-                            })
+                        .append($("<div>").addClass("file-container")
+                            .append($("<div>").addClass("file-download-link").text(storify.creator.detail.shortenFileName(data.filename))
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                            .click(function(e){
+                                                e.preventDefault();
+                                                storify.creator.detail._showDownloadDialog(data.file_id);
+                                            })
+                                )
                         )
                     )
                     .append(actiondiv)
@@ -759,9 +771,12 @@ storify.creator.detail = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
-                    $("#downloadLinkModal").find(".filename").text(rs.filename);
-                    $("#downloadLinkModal").find(".filesize").text(rs.filesize);
-                    $("#downloadLinkModal").find(".filemime").text(rs.filemime);
+                    $("#downloadLinkModal").find(".filename")
+                                                .attr({href:rs.filelink, target:"_blank"})
+                                                .text(storify.creator.detail.shortenFileName(rs.filename))
+                                                .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
+                    $("#downloadLinkModal").find(".filesize").text("");
+                    $("#downloadLinkModal").find(".filemime").text("");
                     $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
                     $("#downloadLinkModal").modal("show");
                 }
@@ -963,6 +978,15 @@ storify.creator.detail = {
                 }
             }
         });
+    },
+    shortenFileName:function(input){
+        var a = input.slice(0, input.lastIndexOf(".")),
+            b = input.slice(input.lastIndexOf("."));
 
+        if(a.length > 27){
+            return a.slice(0,24)+"..."+b;
+        }else{
+            return input;
+        }
     }
 };

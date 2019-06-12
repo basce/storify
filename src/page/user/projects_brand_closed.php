@@ -79,7 +79,7 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <div class="project-items" id="closed_grid" data-page="0" data-sort="date" data-filter="close">
+                            <div class="project-items" id="closed_grid" data-page="0" data-sort="rev_closing_date" data-filter="close">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="closeloadmore">Load More</a>

@@ -76,24 +76,34 @@ class project{
 		return $project_id;
 	}
 
+	public function getUTCStringFromLocal($datetimeStr, $hours){
+		return date("Y-m-d H:i:s", strtotime($datetimeStr) - $hours*3600);
+	}
+
 	public function edit_save($project_id, $data){
 		global $wpdb;
 
 		//update project name, and closing date
 		$query = "UPDATE `".$this->tbl_project."` SET name = %s, closing_date = %s, invitation_closing_date = %s WHERE id = %d";
-		$wpdb->query($wpdb->prepare($query, $data["detail"]["name"], $data["detail"]["closing_date"], $data["detail"]["invitation_closing_date"], $project_id));
+		$wpdb->query($wpdb->prepare($query, $data["detail"]["name"], $this->getUTCStringFromLocal($data["detail"]["closing_date"], 8), $this->getUTCStringFromLocal($data["detail"]["invitation_closing_date"], 8), $project_id));
 
 		//save detail
 		$this->detail_manager->save($project_id, $data["detail"]);
 
 		//update brand
-		$this->brand_manager->updateBrand($data["brand"], $project_id);
+		if(isset($data["brand"])){
+			$this->brand_manager->updateBrand($data["brand"], $project_id);
+		}
 
 		//update location
-		$this->location_manager->updateLocation($data["location"], $project_id);
+		if(isset($data["location"])){
+			$this->location_manager->updateLocation($data["location"], $project_id);
+		}
 
 		//update tags ( categories )
-		$this->tag_manager->updateTag($data["tag"], $project_id);
+		if(isset($data["tag"])){
+			$this->tag_manager->updateTag($data["tag"], $project_id);
+		}
 
 		//generate summary json and save
 		$summary_json = $this->generateSummaryJson($project_id);
@@ -121,7 +131,7 @@ class project{
 		global $wpdb;
 		//update project name, and closing date
 		$query = "UPDATE `".$this->tbl_project."` SET name = %s, closing_date = %s, invitation_closing_date = %s WHERE id = %d";
-		$wpdb->query($wpdb->prepare($query, $data["detail"]["name"], $data["detail"]["closing_date"], $data["detail"]["invitation_closing_date"], $project_id));
+		$wpdb->query($wpdb->prepare($query, $data["detail"]["name"], $this->getUTCStringFromLocal($data["detail"]["closing_date"],8), $this->getUTCStringFromLocal($data["detail"]["invitation_closing_date"],8), $project_id));
 
 		//save detail
 		$this->detail_manager->save($project_id, $data["detail"]);
@@ -291,7 +301,7 @@ class project{
 			"invitation_closing_date"=>$details["invitation_closing_date"],
 			"formatted_invitation_closing_date"=>date('d-m-y',strtotime($details["invitation_closing_date"])),
 			"closing_date"=>$details["closing_date"],
-			"formatted_colsing_date"=>date('d-m-y',strtotime($details["closing_date"])),
+			"formatted_closing_date"=>date('d-m-y',strtotime($details["closing_date"])),
 			"created_date"=>$details["tt"],
 			"deliverables_ar"=>$deliverables,
 			"deliverables"=>$deliverables_text,
@@ -500,6 +510,9 @@ class project{
 			case "closing_date":
 				$orderByCond = " ORDER BY b.closing_date ASC";
 			break;
+			case "rev_closing_date":
+				$orderByCond = " ORDER BY b.closing_date DESC";
+			break;
 			case "invitation_closing_date":
 			default:
 				$orderByCond = " ORDER BY b.invitation_closing_date ASC";
@@ -514,7 +527,7 @@ class project{
 			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "removed", 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
 			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "removed", 0, "open", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
 		}else if($filter == "other"){
@@ -524,7 +537,7 @@ class project{
 			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", "removed", 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status =%s".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status != %s AND status != %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status =%s".$orderByCond." LIMIT %d, %d";
 
 			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", "removed", 0, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 		}else if($filter == ""){
@@ -534,7 +547,7 @@ class project{
 			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
 			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "pending", 0, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 		}else{
@@ -544,7 +557,7 @@ class project{
 			$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, $orderBy, 0, "open"));
 			$totalpage = ceil($totalsize / $pagesize);
 
-			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
+			$query = "SELECT a.invitation_id, a.status, b.*, UNIX_TIMESTAMP( b.invitation_closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM ( SELECT id as `invitation_id`, project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND status = %s ) a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = %d AND b.status = %s".$orderByCond." LIMIT %d, %d";
 
 			$data = $wpdb->get_results($wpdb->prepare($query, $user_id, $filter, 0, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 		}
@@ -559,7 +572,7 @@ class project{
 			$data[$key]["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["closing_date"]));
 			$data[$key]["summary"]["closing_timestamp"] = strtotime($data[$key]["summary"]["closing_date"]);
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
-			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
+			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
 			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["invitation_closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
@@ -589,6 +602,7 @@ class project{
 				$orderByCond = " ORDER BY b.number_creatives ASC";
 			break;
 			case "closing_date":
+			case "date":
 				$orderByCond = " ORDER BY b.closing_date ASC";
 			break;
 			case "rev_closing_date":
@@ -607,7 +621,7 @@ class project{
 				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
 				$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
+				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
 				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 			break;
 			case "close":
@@ -615,7 +629,7 @@ class project{
 				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
 				$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() - 28800 as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
+				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
 				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "close", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 			break;
 		}
@@ -630,7 +644,7 @@ class project{
 			$data[$key]["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["closing_date"]));
 			$data[$key]["summary"]["closing_timestamp"] = strtotime($data[$key]["summary"]["closing_date"]);
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
-			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
+			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
 			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
@@ -663,7 +677,12 @@ class project{
 				$orderByCond = " ORDER BY b.number_creatives ASC";
 			break;
 			case "closing_date":
+			case "close":
+			case "date":
 				$orderByCond = " ORDER BY b.closing_date ASC";
+			break;
+			case "rev_closing_date":
+				$orderByCond = " ORDER BY b.closing_date DESC";
 			break;
 			case "invitation_closing_date":
 			default:
@@ -700,7 +719,7 @@ class project{
 			$data[$key]["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["closing_date"]));
 			$data[$key]["summary"]["closing_timestamp"] = strtotime($data[$key]["summary"]["closing_date"]);
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
-			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
+			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
 			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
@@ -993,7 +1012,7 @@ class project{
 			);
 		}else{
 
-			$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.project_id = %d AND a.creator_id = %d";
+			$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.project_id = %d AND a.creator_id = %d ORDER BY a.tt DESC";
 			$submissions = $wpdb->get_results($wpdb->prepare($query, $project_id, $user_id), ARRAY_A);
 
 			usort($submissions, function($a, $b){
@@ -1587,11 +1606,11 @@ class project{
 
 		//expired invitation
 		//SELECT a . * , b.invitation_closing_date FROM ( SELECT * FROM  `wp_project_invitation` WHERE STATUS =  "pending" )a LEFT JOIN wp_project b ON a.project_id = b.id WHERE b.invitation_closing_date < NOW() && b.invitation_closing_date != "0000-00-00 00:00:00"
-		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE ( UNIX_TIMESTAMP( b.invitation_closing_date ) - 28800 ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
+		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE ( UNIX_TIMESTAMP( b.invitation_closing_date ) ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
 		$wpdb->query($wpdb->prepare($query, "expired", "pending", "0000-00-00 00:00:00"));
 
 		//expired project
-		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 576000 ) < UNIX_TIMESTAMP() AND status = %s";
+		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 604800 ) < UNIX_TIMESTAMP() AND status = %s";
 		$ids = $wpdb->get_col($wpdb->prepare($query, "open"));
 
 		if(sizeof($ids)){
