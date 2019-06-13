@@ -295,7 +295,7 @@ class project{
 			"invitation_closing_date"=>$details["invitation_closing_date"],
 			"formatted_invitation_closing_date"=>date('d-m-y',strtotime($details["invitation_closing_date"])),
 			"closing_date"=>$details["closing_date"],
-			"formatted_colsing_date"=>date('d-m-y',strtotime($details["closing_date"])),
+			"formatted_closing_date"=>date('d-m-y',strtotime($details["closing_date"])),
 			"created_date"=>$details["tt"],
 			"deliverables_ar"=>$deliverables,
 			"deliverables"=>$deliverables_text,
@@ -997,7 +997,7 @@ class project{
 			);
 		}else{
 
-			$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.project_id = %d AND a.creator_id = %d";
+			$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.project_id = %d AND a.creator_id = %d ORDER BY a.tt DESC";
 			$submissions = $wpdb->get_results($wpdb->prepare($query, $project_id, $user_id), ARRAY_A);
 
 			usort($submissions, function($a, $b){

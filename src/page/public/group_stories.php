@@ -209,6 +209,16 @@ if(isset($_REQUEST["order"])){
               });
             }
 
+            function updateMemberOnlyModal(title, content){
+                if($("#memberonlymodal").length){
+                    $("#memberonlymodal .modal-header .modal-title").text(title);
+                    $("#memberonlymodal .modal-body .form-group").html(content);
+                    $("#memberonlymodal").modal();
+                }else{
+                    alert(title);
+                }
+            }
+
             function bookmarkTrigger(itemid, type, obj){
                 var bookmark;
                 if(obj.hasClass("active")){
@@ -308,7 +318,6 @@ if(isset($_REQUEST["order"])){
                                     bookmarkTrigger($(this).attr("o"), $(this).attr("c"), $(this));
                                 })
                             )
-                            
                         )
                         .append($("<div>").addClass("description")
                             .append($("<p>").text($obj.caption))

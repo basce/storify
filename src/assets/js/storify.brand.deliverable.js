@@ -174,9 +174,8 @@ storify.brand.deliverable = {
             temp_history = null;
 
         if(data.remark){
-            temp_remark = $("<div>").addClass("single_block")
-                                .append($("<label>").text("Remark"))
-                                .append(document.createTextNode(data.remark));
+            temp_remark = $("<div>").addClass("single_block urldescription")
+                                .append($("<p>").text(data.remark));
         }
         if(data.status == "accepted" || data.status == "rejected"){
             temp_status = $("<div>").addClass("single_block")
@@ -229,10 +228,10 @@ storify.brand.deliverable = {
                     .append($("<div>").addClass("single_block")
                         .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
                         .append($("<div>").addClass("file")
-                            .append($("<div>").text('file name : '+ data.filename))
-                            .append($("<div>").text('file size : '+ data.size))
-                            .append($("<div>").text('file type : '+ data.mime))
-                            .append($("<div>").text('Click here to download'))
+                            .append($("<div>").text(storify.brand.deliverable.shortenFileName(data.filename))
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                )
+                            .append($("<div>").text(data.mime))
                             .click(function(e){
                                 e.preventDefault();
                                 storify.brand.deliverable._showDownloadDialog(data.file_id);
@@ -280,8 +279,9 @@ storify.brand.deliverable = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
-                    $("#downloadLinkModal").find(".filename").text(rs.filename);
-                    $("#downloadLinkModal").find(".filesize").text(rs.filesize);
+                    $("#downloadLinkModal").find(".filename").text(storify.brand.deliverable.shortenFileName(rs.filename))
+                                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
+                    $("#downloadLinkModal").find(".filesize").text("");
                     $("#downloadLinkModal").find(".filemime").text(rs.filemime);
                     $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
                     $("#downloadLinkModal").modal("show");
@@ -454,6 +454,16 @@ storify.brand.deliverable = {
     	var a = "#reject_submission";
         if($(a+" button.confirmreject").attr("data-id")){
             storify.brand.deliverable.response($(a+" button.confirmreject").attr("data-id"), "rejected", $(a+" textarea").val());
+        }
+    },
+    shortenFileName:function(input){
+        var a = input.slice(0, input.lastIndexOf(".")),
+            b = input.slice(input.lastIndexOf("."));
+
+        if(a.length > 27){
+            return a.slice(0,24)+"..."+b;
+        }else{
+            return input;
         }
     }
 };

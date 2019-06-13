@@ -665,10 +665,10 @@ storify.creator.detail_closed = {
                 .append($("<div>").addClass("urlrow")
                     .append($("<div>").addClass("urlinput")
                         .append($("<div>").addClass("file")
-                            .append($("<div>").text('file name : '+ data.filename))
-                            .append($("<div>").text('file size : '+ data.size))
-                            .append($("<div>").text('file type : '+ data.mime))
-                            .append($("<div>").text('Click here to download'))
+                            .append($("<div>").text(storify.creator.detail_closed.shortenFileName(data.filename))
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                )
+                            .append($("<div>").text(data.mime))
                             .click(function(e){
                                 e.preventDefault();
                                 storify.creator.detail_closed._showDownloadDialog(data.file_id);
@@ -709,8 +709,9 @@ storify.creator.detail_closed = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
-                    $("#downloadLinkModal").find(".filename").text(rs.filename);
-                    $("#downloadLinkModal").find(".filesize").text(rs.filesize);
+                    $("#downloadLinkModal").find(".filename").text(storify.creator.detail.shortenFileName(rs.filename))
+                                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
+                    $("#downloadLinkModal").find(".filesize").text("");
                     $("#downloadLinkModal").find(".filemime").text(rs.filemime);
                     $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
                     $("#downloadLinkModal").modal("show");
@@ -979,5 +980,15 @@ storify.creator.detail_closed = {
             target: "_blank"
         });
         return cont;
+    },
+    shortenFileName:function(input){
+        var a = input.slice(0, input.lastIndexOf(".")),
+            b = input.slice(input.lastIndexOf("."));
+
+        if(a.length > 27){
+            return a.slice(0,24)+"..."+b;
+        }else{
+            return input;
+        }
     }
 };
