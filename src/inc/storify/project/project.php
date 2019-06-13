@@ -956,7 +956,7 @@ class project{
 		$total_deliverables = $task["no_of_photo"] + $task["no_of_video"];
 
 		if($user_role == "admin"){
-			$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.project_id = %d ORDER BY a.creator_id, a.type";
+			$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.project_id = %d ORDER BY a.tt DESC, a.creator_id ASC, a.type ASC";
 			$submissions = $wpdb->get_results($wpdb->prepare($query, $project_id), ARRAY_A);
 			//group all together
 

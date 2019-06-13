@@ -288,6 +288,10 @@
         font-size: 1.4rem;
         margin-top: 5px;
       }
+      .status_block{
+        float:right;
+        padding:.7rem 0 0;
+      }
       .right-cont{
         float:left;
         width:60px;
@@ -760,11 +764,12 @@
           margin-bottom:5px;
         }
         .progressbar{
-          background:lightgray;
-          border:solid 1px gray;
+          box-shadow: inset 0 0 1rem 0 rgba(0,0,0, .1);
+          border: .1rem solid rgba(0,0,0, .15);
+          background: transparent;
           .progressbar-inner{
             height:5px;
-            background:blue;
+            background:#ff0000;
           }
         }
       }

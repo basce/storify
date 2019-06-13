@@ -728,7 +728,7 @@ storify.creator.detail = {
                 .append($("<div>").addClass("urlrow")
                     .append($("<div>").addClass("urlinput")
                         .append($("<div>").addClass("file-container")
-                            .append($("<div>").addClass("file-download-link").text(storify.creator.detail.shortenFileName(data.filename))
+                            .append($("<div>").addClass("file-download-link").text(storify.creator.detail.shortenFileName(data.filename)+" ("+data.mime+")")
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
                                             .click(function(e){
                                                 e.preventDefault();
@@ -773,7 +773,7 @@ storify.creator.detail = {
                 } else {
                     $("#downloadLinkModal").find(".filename")
                                                 .attr({href:rs.filelink, target:"_blank"})
-                                                .text(storify.creator.detail.shortenFileName(rs.filename))
+                                                .text(storify.creator.detail.shortenFileName(rs.filename)+" ("+rs.filemime+")")
                                                 .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
                     $("#downloadLinkModal").find(".filesize").text("");
                     $("#downloadLinkModal").find(".filemime").text("");

@@ -142,8 +142,7 @@ storify.brand.deliverable_closed = {
                                 .append($("<p>").text(data.remark));
         }
         if(data.status == "accepted" || data.status == "rejected"){
-            temp_status = $("<div>").addClass("single_block")
-                                .append($("<label>").text("Status"))
+            temp_status = $("<div>").addClass("status_block")
                                 .append($("<span>").addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1)));
             if(data.status == "accepted"){
                 d.addClass("item-accepted");
@@ -194,7 +193,7 @@ storify.brand.deliverable_closed = {
                     .append($("<div>").addClass("single_block")
                         .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
                         .append($("<div>").addClass("file-container")
-                            .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable_closed.shortenFileName(data.filename))
+                            .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable_closed.shortenFileName(data.filename)+" ("+data.mime+")")
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
                                             .click(function(e){
                                                 e.preventDefault();
@@ -245,7 +244,7 @@ storify.brand.deliverable_closed = {
                 } else {
                     $("#downloadLinkModal").find(".filename")
                                                 .attr({href:rs.filelink, target:"_blank"})
-                                                .text(storify.brand.deliverable_closed.shortenFileName(rs.filename))
+                                                .text(storify.brand.deliverable_closed.shortenFileName(rs.filename)+" ("+rs.filemime+")")
                                                 .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
                     $("#downloadLinkModal").find(".filesize").text("");
                     $("#downloadLinkModal").find(".filemime").text("");
