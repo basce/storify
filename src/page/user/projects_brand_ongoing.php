@@ -925,8 +925,8 @@ include("page/component/header.php"); ?>
                 //$("#edit_closing_date").val(changeDateTime(data.closing_date));
                 //$("#edit_invitation_closing_date").val(changeDateTime(data.invitation_closing_date));
 
-                $("#edit_closing_date").datepicker("update", changeDateTime(data.closing_date));
-                $("#edit_invitation_closing_date").datepicker("update", changeDateTime(data.invitation_closing_date));
+                $("#edit_closing_date").datepicker("update", changeDateTime(data.summary.closing_date));
+                $("#edit_invitation_closing_date").datepicker("update", changeDateTime(data.summary.invitation_closing_date));
 
                 if(data.location && data.location.length){
                     $("#edit_location")[0].selectize.addOption(convertToOption(data.location));

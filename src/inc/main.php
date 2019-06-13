@@ -1384,8 +1384,8 @@ class main{
 					$posts[] = array(
 						"id"=>$post_pods->field('id'),
 						"name"=>$post_pods->field('name'),
-						"image_hires"=>pods_image_url($post_pods->field('image_hires')["ID"], 'large'),
-						"hr_image"=>pods_image_url($post_pods->field('image_hires')["ID"], NULL),
+						"image_hires"=>str_replace('https://storify.me/', 'https://cdn.storify.me/', pods_image_url($post_pods->field('image_hires')["ID"], 'large')),
+						"hr_image"=>str_replace('https://storify.me/', 'https://cdn.storify.me/', pods_image_url($post_pods->field('image_hires')["ID"], NULL)),
 						"caption"=>$post_pods->field('caption'),
 						"likes"=>$post_pods->field('likes'),
 						"comments"=>$post_pods->field('comments'),
