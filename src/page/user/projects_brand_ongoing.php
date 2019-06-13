@@ -617,31 +617,6 @@ include("page/component/header.php"); ?>
             var _default_country_id = <?=$default_country_id?>;
             var _baseurl = "/user@<?=$current_user->ID?>/projects/closed/";
 
-
-            if (!$("#downloadLinkModal").length) {
-                $("body").append(
-                    $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
-                    .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
-                        .append($("<div>").addClass("modal-content")
-                            .append($("<div>").addClass("modal-header")
-                                .append($("<h5>").addClass("modal-title").text(""))
-                                .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
-                            )
-                            .append($("<div>").addClass("modal-body")
-                                .append($("<div>").addClass("filename"))
-                                .append($("<div>").addClass("filesize"))
-                                .append($("<div>").addClass("filemime"))
-                            )
-                            .append($("<div>").addClass("modal-footer")
-                                .append(
-                                    $("<a>").addClass("btn btn-primary small download").text("download").attr({ target:"_blank", href:""})
-                                )
-                            )
-                        )
-                    )
-                );
-            }
-
         //add project related
         
             $("#creators").selectize({

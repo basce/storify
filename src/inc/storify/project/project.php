@@ -91,13 +91,19 @@ class project{
 		$this->detail_manager->save($project_id, $data["detail"]);
 
 		//update brand
-		$this->brand_manager->updateBrand($data["brand"], $project_id);
+		if(isset($data["brand"])){
+			$this->brand_manager->updateBrand($data["brand"], $project_id);
+		}
 
 		//update location
-		$this->location_manager->updateLocation($data["location"], $project_id);
+		if(isset($data["location"])){
+			$this->location_manager->updateLocation($data["location"], $project_id);
+		}
 
 		//update tags ( categories )
-		$this->tag_manager->updateTag($data["tag"], $project_id);
+		if(isset($data["tag"])){
+			$this->tag_manager->updateTag($data["tag"], $project_id);
+		}
 
 		//generate summary json and save
 		$summary_json = $this->generateSummaryJson($project_id);
@@ -504,6 +510,9 @@ class project{
 			case "closing_date":
 				$orderByCond = " ORDER BY b.closing_date ASC";
 			break;
+			case "rev_closing_date":
+				$orderByCond = " ORDER BY b.closing_date DESC";
+			break;
 			case "invitation_closing_date":
 			default:
 				$orderByCond = " ORDER BY b.invitation_closing_date ASC";
@@ -563,7 +572,7 @@ class project{
 			$data[$key]["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["closing_date"]));
 			$data[$key]["summary"]["closing_timestamp"] = strtotime($data[$key]["summary"]["closing_date"]);
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
-			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
+			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
 			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["invitation_closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
@@ -593,6 +602,7 @@ class project{
 				$orderByCond = " ORDER BY b.number_creatives ASC";
 			break;
 			case "closing_date":
+			case "date":
 				$orderByCond = " ORDER BY b.closing_date ASC";
 			break;
 			case "rev_closing_date":
@@ -634,7 +644,7 @@ class project{
 			$data[$key]["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["closing_date"]));
 			$data[$key]["summary"]["closing_timestamp"] = strtotime($data[$key]["summary"]["closing_date"]);
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
-			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
+			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
 			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
@@ -667,7 +677,12 @@ class project{
 				$orderByCond = " ORDER BY b.number_creatives ASC";
 			break;
 			case "closing_date":
+			case "close":
+			case "date":
 				$orderByCond = " ORDER BY b.closing_date ASC";
+			break;
+			case "rev_closing_date":
+				$orderByCond = " ORDER BY b.closing_date DESC";
 			break;
 			case "invitation_closing_date":
 			default:
@@ -704,7 +719,7 @@ class project{
 			$data[$key]["summary"]["formatted_closing_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["closing_date"]));
 			$data[$key]["summary"]["closing_timestamp"] = strtotime($data[$key]["summary"]["closing_date"]);
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
-			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y H:i',strtotime($data[$key]["summary"]["created_date"]));
+			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
 			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
