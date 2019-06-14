@@ -74,7 +74,7 @@ include("page/component/header.php"); ?>
                         </div>
                         <div class="col-md-9">
                             <div class="user_edit">
-                                <section class="my-0">
+                                <section class="">
                                     <div class="author big clearfix">
                                         <div class="author-image">
                                             <div class="background-image">
@@ -144,7 +144,7 @@ include("page/component/header.php"); ?>
                                                     }
                                                 ?>
                                             </select>
-                                            <div class="alert alert-danger hide">Please select at least 1 option</div>
+                                            <div class="alert alert-danger hide">Please select at least 1 option.</div>
                                         </div>
                                     </div>
                                     <div class="author-description">
@@ -174,7 +174,7 @@ include("page/component/header.php"); ?>
                                                     }
                                                 ?>
                                             </select>
-                                            <div class="alert alert-danger hide">Please select at least 1 option</div>
+                                            <div class="alert alert-danger hide">Please select at least 1 option.</div>
                                         </div>
                                     </div>
                                 </section>
@@ -516,14 +516,14 @@ include("page/component/header.php"); ?>
                                     var a = $("#category").parents(".form-group").find(".alert");
                                     a.text("Passion tags updated successfully.").removeClass("hide alert-danger").addClass("alert-success");
                                     setTimeout(function() {
-                                        a.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
+                                        a.text("Please select at least 1 option.").removeClass("alert-success").addClass("alert-danger hide");
                                     },1000);
                                 }
                                 if(data.country_changed){
                                     var b = $("#country").parents(".form-group").find(".alert");
                                     b.text("Country tags updated successfully.").removeClass("hide alert-danger").addClass("alert-success");
                                     setTimeout(function() {
-                                        b.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
+                                        b.text("Please select at least 1 option.").removeClass("alert-success").addClass("alert-danger hide");
                                     },1000);
                                 }
                                 if(data.social_data && data.social_data.iger && data.social_data.iger.modified){

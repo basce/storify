@@ -951,10 +951,12 @@
       padding-left: 0;
       padding-right: 0;
       padding-bottom: 0; }
-      .project-items .project-item .content .description p {
-        width: calc(100% - 230px); }
     .project-items .project-item .content .description.one-button p {
       width: calc(100% - 95px); }
+    .project-items .project-item .content .description.two-button p {
+      width: calc(100% - 165px); }
+    .project-items .project-item .content .description.three-button p {
+      width: calc(100% - 240px); }
     .project-items .project-item .content .actions {
       position: absolute;
       right: 2rem;
@@ -990,7 +992,9 @@
       height: 8rem; }
 
   #invite_grid .project-item .content {
-    padding-bottom: 8rem; } }
+    padding-bottom: 8rem; }
+    #invite_grid .project-item .content .description p {
+      width: 100%; } }
 .history_block {
   padding: 10px; }
   .history_block .history_item {

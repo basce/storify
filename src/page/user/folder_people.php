@@ -117,8 +117,9 @@ if(isset($_REQUEST["order"])){
                                         <div class="float-right">
                                             <a href="/user@<?=$current_user->ID?>/collections/<?=$pathquery[2]?>/<?=$pathquery[3]?>/add" title="Add" class="btn btn-primary float-right" id="add_new_item2"><i class="fa fa-plus-square"></i></a>
                                             <a href="#" title="Remove" class="btn btn-primary float-right" id="enter_edit_mode"><i class="fa fa-minus-square"></i></a>
-                                            <a href="#" title="Remove" class="btn btn-primary float-right hide" id="remove"><i class="fa fa-check-square"></i></a>
+                                            <a href="#" title="Update" class="btn btn-primary float-right hide" id="remove"><i class="fa fa-check-square"></i></a>
                                             <a href="#" title="Back" class="btn btn-primary float-right hide" id="back"><i class="fa fa-chevron-left"></i></a>
+                                            <a href="#" title="Share" class="btn btn-primary float-right hide" id="share"><i class="fa fa-share-alt-square"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -136,6 +137,23 @@ if(isset($_REQUEST["order"])){
             <!--end block-->
         </section>
     <?php include("page/component/footer.php"); ?>
+    <modal class="modal" tabindex="-1" role="dialog" id="shareModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary small" type="button" data-dismiss="modal" aria-label="Close">Ok</button>
+                </div>
+            </div>
+        </div>
+    </modal>
     </div>
     <!--end page-->
     <script type="text/javascript">

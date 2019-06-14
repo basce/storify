@@ -47,7 +47,7 @@ $header_without_toggle_button = true;
 include("page/component/header.php"); ?>
                 <div class="page-title">
                     <div class="container">
-                        <?php if($retrieve_success){ ?>
+                        <?php if(isset($retrieve_success) && $retrieve_success){ ?>
                             <h1>Reset notification sent</h1>
                             <h2>An email containing instructions to reset your password has been sent. Check your inbox.</h2>
                         <?php }else{ 
@@ -57,7 +57,8 @@ include("page/component/header.php"); ?>
                             <h2>We did not manage to identify your account. Please enter the correct email address to your account.</h2>
                                     <?php }else{ ?>
                             <h1>System error</h1>
-                            <h2><?=$retrieve_error_msg?></h2>
+                            <h2>Please try again later</h2>
+                            <div style="display:none"><?=$retrieve_error_msg?></div>
                                     <?php }
                                 }else{ ?>
                             <h1>Reset your password</h1>
@@ -74,7 +75,7 @@ include("page/component/header.php"); ?>
             <section class="block">
                 <div class="container">
                     <div class="row justify-content-center">
-                        <?php if($retrieve_success){ ?>
+                        <?php if(isset($retrieve_success) && $retrieve_success ){ ?>
                         <div class="col-md-6">
                             <p></p>
                         </div>

@@ -84,6 +84,7 @@ storify.brand.projectList_closed = {
             }
         });
 
+        div_description.append(" / creator");
         div_description.append($("<br>"));
         div_description.append(document.createTextNode(summary.description));
 
@@ -95,7 +96,7 @@ storify.brand.projectList_closed = {
             .append($("<div>").addClass("content")
                 .append(title)
                 .append(div_location)
-                .append($("<div>").addClass("description")
+                .append($("<div>").addClass("description one-button")
                     .append(div_description)
                 )
                 .append($("<div>").addClass("actions")

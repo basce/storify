@@ -3,6 +3,74 @@ storify.brand = storify.brand || {};
 
 storify.brand.invitation_closed = {
 	addElementIfNotExist:function(){
+		if( !$("#single_invitation_dialog").length ){
+			$("body").append(
+				$("<modal>").addClass("modal")
+					.attr({tabindex:"-1", role:"dialog", id:"single_invitation_dialog"})
+					.append(
+						$("<div>").addClass("modal-dialog modal-dialog-centered")
+							.attr({role:"document"})
+							.append(
+								$("<div>").addClass("modal-content")
+									.append(
+										$("<div>").addClass("modal-header")
+											.append(
+												$("<h5>").addClass("modal-title")
+													.text("Manage Invitation")
+											)
+											.append(
+												$("<button>").addClass("close")
+													.attr({type:"button", "data-dismiss":"modal", "aria-label":"Close"})
+													.append(
+														$("<span>").attr({"aria-hidden":true})
+															.html("&times;")
+													)
+											)
+									)
+									.append(
+										$("<div>").addClass("modal-body")
+											.append(
+												$("<div>").addClass("container")
+													.append(
+														$("<div>").addClass("row")
+															.append(
+																$("<div>").addClass("col-3")
+																	.append($("<div>").addClass("profile-image"))
+															)
+															.append(
+																$("<div>").addClass("col-9")
+																	.append(
+																		$("<div>").append($("<strong>"))
+																	)
+																	.append(
+																		$("<div>").append(document.createTextNode("Status : "))
+																			.append(
+																				$("<span>").addClass("status")
+																			)
+																	)
+																	.append(
+																		$("<div>").addClass("remark")
+																	)
+															)
+													)
+											)
+									)
+									.append(
+										$("<div>").addClass("modal-footer")
+											.append(
+												$("<div>").addClass("text-center")
+													.append(
+														$("<button>").addClass("btn btn-primary")
+															.text("invite")
+													)
+											)
+									)
+							)
+					)
+			);
+
+			$("#single_invitation_dialog .modal-footer button").click(storify.brand.invitation_closed.dialog_click);
+		}
 	},
 	_updatingInvitation:false,
 	dialog_click:function(e){
@@ -22,6 +90,7 @@ storify.brand.invitation_closed = {
 			$("#single_invitation_dialog").modal("hide");
 			return;
 		}
+		/*
 		if( command_type ){
 			if( storify.brand.invitation_closed._updatingInvitation ) return;
 			storify.brand.invitation_closed._updatingInvitation = true;
@@ -42,6 +111,7 @@ storify.brand.invitation_closed = {
 				}
 			});
 		}
+		*/
 	},
 	resetForm:function(){
 		storify.brand.invitation_closed.addElementIfNotExist();
@@ -56,15 +126,13 @@ storify.brand.invitation_closed = {
 			b = $(a+" .modal-body .status"),
 			c = $(a+" .modal-footer button");
 		$(a+" .profile-image").css({"background-image":"url("+data.profile_image+")"});
-        $(a+" .modal-body strong").text(data.display_name+" ("+data.user_email+ ")");
+        $(a+" .modal-body strong").empty()
+        	.append($("<a>").attr({href:"/"+data.igusername, target:"_blank"}).text('@'+data.igusername))
+        	.append(document.createTextNode(" ("+data.user_email+ ")"));
         switch(data.invitation_status){
-        	case "pending":
-        		b.addClass("item-pending").text("Waiting");
-        		c.text("Withdraw Invitation").attr({"data-id":data.invitation_id, "data-command_type":1});
-        	break;
         	case "rejected":
         		b.addClass("item-rejected").text("Rejected");
-        		c.text("Resend Invitation").attr({"data-id":data.user_id, "data-command_type":2});
+        		c.text("ok").attr({"data-id":data.user_id, "data-command_type":3});
         	break;
         	case "accepted":
         		/*
@@ -73,6 +141,11 @@ storify.brand.invitation_closed = {
         		*/
         		b.addClass("item-accepted").text("Accepted");
         		c.text("Ok").attr({"data-id":data.user_id, "data-command_type":3});
+        	break;
+        	case "pending":
+        	default:
+        		b.addClass("item-pending").text("Waiting");
+        		c.text("ok").attr({"data-id":data.invitation_id, "data-command_type":3});
         	break;
         }
         if(data.remark){
@@ -91,13 +164,13 @@ storify.brand.invitation_closed = {
                     });
         switch(data.invitation_status){
             case "pending":
-                a.addClass("item-pending default-pointer").attr({title:data.display_name});
+                a.addClass("item-pending").attr({title:'@'+data.igusername});
             break;
             case "accepted":
-                a.addClass("item-accepted default-pointer").attr({title:data.display_name});
+                a.addClass("item-accepted").attr({title:'@'+data.igusername});
             break;
             case "rejected":
-                a.addClass("item-rejected default-pointer").attr({title:data.display_name});
+                a.addClass("item-rejected").attr({title:'@'+data.igusername});
             break;
         }
 

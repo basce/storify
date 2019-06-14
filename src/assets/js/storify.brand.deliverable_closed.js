@@ -273,12 +273,12 @@ storify.brand.deliverable_closed = {
             video_rejected = 0,
             video_submitted = 0;
 
-        photo_total += parseInt(odata.no_of_photo, 10);
-        video_total += parseInt(odata.no_of_video, 10);
+        photo_total = parseInt(odata.no_of_photo, 10);
+        video_total = parseInt(odata.no_of_video, 10);
 
         $.each(data, function(index,value){
             withData = true;
-            $.each(value, function(index2, value2){
+            $.each(value.data, function(index2, value2){
                 if(value2.type == "photo"){
                     switch(value2.status){
                         case "accepted":
@@ -343,7 +343,7 @@ storify.brand.deliverable_closed = {
                 total_expect = 0,
                 tempuser = storify.project.user.data.slice(0);
 
-            var ctempuser = storify.project.user.getUserDetail(index);
+            var ctempuser = storify.project.user.getUserDetail(value.user_id);
 
             total_expect = parseInt(odata.no_of_photo, 10) + parseInt(odata.no_of_video, 10);
 
@@ -355,10 +355,7 @@ storify.brand.deliverable_closed = {
                 .append($("<h3>").text(ctempuser.display_name))
             );
 
-            if(value.remark){
-                a.append($("<div>").addClass("deliverable-remark").text(value.remark));
-            }
-            $.each(value, function(index2, value2){
+            $.each(value.data, function(index2, value2){
             	switch(value2.status){
             		case "accepted":
             			count_done++;

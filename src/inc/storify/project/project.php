@@ -1000,7 +1000,14 @@ class project{
 					}
 					$newSubmission[$value["creator_id"]][] = $value;
 				}
-				$submissions = $newSubmission;
+
+				$submissions = array();
+				foreach($newSubmission as $key=>$value){
+					$submissions[] = array(
+						"user_id"=>$key,
+						"data"=>$value
+					);
+				}
 			}
 
 			return array(

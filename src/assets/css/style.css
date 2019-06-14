@@ -257,7 +257,7 @@ Headers:		'Varela Round', sans-serif;
     margin-left: 8rem;
 }
 .author.big {
-    padding-bottom: 2rem;
+    
 }
 .author.big .author-image {
     width: 26rem;
@@ -3836,7 +3836,7 @@ textarea.form-control {
         float: none !important;
     }
     .block section {
-        margin-bottom: 4rem;
+        margin-bottom: 3rem;
     }
     .d-xs-none {
         display: none !important;

@@ -124,12 +124,10 @@ storify.brand.invitation = {
 			b = $(a+" .modal-body .status"),
 			c = $(a+" .modal-footer button");
 		$(a+" .profile-image").css({"background-image":"url("+data.profile_image+")"});
-        $(a+" .modal-body strong").text(data.display_name+" ("+data.user_email+ ")");
+        $(a+" .modal-body strong").empty()
+        	.append($("<a>").attr({href:"/"+data.igusername, target:"_blank"}).text('@'+data.igusername))
+        	.append(document.createTextNode(" ("+data.user_email+ ")"));
         switch(data.invitation_status){
-        	case "pending":
-        		b.addClass("item-pending").text("Waiting");
-        		c.text("Withdraw Invitation").attr({"data-id":data.invitation_id, "data-command_type":1});
-        	break;
         	case "rejected":
         		b.addClass("item-rejected").text("Rejected");
         		c.text("Resend Invitation").attr({"data-id":data.user_id, "data-command_type":2});
@@ -141,6 +139,11 @@ storify.brand.invitation = {
         		*/
         		b.addClass("item-accepted").text("Accepted");
         		c.text("Ok").attr({"data-id":data.user_id, "data-command_type":3});
+        	break;
+        	case "pending":
+        	default:
+        		b.addClass("item-pending").text("Waiting");
+        		c.text("Withdraw Invitation").attr({"data-id":data.invitation_id, "data-command_type":1});
         	break;
         }
         if(data.remark){
@@ -159,13 +162,13 @@ storify.brand.invitation = {
                     });
         switch(data.invitation_status){
             case "pending":
-                a.addClass("item-pending").attr({title:data.display_name});
+                a.addClass("item-pending").attr({title:'@'+data.igusername});
             break;
             case "accepted":
-                a.addClass("item-accepted").attr({title:data.display_name});
+                a.addClass("item-accepted").attr({title:'@'+data.igusername});
             break;
             case "rejected":
-                a.addClass("item-rejected").attr({title:data.display_name});
+                a.addClass("item-rejected").attr({title:'@'+data.igusername});
             break;
         }
 

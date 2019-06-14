@@ -117,7 +117,6 @@ class mailer{
             }
         }
 
-        print_r($debug_msg);
         try{
             if($this->mail->Send()) {
                 return array("error"=>0, "msg"=>"email sent to ".$receiver["email"]." bcc :".$bcc." cc:".$cc." Debug :".json_encode($debug_msg));
