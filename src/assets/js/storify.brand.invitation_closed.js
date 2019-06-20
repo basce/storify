@@ -126,12 +126,15 @@ storify.brand.invitation_closed = {
 			b = $(a+" .modal-body .status"),
 			c = $(a+" .modal-footer button");
 		$(a+" .profile-image").css({"background-image":"url("+data.profile_image+")"});
+		$(a+" .profile-image").removeClass("item-rejected item-accepted item-expired item-pending");
+		b.removeClass("item-rejected item-accepted item-expired item-pending");
         $(a+" .modal-body strong").empty()
         	.append($("<a>").attr({href:"/"+data.igusername, target:"_blank"}).text('@'+data.igusername))
         	.append(document.createTextNode(" ("+data.user_email+ ")"));
         switch(data.invitation_status){
         	case "rejected":
         		b.addClass("item-rejected").text("Rejected");
+        		$(a+" .profile-image").addClass("item-rejected");
         		c.text("ok").attr({"data-id":data.user_id, "data-command_type":3});
         	break;
         	case "accepted":
@@ -140,11 +143,18 @@ storify.brand.invitation_closed = {
         		c.text("Remove Creator from Project").attr({"data-id":data.user_id, "data-command_type":3});
         		*/
         		b.addClass("item-accepted").text("Accepted");
+        		$(a+" .profile-image").addClass("item-accepted");
         		c.text("Ok").attr({"data-id":data.user_id, "data-command_type":3});
+        	break;
+        	case "expired":
+        		b.addClass("item-expired").text("Expired");
+        		$(a+" .profile-image").addClass("item-expired");
+        		c.text("Resend Invitation").attr({"data-id":data.user_id, "data-command_type":2});
         	break;
         	case "pending":
         	default:
         		b.addClass("item-pending").text("Waiting");
+        		$(a+" .profile-image").addClass("item-pending");
         		c.text("ok").attr({"data-id":data.invitation_id, "data-command_type":3});
         	break;
         }
@@ -171,6 +181,9 @@ storify.brand.invitation_closed = {
             break;
             case "rejected":
                 a.addClass("item-rejected").attr({title:'@'+data.igusername});
+            break;
+            case "expired":
+                a.addClass("item-expired").attr({title:'@'+data.igusername});
             break;
         }
 

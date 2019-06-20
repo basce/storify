@@ -90,12 +90,22 @@
   border: solid 3px #999;
   border-radius: 50%;
   background-size: cover; }
+#single_invitation_dialog .profile-image.item-accepted {
+  border-color: #3c763d; }
+#single_invitation_dialog .profile-image.item-rejected {
+  border-color: #a94442; }
+#single_invitation_dialog .profile-image.item-pending, #single_invitation_dialog .profile-image.item-waiting {
+  border-color: #8a6d3b; }
+#single_invitation_dialog .profile-image.item-expired {
+  border-color: #999; }
 #single_invitation_dialog .status.item-accepted {
   color: #3c763d; }
 #single_invitation_dialog .status.item-rejected {
   color: #a94442; }
 #single_invitation_dialog .status.item-waiting, #single_invitation_dialog .status.item-pending {
   color: #8a6d3b; }
+#single_invitation_dialog .status.item-expired {
+  color: #999; }
 #single_invitation_dialog .remark {
   background-color: #ccc;
   padding: .5rem; }
@@ -1566,6 +1576,21 @@
     position: absolute;
     top: 0;
     right: 0; }
+
+modal#shareModal #collection_link {
+  cursor: pointer;
+  margin-bottom: .5rem;
+  padding: 1.6rem 6rem 1.6rem 1.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
+modal#shareModal .copybutton {
+  position: absolute;
+  top: 1.1rem;
+  font-size: 1.4rem;
+  padding: 1.6rem;
+  right: 1.1rem;
+  pointer-events: none; }
 
 /*
  *  Owl Carousel - Core

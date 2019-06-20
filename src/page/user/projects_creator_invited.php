@@ -41,6 +41,7 @@
     <script src="/assets/js/owlcarousel/owl.animate.js"></script>
     <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
     <script src="/assets/js/storify.project.users.js"></script>
     <script src="/assets/js/storify.creator.detail_invite.js"></script>
     <script src="/assets/js/storify.creator.projectlist_invite.js"></script>
@@ -59,7 +60,7 @@ include("page/component/header.php"); ?>
                 <div class="page-title">
                     <div class="container">
                         <h1>Invites received</h1>
-                        <h2>
+                        <h2 class="dynamic_title_text">
 <?php
                         //$total_invites = $main->getProjectManager()->getNumberOfInvitationCreator($current_user->ID);
                         $stats = $main->getProjectManager()->getProjectStats($current_user->ID);
@@ -107,6 +108,34 @@ include("page/component/header.php"); ?>
     <script type="text/javascript">
         $(function(){
             "use strict";
+
+            //add listner on update leftnav
+            storify.core.addListener("menu_project_item_amount_update", function(obj){
+                console.log(obj);
+                if(obj.invite !== false){
+                    $(".left_menu_invite").text("("+obj.invite+")");
+                }
+                if(obj.open !== false){
+                    $(".left_menu_ongoing").text("("+obj.open+")");
+                }
+                if(obj.closed !== false){
+                    $(".left_menu_closed").text("("+obj.closed+")");
+                }
+            });
+
+            //update title
+            storify.core.addListener("menu_project_item_amount_update", function(obj){
+                console.log(obj);
+                if(obj.invite !== false){
+                    if(obj.invite == 0){
+                        $(".dynamic_title_text").text("You have not received any invitations.");
+                    }else if(obj.invite == 1){
+                        $(".dynamic_title_text").text("Say yes to 1 project.");
+                    }else{
+                        $(".dynamic_title_text").text("Say yes to "+obj.invite+" projects.");
+                    }
+                }
+            });
 
             $("#invitationloadmore").click(function(e){
                 e.preventDefault();

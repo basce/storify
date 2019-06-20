@@ -3,12 +3,10 @@
 
 $user_info = get_userdata($temp_userID);
 
-$people_summary_result = $main->getSummaryByUserID("people", 0, $temp_userID); //all
-$story_summary_result = $main->getSummaryByUserID("story", 0, $temp_userID); //all
+$temp_result = $main->getGroupItem($pathquery[3], "people", 1, 1); // only interest on the total item
+$temp_total = isset($temp_result["total"]) ? (int) $temp_result["total"] : 0;
 
-$total_creators = $people_summary_result["no_items"];
-$total_stories = $story_summary_result["no_items"];
-$temp_description = ( $total_creators != 1 ? $total_creators." creators ":" 1 creators ")."and ".($total_stories != 1 ? $total_stories." stories ":"1 story ")."on ".$user_info->display_name."'s Collections - add stories and creators to your own boards.";
+$temp_description = ( $temp_total != 1 ? $temp_total." creators ":" 1 creators ")."on ".$group_detail["name"]." - add stories and creators to your own boards.";
 
 $image_url = $main->getRandomGroupFolderImage($temp_groupID, $temp_type);
 if($image_url){
@@ -20,13 +18,13 @@ if($image_url){
 }
 
 $pageSettings["meta"] = array(
-    "name"=>$user_info->display_name."'s Collections - Storify",
+    "name"=>$group_detail["name"]." by ".$user_info->display_name,
     "description"=>$temp_description,
-    "canonical"=>"https://storify.me/collections/".$pathquery[1]."/".$pathquery[2]."/".$pathquery[3]
+    "canonical"=>get_home_url()."/collections/".$pathquery[1]."/".$pathquery[2]."/".$pathquery[3]
 );
 $pageSettings["og"] = array(
     "og:type"=>"website",
-    "og:title"=>$user_info->display_name."'s Collections - Storify",
+    "og:title"=>$group_detail["name"]." by ".$user_info->display_name,
     "og:description"=>$temp_description,
     "og:site_name"=>"Storify.Me",
     "og:image"=>$post_image,
@@ -65,6 +63,7 @@ $pageSettings["breadcrumb"] = array(
     <link rel="stylesheet" href="/assets/css/selectize.css" type="text/css">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/user.css">
+    <link rel="stylesheet" href="/assets/css/main.css">
     <script>
         window._startTime = new Date().getTime();
 
@@ -117,10 +116,6 @@ if(isset($_REQUEST["order"])){
                     <div class="container">
                         <h1><?=htmlspecialchars($group_detail["name"])?></h1>
                         <?php
-                            $temp_result = $main->getGroupItem($pathquery[3], "people", 1, 1); // only interest on the total item
-
-                            $temp_total = isset($temp_result["total"]) ? (int) $temp_result["total"] : 0;
-
                             if($temp_total == 1){
                                 $temp_subtitle = "1 creator on this board.";
                             }else{
@@ -152,6 +147,11 @@ if(isset($_REQUEST["order"])){
                                                 <option value="latest" <?php if($sortBy == "latest"){ echo "selected";}?>>Newest</option>
                                                 <option value="oldest" <?php if($sortBy == "oldest"){ echo "selected";}?>>Oldest</option>
                                             </select>
+                                    </div>
+                                    <div class="col-6 edit_bar">
+                                        <div class="float-right">
+                                            <a href="#" title="Share your board" class="btn btn-primary float-right" data-toggle="modal" data-target="#shareModal" id="share"><i class="fa fa-share-alt-square"></i></a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -192,6 +192,26 @@ if(isset($_REQUEST["order"])){
         </div>
       </div>
     </div>
+    <modal class="modal" tabindex="-1" role="dialog" id="shareModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Share this board.</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" readonly="readonly" id="collection_link" value="<?=get_home_url()?>/collections/<?=$pathquery[1]?>/<?=$pathquery[2]?>/<?=$pathquery[3]?>/">
+                    <a href="#" class="copybutton">Copy</a>
+                    <div class="alert alert-success hide">Link has been copied to clipboard.</div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary small" type="button" data-dismiss="modal" aria-label="Close">Ok</button>
+                </div>
+            </div>
+        </div>
+    </modal>
     <!--end page-->
     <script type="text/javascript">
         $(document).ready(function($){
@@ -206,6 +226,37 @@ if(isset($_REQUEST["order"])){
               return n.toFixed(0).replace(/./g, function(c, i, a) {
                 return i > 0 && c !== "." && (a.length - i) % 3 === 0 ? "," + c : c;
               });
+            }
+
+            $("#collection_link").click(function(e){
+                e.preventDefault();
+                iosCopyToClipboard(this);
+            });
+
+            function iosCopyToClipboard(el) {
+                var oldContentEditable = el.contentEditable,
+                    oldReadOnly = el.readOnly,
+                    range = document.createRange();
+
+                el.contentEditable = true;
+                el.readOnly = false;
+                range.selectNodeContents(el);
+
+                var s = window.getSelection();
+                s.removeAllRanges();
+                s.addRange(range);
+
+                el.setSelectionRange(0, 999999); // A big number, to cover anything that could be inside the element.
+
+                el.contentEditable = oldContentEditable;
+                el.readOnly = oldReadOnly;
+
+                document.execCommand('copy');
+
+                $("#shareModal .alert").removeClass("hide");
+                setTimeout(function(){
+                    $("#shareModal .alert").addClass("hide");
+                },2000);
             }
 
             var _adding_to_project = false;

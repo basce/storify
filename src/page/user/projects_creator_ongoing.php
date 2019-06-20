@@ -65,7 +65,7 @@ include("page/component/header.php"); ?>
 <?php
                         $total_ongoing = $main->getProjectManager()->getNumberOfOnGoingCreator($current_user->ID);
                         if($total_ongoing == 0){
-                            echo "You have not received any invitations.";
+                            echo "You have not accepted any invitations.";
                         }else if($total_ongoing == 1){
                             echo "You have 1 project to complete.";
                         }else{

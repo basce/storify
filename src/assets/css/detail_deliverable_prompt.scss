@@ -98,6 +98,18 @@
     border-radius: 50%;
     background-size:cover;
   }
+  .profile-image.item-accepted{
+    border-color:#3c763d;
+  }
+  .profile-image.item-rejected{
+    border-color:#a94442;
+  }
+  .profile-image.item-pending, .profile-image.item-waiting{
+    border-color:#8a6d3b;
+  }
+  .profile-image.item-expired{
+    border-color:#999;
+  }
   .status.item-accepted{
     color:#3c763d;
   }
@@ -106,6 +118,9 @@
   }
   .status.item-waiting, .status.item-pending{
     color:#8a6d3b;
+  }
+  .status.item-expired{
+    color:#999;
   }
   .remark{
     background-color:#ccc;

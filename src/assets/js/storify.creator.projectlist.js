@@ -197,6 +197,11 @@ storify.creator.projectList = {
                     $(".linkify").linkify({
                         target: "_blank"
                     });
+
+                    if(!+rs.result.total){
+                        $grid.append($("<p>").text("No ongoing projects now. Accept your next invite and kickstart a project!"));
+                    }
+                    
                     if(onComplete)onComplete();
                 }
             }

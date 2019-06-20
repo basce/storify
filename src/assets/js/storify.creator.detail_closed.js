@@ -774,11 +774,11 @@ storify.creator.detail_closed = {
         });
 
         if(number_photo == 0){
-            $("#submission-content .photolist").append($("<p>").text("The project has ended. No submission have been made."));
+            $("#submission-content .photolist").append($("<p>").text("The project has ended. No submissions have been made."));
         }
 
         if(number_video == 0){
-            $("#submission-content .videolist").append($("<p>").text("The project has ended. No submission have been made."));
+            $("#submission-content .videolist").append($("<p>").text("The project has ended. No submissions have been made."));
         }
 
         $("#tab_control2").attr({

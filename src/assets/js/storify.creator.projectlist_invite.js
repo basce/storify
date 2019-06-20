@@ -264,6 +264,15 @@ storify.creator.projectList_invite = {
                         $grid.append($temp);
                         ScrollReveal().reveal($temp, storify.slideUp);
                     });
+
+                    $(".linkify").linkify({
+                        target: "_blank"
+                    });
+
+                    if(!+rs.result.total){
+                        $grid.append($("<p>").text("No invites yet. But press on, we are working hard to showcase your work to the brands you love."));
+                    }
+
                     if(onComplete)onComplete();
                 }
             }
@@ -287,12 +296,14 @@ storify.creator.projectList_invite = {
                 reason: reject_reason
             },
             success:function(rs){
+                storify.creator.projectList_invite._rejectingInvitation = false;
                 if(rs.error){
                     console.log(rs);
                     alert(rs.msg);
                 }else{
                     $(".project-item[id='"+project_id+"']").remove();
                     $("#rejectModal").modal("hide");
+                    storify.core.call("menu_project_item_amount_update",rs.project_items_status);
                 }
             }
         });
@@ -318,6 +329,7 @@ storify.creator.projectList_invite = {
                     $(".project-item[id='"+rs.added+"']").remove();
                     $("#acceptModal").modal("show");
                     $("#acceptModal .acceptlink").attr({href:"/user@"+rs.user_id+"/projects/ongoing/"+rs.added, target:"_self"});
+                    storify.core.call("menu_project_item_amount_update",rs.project_items_status);
                 }
             }
         });
