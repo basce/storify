@@ -62,6 +62,55 @@ class main{
 		return $this->email_manager;
 	}
 
+	public function sendLambdaEmail($receiver, $content, $template_name="storify_basic"){
+		//check if 'to' missing
+		if(! ( isset($receiver) && isset($receiver["email"])) ){
+			return array(
+				"error"=>1,
+				"msg"=>"Missing receiver"
+			);
+		}
+
+		$data = array(
+			"to"=>$receiver,
+			"from"=>array(
+				"name"=>"no-reply",
+				"email"=>"no-reply@storify.me"
+			),
+			"template"=>$template_name,
+			"content"=>$content
+		);
+
+		$headers = array(
+			"x-api-key : ".AWS_LAMBDA_SES_SEND_EMAIL_API_KEY
+		);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, AWS_LAMBDA_SES_SEND_EMAIL_ENDPOINT);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		$output = curl_exec($ch); 
+		curl_close($ch);
+
+		$output_obj = json_decode($output, true);
+		if($output_obj && $output_obj["MessageId"]){
+			return array(
+				"error"=>0,
+				"message_id"=>$output_obj["MessageId"],
+				"msg"=>$output
+			);
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>$output
+			);
+		}
+
+	}
+
 	public function gen_string($string,$max=20) {
 	    $tok = strtok($string,' ');
 	    $sub = '';
