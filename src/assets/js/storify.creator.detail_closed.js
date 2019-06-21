@@ -152,6 +152,29 @@ storify.creator.detail_closed = {
                     )
             );
         }
+        if (!$("#downloadLinkModal").length) {
+            $("body").append(
+                $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
+                .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
+                    .append($("<div>").addClass("modal-content")
+                        .append($("<div>").addClass("modal-header")
+                            .append($("<h5>").addClass("modal-title").text(""))
+                            .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
+                        )
+                        .append($("<div>").addClass("modal-body")
+                            .append($("<a>").addClass("filename"))
+                            .append($("<div>").addClass("filesize"))
+                            .append($("<div>").addClass("filemime"))
+                        )
+                        .append($("<div>").addClass("modal-footer")
+                            .append(
+                                $("<a>").addClass("btn btn-primary small download").text("download").attr({ target:"_blank", href:""})
+                            )
+                        )
+                    )
+                )
+            );
+        }
     },
     createBountyTable:function(detail){
         var cashtable = $("<div>").addClass("bountycash2"),
@@ -636,7 +659,28 @@ storify.creator.detail_closed = {
             break;
         }
 
-        div = $("<div>").addClass("submission "+mainClass).attr({o:data.id})
+        if(+data.file_id){
+            div = $("<div>").addClass("submission " + mainClass).attr({ o: data.id })
+                .append($("<i>").addClass("submission-icon fa " + iconClass))
+                .append($("<div>").addClass("urlrow")
+                    .append($("<div>").addClass("urlinput")
+                        .append($("<div>").addClass("file-container")
+                            .append($("<div>").addClass("file-download-link").text(storify.creator.detail_closed.shortenFileName(data.filename)+" ("+data.mime+")")
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                            .click(function(e){
+                                                e.preventDefault();
+                                                storify.creator.detail_closed._showDownloadDialog(data.file_id);
+                                            })
+                                )
+                        )
+                    )
+                    .append(actiondiv)
+                )
+                .append($("<div>").addClass("urldescription")
+                    .append($("<p>").text(data.remark ? data.remark : "no caption given."))
+                );
+        }else{
+            div = $("<div>").addClass("submission "+mainClass).attr({o:data.id})
                 .append($("<i>").addClass("submission-icon fa fa-camera"))
                     .append($("<div>").addClass("urlrow")
                         .append($("<div>").addClass("urlinput")
@@ -647,7 +691,35 @@ storify.creator.detail_closed = {
                     .append($("<div>").addClass("urldescription")
                         .append($("<p>").text(data.remark ? data.remark : "no caption given."))
                     );
+        }
         return div;
+    },
+    _showDownloadDialog:function(id){
+        storify.loading.show();
+        $.ajax({
+            method: "POST",
+            dataType: "json",
+            data: {
+                method: "getDownloadLink",
+                id:id
+            },
+            success: function(rs){
+                storify.loading.hide();
+                if(rs.error){
+                    alert(rs.msg);
+                } else {
+                    $("#downloadLinkModal").find(".filename")
+                                                .attr({href:rs.filelink, target:"_blank"})
+                                                .text(storify.creator.detail_closed.shortenFileName(rs.filename)+" ("+rs.filemime+")")
+                                                .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
+                    $("#downloadLinkModal").find(".filesize").text("");
+                    $("#downloadLinkModal").find(".filemime").text();
+                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
+                    $("#downloadLinkModal").modal("show");
+                }
+            }
+
+        })
     },
     updatelistnotification:function(type){
         
@@ -702,11 +774,11 @@ storify.creator.detail_closed = {
         });
 
         if(number_photo == 0){
-            $("#submission-content .photolist").append($("<p>").text("The project has ended. No submission have been made."));
+            $("#submission-content .photolist").append($("<p>").text("The project has ended. No submissions have been made."));
         }
 
         if(number_video == 0){
-            $("#submission-content .videolist").append($("<p>").text("The project has ended. No submission have been made."));
+            $("#submission-content .videolist").append($("<p>").text("The project has ended. No submissions have been made."));
         }
 
         $("#tab_control2").attr({
@@ -909,5 +981,15 @@ storify.creator.detail_closed = {
             target: "_blank"
         });
         return cont;
+    },
+    shortenFileName:function(input){
+        var a = input.slice(0, input.lastIndexOf(".")),
+            b = input.slice(input.lastIndexOf("."));
+
+        if(a.length > 27){
+            return a.slice(0,24)+"..."+b;
+        }else{
+            return input;
+        }
     }
 };

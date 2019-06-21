@@ -131,7 +131,7 @@ class invitation{
 			$invitation_status = $wpdb->get_var($wpdb->prepare($query, $invitation_id));
 
 			// pending, rejected, removed, accepted
-			if(in_array($invitation_status, array("pending", "rejected", "removed"))){
+			if(in_array($invitation_status, array("pending", "rejected", "removed", "expired"))){
 				$query = "UPDATE `".$this->tbl_invitation."` SET status = %s, sent_date = NOW() WHERE id = %d";
 				$wpdb->query($wpdb->prepare($query, 'pending', $invitation_id));
 			}else{
@@ -195,7 +195,7 @@ class invitation{
 						"error"=>0,
 						"success"=>1,
 						"msg"=>"update success",
-						"remark_id"=>$remard_id,
+						"remark_id"=>$remark_id,
 						"added"=>0
 					);
 

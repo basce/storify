@@ -79,7 +79,7 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <div class="project-items" id="closed_grid" data-page="0" data-sort="date" data-filter="close">
+                            <div class="project-items" id="closed_grid" data-page="0" data-sort="rev_closing_date" data-filter="close">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="closeloadmore">Load More</a>
@@ -111,7 +111,7 @@ include("page/component/header.php"); ?>
                 <?php
                 if(sizeof($pathquery) == 4){
                     ?>
-                    storify.brand.detail_closed.viewDetail(<?=$query[3]?>);
+                    storify.brand.detail_closed.viewDetail(<?=$pathquery[3]?>);
                     <?php
                 }
                 ?>

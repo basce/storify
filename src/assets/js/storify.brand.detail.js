@@ -407,6 +407,7 @@ storify.brand.detail = {
                 }
             });
 
+            list_div_description.append(" / creator");
             list_div_description.append($("<br>"));
             list_div_description.append(document.createTextNode(list_summary.description));
 
@@ -418,7 +419,7 @@ storify.brand.detail = {
                 .append($("<div>").addClass("content")
                     .append(list_title)
                     .append(list_div_location)
-                    .append($("<div>").addClass("description")
+                    .append($("<div>").addClass("description one-button")
                         .append(list_div_description)
                     )
                     .append($("<div>").addClass("actions")
@@ -467,6 +468,7 @@ storify.brand.detail = {
                 .append($("<i>").addClass("fa fa-video-camera"));
         }
 
+        deliverable_block.append(" / creator");
         //sample block
         var owlImages = null;
 

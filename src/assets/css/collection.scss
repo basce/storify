@@ -56,3 +56,22 @@
         }
     }
 }
+
+modal#shareModal{
+    #collection_link{
+        cursor:pointer;
+        margin-bottom:.5rem;
+        padding: 1.6rem 6rem 1.6rem 1.6rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .copybutton{
+        position: absolute;
+        top: 1.1rem;
+        font-size: 1.4rem;
+        padding: 1.6rem;
+        right: 1.1rem;
+        pointer-events:none;
+    }
+}

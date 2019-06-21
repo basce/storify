@@ -20,6 +20,7 @@ if($current_user->ID){
                 $obj["msg"] = $result["msg"];
                 $obj["added"] = $result["added"];
                 $obj["remark_id"] = $result["remark_id"];
+                $obj["project_items_status"] = $main->getProjectManager()->getProjectStats($current_user->ID);
             }
         break;
         case "accept":
@@ -32,6 +33,7 @@ if($current_user->ID){
                 $obj["user_id"] = $current_user->ID;
                 $obj["msg"] = $result["msg"];
                 $obj["added"] = $result["added"];
+                $obj["project_items_status"] = $main->getProjectManager()->getProjectStats($current_user->ID);
             }
         break;
         case "getDetail":

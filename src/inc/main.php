@@ -1,17 +1,24 @@
 <?php
 namespace storify;
 
+date_default_timezone_set('Asia/Singapore');
+
 define('WP_USE_THEMES', false);
 require_once(__DIR__.'/storify/staticparam.php');
 require_once(__DIR__.'/../ao/wp-load.php');
 include_once(__DIR__.'/../ao/wp-admin/includes/image.php' );
 require_once(__DIR__.'/storify/bookmark.php');
 require_once(__DIR__.'/storify/pagesettings.php');
+require_once(__DIR__.'/storify/notification.php');
+require_once(__DIR__.'/storify/job.php');
 require_once(__DIR__.'/storify/project/project.php');
 require_once(__DIR__."/noisycrayons/phpemail/mailer.php");
+require_once(__DIR__."/vendor/autoload.php");
 
 use storify\project as project;
 use storify\bookmark as bookmark;
+use storify\notification as notification;
+use storify\job as job;
 use storify\pagesettings as pagesettings;
 use storify\staticparam as staticparam;
 use noisycrayons\phpemail\mailer as mailer;
@@ -55,6 +62,74 @@ class main{
 			$this->email_manager = new mailer();
 		}
 		return $this->email_manager;
+	}
+
+	public function sendLambdaEmail($receiver, $content, $template_name="storify_basic"){
+		//check if 'to' missing
+		if(! ( isset($receiver) && isset($receiver["email"])) ){
+			return array(
+				"error"=>1,
+				"msg"=>"Missing receiver"
+			);
+		}
+
+		$data = array(
+			"to"=>$receiver,
+			"from"=>array(
+				"name"=>"no-reply",
+				"email"=>"no-reply@storify.me"
+			),
+			"template"=>$template_name,
+			"content"=>$content
+		);
+
+		$headers = array(
+			"x-api-key : ".AWS_LAMBDA_SES_SEND_EMAIL_API_KEY
+		);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, AWS_LAMBDA_SES_SEND_EMAIL_ENDPOINT);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		$output = curl_exec($ch); 
+		curl_close($ch);
+
+		$output_obj = json_decode($output, true);
+		if($output_obj && $output_obj["MessageId"]){
+			return array(
+				"error"=>0,
+				"message_id"=>$output_obj["MessageId"],
+				"msg"=>$output
+			);
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>$output
+			);
+		}
+
+	}
+
+	public function gen_string($string,$max=20) {
+	    $tok = strtok($string,' ');
+	    $sub = '';
+	    while($tok !== false && mb_strlen($sub) < $max) {
+	        if(strlen($sub) + mb_strlen($tok) <= $max) {
+	            $sub .= $tok.' ';
+	        } else {
+	            break;
+	        }
+	        $tok = strtok(' ');
+	    }
+	    $sub = trim($sub);
+	    if(mb_strlen($sub) == 0){
+	    	$sub = mb_substr($string, 0, $max-1);
+	    }
+	    if(mb_strlen($sub) < mb_strlen($string)) $sub .= '&hellip;';
+	    return $sub;
 	}
 
 	public function getCountriesList(){
@@ -731,7 +806,7 @@ class main{
 	
 		//check if any tag change
 		$category_changed = false;
-		if(sizeof($original_categories) == sizeof($categories)){
+		if($original_categories && sizeof($original_categories) && (sizeof($original_categories) == sizeof($categories))){
 			foreach($original_categories as $key=>$value){
 				$exist = false;
 				foreach($categories as $key2=>$value2){
@@ -750,7 +825,7 @@ class main{
 
 		//check if any tag change
 		$country_changed = false;
-		if(sizeof($original_countries) == sizeof($countries)){
+		if($original_countries && sizeof($original_countries) && (sizeof($original_countries) == sizeof($countries))){
 			foreach($original_countries as $key=>$value){
 				$exist = false;
 				foreach($countries as $key2=>$value2){
@@ -1360,8 +1435,8 @@ class main{
 					$posts[] = array(
 						"id"=>$post_pods->field('id'),
 						"name"=>$post_pods->field('name'),
-						"image_hires"=>pods_image_url($post_pods->field('image_hires')["ID"], 'large'),
-						"hr_image"=>pods_image_url($post_pods->field('image_hires')["ID"], NULL),
+						"image_hires"=>str_replace('https://storify.me/', 'https://cdn.storify.me/', pods_image_url($post_pods->field('image_hires')["ID"], 'large')),
+						"hr_image"=>str_replace('https://storify.me/', 'https://cdn.storify.me/', pods_image_url($post_pods->field('image_hires')["ID"], NULL)),
 						"caption"=>$post_pods->field('caption'),
 						"likes"=>$post_pods->field('likes'),
 						"comments"=>$post_pods->field('comments'),
@@ -1658,6 +1733,7 @@ class main{
 	}
 
 	function isBrandVerified($user_id){
+		global $current_user;
 		return get_user_meta($current_user->ID, "brand_verified", true);
 	}
 
@@ -1882,6 +1958,80 @@ class main{
 			echo '</ul></nav></div>';
 		}else{
 
+		}
+	}
+
+	function getS3UploadPresignedLink($filekey, $filemime){
+		$s3 = new \Aws\S3\S3Client(array(
+			"region"=>"ap-southeast-1",
+			"version"=>"latest",
+			"credentials"=>array(
+				"key"=>AS3CF_AWS_ACCESS_KEY_ID,
+				"secret"=>AS3CF_AWS_SECRET_ACCESS_KEY
+			)
+		));
+
+		try{
+			$cmd = $s3->getCommand(
+				'putObject',
+				array(
+					'Bucket' => 'ncstorifymeprivate',
+					"Key" => $filekey,
+					"ContentType" => $filemime
+				)
+			);
+
+			$request = $s3->createPresignedRequest($cmd, "+10minutes");
+
+			$url = (string)$request->getUri();
+
+			return array(
+				"error"=>0,
+				"url"=>$url,
+				"key"=>$filekey
+			);
+		}catch( Exception $e ){
+
+			return array(
+				"error"=>1,
+				"msg"=>$e->getMessage()
+			);
+		}
+	}
+
+	function getS3presignedLink($filekey){
+		$s3 = new \Aws\S3\S3Client(array(
+			"region"=>"ap-southeast-1",
+			"version"=>"latest",
+			"credentials"=>array(
+				"key"=>AS3CF_AWS_ACCESS_KEY_ID,
+				"secret"=>AS3CF_AWS_SECRET_ACCESS_KEY
+			)
+		));
+
+		try{
+			$cmd = $s3->getCommand(
+				'GetObject',
+				array(
+					"Bucket" => 'ncstorifymeprivate',
+					"Key" => $filekey
+				)
+			);
+
+			$request = $s3->createPresignedRequest($cmd, '+20minutes');
+
+			$url = (string)$request->getUri();
+
+			return array(
+				"error"=>0,
+				"url"=>$url
+			);
+		}catch( Exception $e ){
+
+			return array(
+				"error"=>1,
+				"msg"=>$e->getMessage()
+			);
 		}
 	}
 }

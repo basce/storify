@@ -16,12 +16,30 @@
 .modal-xl {
   max-width: 1024px; }
 
+#downloadLinkModal {
+  z-index: 1090; }
+  #downloadLinkModal a.filename {
+    text-decoration: underline; }
+
 .modal-custom-xl {
   max-width: 70%; }
   .modal-custom-xl .modal-body {
     height: 70vh;
     overflow-x: hidden;
     overflow-y: auto; }
+
+.file-container {
+  background-color: #e9ecef;
+  padding: 1.1rem 1.6rem;
+  font-size: 1.4rem;
+  margin-top: 5px; }
+  .file-container .file-download-link {
+    background-color: white;
+    display: inline-block;
+    padding: .5rem;
+    margin-left: -0.5rem;
+    cursor: pointer;
+    text-decoration: underline; }
 
 .section-container {
   border: solid 1px #CCC;
@@ -72,12 +90,22 @@
   border: solid 3px #999;
   border-radius: 50%;
   background-size: cover; }
+#single_invitation_dialog .profile-image.item-accepted {
+  border-color: #3c763d; }
+#single_invitation_dialog .profile-image.item-rejected {
+  border-color: #a94442; }
+#single_invitation_dialog .profile-image.item-pending, #single_invitation_dialog .profile-image.item-waiting {
+  border-color: #8a6d3b; }
+#single_invitation_dialog .profile-image.item-expired {
+  border-color: #999; }
 #single_invitation_dialog .status.item-accepted {
   color: #3c763d; }
 #single_invitation_dialog .status.item-rejected {
   color: #a94442; }
 #single_invitation_dialog .status.item-waiting, #single_invitation_dialog .status.item-pending {
   color: #8a6d3b; }
+#single_invitation_dialog .status.item-expired {
+  color: #999; }
 #single_invitation_dialog .remark {
   background-color: #ccc;
   padding: .5rem; }
@@ -181,10 +209,26 @@
     margin: 3px;
     padding: 10px;
     border: solid 3px #CCC; }
+    .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block label {
+      display: block; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block p {
       margin-bottom: 0; }
+    .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block .file {
+      cursor: pointer;
+      display: inline-block; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block small {
       display: block; }
+    .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block input[readonly] {
+      background-color: #e9ecef;
+      opacity: 1; }
+    .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block.urldescription {
+      background-color: #e9ecef;
+      padding: 1.6rem;
+      font-size: 1.4rem;
+      margin-top: 5px; }
+    .deliverable-group .deliverable-creator-group .deliverable-creator-item .status_block {
+      float: right;
+      padding: .7rem 0 0; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item .right-cont {
       float: left;
       width: 60px; }
@@ -198,14 +242,16 @@
       float: left; }
       .deliverable-group .deliverable-creator-group .deliverable-creator-item .left-cont small {
         color: #CCC; }
-    .deliverable-group .deliverable-creator-group .deliverable-creator-item .bottom_panel button {
-      float: right;
-      margin-left: 5px;
-      margin-right: 0; }
-    .deliverable-group .deliverable-creator-group .deliverable-creator-item .bottom_panel::after {
-      content: "";
-      clear: both;
-      display: block; }
+    .deliverable-group .deliverable-creator-group .deliverable-creator-item .bottom_panel {
+      margin-top: .5rem; }
+      .deliverable-group .deliverable-creator-group .deliverable-creator-item .bottom_panel button {
+        float: right;
+        margin-left: 5px;
+        margin-right: 0; }
+      .deliverable-group .deliverable-creator-group .deliverable-creator-item .bottom_panel::after {
+        content: "";
+        clear: both;
+        display: block; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item .item-status {
       text-transform: capitalize; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item::after {
@@ -320,6 +366,27 @@
       content: " ";
       clear: both;
       display: block; }
+
+.submission-label {
+  display: block;
+  box-shadow: inset 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+  border: 0.1rem solid rgba(0, 0, 0, 0.15);
+  border-radius: .3rem;
+  color: #363636;
+  transition: .3s;
+  transform-style: preserve-3d;
+  -webkit-appearance: none;
+  background-color: #fff;
+  font-size: 1.4rem;
+  outline: none !important;
+  width: 100%;
+  height: inherit;
+  padding: 1.6rem; }
+  .submission-label .button {
+    border: solid 1px #999;
+    padding: .4rem .7rem;
+    background-image: linear-gradient(#FFF, #DDD);
+    margin-right: .5rem; }
 
 .bountycontent .title, .finalcontent .title {
   margin-bottom: 0;
@@ -524,54 +591,64 @@
         .submissioncontent .submissionsection .submission_form .submission_form_bottom .form-width {
           width: calc(100% - 100px);
           margin-bottom: 5px; }
+        .submissioncontent .submissionsection .submission_form .submission_form_bottom .progressbar {
+          box-shadow: inset 0 0 1rem 0 rgba(0, 0, 0, 0.1);
+          border: 0.1rem solid rgba(0, 0, 0, 0.15);
+          background: transparent; }
+          .submissioncontent .submissionsection .submission_form .submission_form_bottom .progressbar .progressbar-inner {
+            height: 5px;
+            background: #ff0000; }
     .submissioncontent .submissionsection::after {
       clear: both;
       display: block;
       content: " "; }
-  .submissioncontent .submissionlist {
+  .submissioncontent .submissionsection, .submissioncontent .submissionlist {
     position: relative; }
-    .submissioncontent .submissionlist .nav-link i {
+    .submissioncontent .submissionsection .nav-link i, .submissioncontent .submissionlist .nav-link i {
       color: #495057; }
-    .submissioncontent .submissionlist .nav-link:hover i {
+    .submissioncontent .submissionsection .nav-link:hover i, .submissioncontent .submissionlist .nav-link:hover i {
       color: #ff0000; }
-    .submissioncontent .submissionlist .listtop {
+    .submissioncontent .submissionsection .listtop, .submissioncontent .submissionlist .listtop {
       position: relative; }
-      .submissioncontent .submissionlist .listtop .listtopleft {
+      .submissioncontent .submissionsection .listtop .listtopleft, .submissioncontent .submissionlist .listtop .listtopleft {
         width: 100px;
         float: left;
         text-align: right;
         padding-right: 5px; }
-        .submissioncontent .submissionlist .listtop .listtopleft .togglebutton-box {
+        .submissioncontent .submissionsection .listtop .listtopleft .togglebutton-box, .submissioncontent .submissionlist .listtop .listtopleft .togglebutton-box {
           display: inline-block; }
-      .submissioncontent .submissionlist .listtop .listnotification {
+      .submissioncontent .submissionsection .listtop .listnotification, .submissioncontent .submissionlist .listtop .listnotification {
         display: block;
         float: left; }
-      .submissioncontent .submissionlist .listtop::after {
+      .submissioncontent .submissionsection .listtop::after, .submissioncontent .submissionlist .listtop::after {
         content: " ";
         clear: both;
         display: block; }
-    .submissioncontent .submissionlist .list {
+    .submissioncontent .submissionsection .list, .submissioncontent .submissionlist .list {
       padding-left: 100px; }
-      .submissioncontent .submissionlist .list .submission {
+      .submissioncontent .submissionsection .list .submission, .submissioncontent .submissionlist .list .submission {
         position: relative;
         margin-bottom: 10px; }
-        .submissioncontent .submissionlist .list .submission .submission-icon {
+        .submissioncontent .submissionsection .list .submission .submission-icon, .submissioncontent .submissionlist .list .submission .submission-icon {
           position: absolute;
           right: calc(100% + 5px);
           top: 5px;
           font-size: 1.5rem; }
-        .submissioncontent .submissionlist .list .submission .urlrow {
+        .submissioncontent .submissionsection .list .submission .urlrow, .submissioncontent .submissionlist .list .submission .urlrow {
           position: relative; }
-          .submissioncontent .submissionlist .list .submission .urlrow .urlinput {
+          .submissioncontent .submissionsection .list .submission .urlrow .urlinput, .submissioncontent .submissionlist .list .submission .urlrow .urlinput {
             float: left;
             width: calc(100% - 100px); }
-            .submissioncontent .submissionlist .list .submission .urlrow .urlinput input {
+            .submissioncontent .submissionsection .list .submission .urlrow .urlinput input, .submissioncontent .submissionlist .list .submission .urlrow .urlinput input {
               font-size: 1.4rem;
               padding: 1.6rem; }
-          .submissioncontent .submissionlist .list .submission .urlrow .urlaction {
+            .submissioncontent .submissionsection .list .submission .urlrow .urlinput .file, .submissioncontent .submissionlist .list .submission .urlrow .urlinput .file {
+              cursor: pointer;
+              display: inline-block; }
+          .submissioncontent .submissionsection .list .submission .urlrow .urlaction, .submissioncontent .submissionlist .list .submission .urlrow .urlaction {
             float: left;
             width: 100px; }
-            .submissioncontent .submissionlist .list .submission .urlrow .urlaction a, .submissioncontent .submissionlist .list .submission .urlrow .urlaction span {
+            .submissioncontent .submissionsection .list .submission .urlrow .urlaction a, .submissioncontent .submissionsection .list .submission .urlrow .urlaction span, .submissioncontent .submissionlist .list .submission .urlrow .urlaction a, .submissioncontent .submissionlist .list .submission .urlrow .urlaction span {
               padding: .1rem;
               font-size: 1.5rem;
               position: relative;
@@ -581,33 +658,33 @@
               width: 2.5rem;
               display: inline-block;
               text-align: center; }
-            .submissioncontent .submissionlist .list .submission .urlrow .urlaction span {
+            .submissioncontent .submissionsection .list .submission .urlrow .urlaction span, .submissioncontent .submissionlist .list .submission .urlrow .urlaction span {
               color: green; }
-            .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.bin {
+            .submissioncontent .submissionsection .list .submission .urlrow .urlaction a.bin, .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.bin {
               color: #ff0000;
               border: solid 1px #ff0000;
               background-color: transparent; }
-              .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.bin:hover {
+              .submissioncontent .submissionsection .list .submission .urlrow .urlaction a.bin:hover, .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.bin:hover {
                 color: #ffffff;
                 background-color: #ff0000; }
-            .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.reject {
+            .submissioncontent .submissionsection .list .submission .urlrow .urlaction a.reject, .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.reject {
               color: #ff0000;
               border: solid 1px #ff0000;
               background-color: transparent; }
-              .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.reject:hover {
+              .submissioncontent .submissionsection .list .submission .urlrow .urlaction a.reject:hover, .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.reject:hover {
                 color: #ffffff;
                 background-color: #ff0000; }
-          .submissioncontent .submissionlist .list .submission .urlrow::after {
+          .submissioncontent .submissionsection .list .submission .urlrow::after, .submissioncontent .submissionlist .list .submission .urlrow::after {
             content: " ";
             clear: both;
             display: block; }
-        .submissioncontent .submissionlist .list .submission .urldescription {
+        .submissioncontent .submissionsection .list .submission .urldescription, .submissioncontent .submissionlist .list .submission .urldescription {
           width: calc(100% - 100px);
           background-color: #e9ecef;
           padding: 1.6rem;
           font-size: 1.4rem;
           margin-top: 5px; }
-    .submissioncontent .submissionlist::after {
+    .submissioncontent .submissionsection::after, .submissioncontent .submissionlist::after {
       content: " ";
       clear: both;
       display: block; }
@@ -884,8 +961,12 @@
       padding-left: 0;
       padding-right: 0;
       padding-bottom: 0; }
-      .project-items .project-item .content .description p {
-        width: calc(100% - 230px); }
+    .project-items .project-item .content .description.one-button p {
+      width: calc(100% - 95px); }
+    .project-items .project-item .content .description.two-button p {
+      width: calc(100% - 165px); }
+    .project-items .project-item .content .description.three-button p {
+      width: calc(100% - 240px); }
     .project-items .project-item .content .actions {
       position: absolute;
       right: 2rem;
@@ -921,7 +1002,9 @@
       height: 8rem; }
 
   #invite_grid .project-item .content {
-    padding-bottom: 8rem; } }
+    padding-bottom: 8rem; }
+    #invite_grid .project-item .content .description p {
+      width: 100%; } }
 .history_block {
   padding: 10px; }
   .history_block .history_item {
@@ -1493,6 +1576,21 @@
     position: absolute;
     top: 0;
     right: 0; }
+
+modal#shareModal #collection_link {
+  cursor: pointer;
+  margin-bottom: .5rem;
+  padding: 1.6rem 6rem 1.6rem 1.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden; }
+modal#shareModal .copybutton {
+  position: absolute;
+  top: 1.1rem;
+  font-size: 1.4rem;
+  padding: 1.6rem;
+  right: 1.1rem;
+  pointer-events: none; }
 
 /*
  *  Owl Carousel - Core

@@ -260,7 +260,7 @@ class bookmark{
 		$query = "UPDATE `".$table."` SET sort_index = %d WHERE id = %d";
 		$wpdb->query($wpdb->prepare($query, $target_index, $group_item_id));
 		
-		$this->updateGroupTime($groupid);
+		$this->updateGroupTime($group_id);
 	}
 
 	public function getGroupItem($groupid, $amount=-1){
