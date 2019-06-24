@@ -39,7 +39,10 @@ if($current_user->ID){
 			}
 		break;
 		case "social_update":
-			$result = $main->updateUserTags($_REQUEST["countries"],$_REQUEST["language"],$_REQUEST["category"],$pathquery[2]); 
+			$countries = isset($_REQUEST["countries"]) ? $_REQUEST["countries"] : array();
+			$language = isset($_REQUEST["language"]) ? $_REQUEST["language"] : array();
+			$category = isset($_REQUEST["category"]) ? $_REQUEST["category"] : array();
+			$result = $main->updateUserTags($countries, $language, $category, $pathquery[2]); 
 			$obj["error"] = 0;
 			$obj["msg"] = "tags updated.";
 			$obj["country_changed"] = $result["country_changed"];

@@ -129,6 +129,26 @@ if($current_user->ID){
                 $obj["no_of_video"] = $result["no_of_video"];
             }
         break;
+        case "getDownloadLink":
+            if($main->getProjectManager()->checkFileAdminAccess($_POST["id"], $current_user->ID)){
+                $file_data = $main->getProjectManager()->getFile($_POST["id"]);
+                $url_result = $main->getS3presignedLink($file_data["file_url"]);
+                if($url_result["error"]){
+                    $obj["error"] = 1;
+                    $obj["msg"] = $url_result["msg"];
+                }else{
+                    $obj["error"] = 0;
+                    $obj["filelink"] = $url_result["url"];
+                    $obj["filename"] = $file_data["filename"];
+                    $obj["filesize"] = $file_data["size"];
+                    $obj["filemime"] = $file_data["mime"];
+                    $obj["msg"] = "";
+                }
+            }else{
+                $obj["error"] = 1;
+                $obj["msg"] = "Invalid ownership";
+            }
+        break;
         case "getUsers":
             $obj["error"] = 0;
             $obj["msg"] = "";

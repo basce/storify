@@ -47,16 +47,20 @@
 <?php 
 $header_without_toggle_button = true;
 include("page/component/header.php"); 
-switch($_REQUEST["order"]){
-    case "oldest":
-        $sortBy = "oldest";
-    break;
-    case "latest":
-        $sortBy = "latest";
-    break;
-    default:
-        $sortBy = "sort_index";
-    break;
+if(isset($_REQUEST["order"])){
+    switch($_REQUEST["order"]){
+        case "oldest":
+            $sortBy = "oldest";
+        break;
+        case "latest":
+            $sortBy = "latest";
+        break;
+        default:
+            $sortBy = "sort_index";
+        break;
+    }
+}else{
+    $sortBy = "sort_index";
 }
 ?>
                 <!--============ Page Title =========================================================================-->
@@ -101,7 +105,7 @@ switch($_REQUEST["order"]){
                             </div>
                             <div class="section-title clearfix hide" id="notemptybox">
                                 <div class="row">
-                                    <div class="col-6">
+                                    <div class="col-md-6 col-4">
                                         <!--
                                             <select name="order" id="order" class="small width-200px" data-placeholder="Default Sorting" >
                                                 <option value="latest" <?php if($sortBy == "latest"){ echo "selected";}?>>Newest</option>
@@ -109,11 +113,12 @@ switch($_REQUEST["order"]){
                                             </select>
                                         -->
                                     </div>
-                                    <div class="col-6 edit_bar">
+                                    <div class="col-md-6 col-8 edit_bar">
                                         <div class="float-right">
+                                            <a href="#" title="Share your board" class="btn btn-primary float-right hide" data-toggle="modal" data-target="#shareModal" id="share"><i class="fa fa-share-alt-square"></i></a>
                                             <a href="/user@<?=$current_user->ID?>/collections/<?=$pathquery[2]?>/<?=$pathquery[3]?>/add" title="Add" class="btn btn-primary float-right" id="add_new_item2"><i class="fa fa-plus-square"></i></a>
                                             <a href="#" title="Remove" class="btn btn-primary float-right" id="enter_edit_mode"><i class="fa fa-minus-square"></i></a>
-                                            <a href="#" title="Remove" class="btn btn-primary float-right hide" id="remove"><i class="fa fa-check-square"></i></a>
+                                            <a href="#" title="Update" class="btn btn-primary float-right hide" id="remove"><i class="fa fa-check-square"></i></a>
                                             <a href="#" title="Back" class="btn btn-primary float-right hide" id="back"><i class="fa fa-chevron-left"></i></a>
                                         </div>
                                     </div>
@@ -132,6 +137,26 @@ switch($_REQUEST["order"]){
             <!--end block-->
         </section>
     <?php include("page/component/footer.php"); ?>
+    <modal class="modal" tabindex="-1" role="dialog" id="shareModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Share this board.</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" readonly="readonly" id="collection_link" value="<?=get_home_url()?>/collections/people/<?=$current_user->ID?>/<?=$pathquery[3]?>/">
+                    <a href="#" class="copybutton">Copy</a>
+                    <div class="alert alert-success hide">Link has been copied to clipboard.</div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary small" type="button" data-dismiss="modal" aria-label="Close">Ok</button>
+                </div>
+            </div>
+        </div>
+    </modal>
     </div>
     <!--end page-->
     <script type="text/javascript">
@@ -143,6 +168,37 @@ switch($_REQUEST["order"]){
                 opacity: null
             };
 
+            $("#collection_link").click(function(e){
+                e.preventDefault();
+                iosCopyToClipboard(this);
+            });
+
+            function iosCopyToClipboard(el) {
+                var oldContentEditable = el.contentEditable,
+                    oldReadOnly = el.readOnly,
+                    range = document.createRange();
+
+                el.contentEditable = true;
+                el.readOnly = false;
+                range.selectNodeContents(el);
+
+                var s = window.getSelection();
+                s.removeAllRanges();
+                s.addRange(range);
+
+                el.setSelectionRange(0, 999999); // A big number, to cover anything that could be inside the element.
+
+                el.contentEditable = oldContentEditable;
+                el.readOnly = oldReadOnly;
+
+                document.execCommand('copy');
+
+                $("#shareModal .alert").removeClass("hide");
+                setTimeout(function(){
+                    $("#shareModal .alert").addClass("hide");
+                },2000);
+            }
+
             function updateButtons(stage){
                 if(stage == 1){
                     $("#add_new_item2").removeClass("hide");
@@ -153,6 +209,12 @@ switch($_REQUEST["order"]){
                     if($(".items.grid").hasClass("ui-sortable")){
                         $(".items.grid").sortable("destroy");
                     }
+                    //check if share button should show
+                    if($(".items.grid").find(".item").length){
+                        $("#share").removeClass("hide");
+                    }else{
+                        $("#share").addClass("hide");
+                    }
                 }else if(stage == 2){
                     $("#add_new_item2").addClass("hide");
                     $("#enter_edit_mode").addClass("hide");
@@ -160,12 +222,16 @@ switch($_REQUEST["order"]){
                     $("#back").removeClass("hide");
                     $(".items.grid").sortable();
                     $(".items.grid").addClass("editmode");
+                    //hide share button when in edit mode
+                    $("#share").addClass("hide");
                 }else{
                     $("#add_new_item2").addClass("hide");
                     $("#enter_edit_mode").addClass("hide");
                     $("#remove").removeClass("hide");
                     $("#back").addClass("hide");
                     $(".items.grid").addClass("editmode");
+                    //hide share button when in edit mode
+                    $("#share").addClass("hide");
                 }
             }
 
@@ -315,7 +381,7 @@ switch($_REQUEST["order"]){
                                 ScrollReveal().reveal($temp, slideUp);
                             });
 
-
+                            updateButtons(1);
                         }
                     }
                 })

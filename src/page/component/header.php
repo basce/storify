@@ -268,7 +268,7 @@
                                 </ul>
                                 <!--Main navigation list-->
                             </div>
-<?php if(!$header_without_toggle_button){ ?>
+<?php if(!(isset($header_without_toggle_button) && $header_without_toggle_button)){ ?>
                             <!--end navbar-collapse-->
                             <a href="#collapseMainSearchForm" class="main-search-form-toggle" data-toggle="collapse"  aria-expanded="false" aria-controls="collapseMainSearchForm">
                                 <i class="fa fa-search"></i>
@@ -279,14 +279,14 @@
                         </nav>
                         <!--end navbar-->
 <?php
-    if(!$header_without_breadcrumbs){
+    if(!(isset($header_without_breadcrumbs) && $header_without_breadcrumbs)){
         if(isset($pageSettings) && isset($pageSettings["breadcrumb"]) && sizeof($pageSettings["breadcrumb"])){
             echo '<ol class="breadcrumb">';
                 foreach($pageSettings["breadcrumb"] as $key=>$value){
                     if($value["href"] !== ""){
-                        echo '<li class="breadcrumb-item"><a href="'.$value["href"].'" '.(isset($value["target"])? 'target="'.$value["target"].'"':'').'>'.$value["label"].'</a></li>';
+                        echo '<li class="breadcrumb-item"><a href="'.$value["href"].'" '.(isset($value["target"])? 'target="'.$value["target"].'"':'').'>'.$main->gen_string($value["label"]).'</a></li>';
                     }else{
-                        echo '<li class="breadcrumb-item active">'.$value["label"].'</a>';
+                        echo '<li class="breadcrumb-item active">'.$main->gen_string($value["label"]).'</a>';
                     }
                 }
             echo '</ol>';

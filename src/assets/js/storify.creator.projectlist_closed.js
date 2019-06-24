@@ -98,7 +98,7 @@ storify.creator.projectList_closed = {
             .append($("<div>").addClass("content")
                 .append(title)
                 .append(div_location)
-                .append($("<div>").addClass("description")
+                .append($("<div>").addClass("description one-button")
                     .append(div_description)
                 )
                 .append($("<div>").addClass("actions")
@@ -183,6 +183,9 @@ storify.creator.projectList_closed = {
                     $(".linkify").linkify({
                         target: "_blank"
                     });
+                    if(!+rs.result.total){
+                        $grid.append($("<p>").text("No closed projects yet."));
+                    }
                     if(onComplete)onComplete();
                 }
             }

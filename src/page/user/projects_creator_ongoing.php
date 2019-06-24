@@ -65,7 +65,7 @@ include("page/component/header.php"); ?>
 <?php
                         $total_ongoing = $main->getProjectManager()->getNumberOfOnGoingCreator($current_user->ID);
                         if($total_ongoing == 0){
-                            echo "You have not received any invitations.";
+                            echo "You have not accepted any invitations.";
                         }else if($total_ongoing == 1){
                             echo "You have 1 project to complete.";
                         }else{
@@ -89,7 +89,7 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <div class="project-items" id="ongoing_grid" data-page="0" data-sort="date" data-filter="ongoing">
+                            <div class="project-items" id="ongoing_grid" data-page="0" data-sort="closing_date" data-filter="ongoing">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="ongoingloadmore">Load More</a>

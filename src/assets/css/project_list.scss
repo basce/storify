@@ -125,9 +125,21 @@
 				padding-left:0;
 				padding-right:0;
 				padding-bottom:0;
+			}
+			.description.one-button{
 				p{
-					width: calc(100% - 230px);
-				}	
+					width: calc(100% - 95px);
+				}
+			}
+			.description.two-button{
+				p{
+					width: calc(100% - 165px);
+				}
+			}
+			.description.three-button{
+				p{
+					width: calc(100% - 240px);
+				}
 			}
 			.actions{
 				position:absolute;
@@ -183,6 +195,11 @@
 		.project-item{
 			.content{
 				padding-bottom:8rem;
+				.description{
+					p{
+						width:100%;
+					}
+				}
 			}
 		}
 	}

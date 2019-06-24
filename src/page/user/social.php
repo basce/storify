@@ -74,7 +74,7 @@ include("page/component/header.php"); ?>
                         </div>
                         <div class="col-md-9">
                             <div class="user_edit">
-                                <section class="my-0">
+                                <section class="">
                                     <div class="author big clearfix">
                                         <div class="author-image">
                                             <div class="background-image">
@@ -86,7 +86,7 @@ include("page/component/header.php"); ?>
                                             <div class="section-title">
                                                 <h2><?=$social_account["iger"]["name"]?></h2>
                                                 <?php
-                                                    if(sizeof($social_account["iger"]["instagrammer_country"])){
+                                                    if($social_account["iger"]["instagrammer_country"] && sizeof($social_account["iger"]["instagrammer_country"])){
                                                 ?><h4 class="location"><?php 
                                                         foreach($social_account["iger"]["instagrammer_country"] as $key=>$value){
                                                             ?><a href="/listing?country%5B%5D=<?=$value["term_id"]?>"><?=$value["name"]?></a><?php
@@ -119,7 +119,7 @@ include("page/component/header.php"); ?>
                                     <p>Help us discover your best stories.</p>
                                     <div class="author-description">
                                         <div class="form-group">
-                                            <select name="category[]" id="category" data-placeholder="Please selection up to 5 passions." class="customselect" data-maxitems=5 data-enable-input=true nc-method="addCategory" multiple>
+                                            <select name="category[]" id="category" data-placeholder="Please select up to 5 passions." class="customselect" data-maxitems=5 data-enable-input=true nc-method="addCategory" multiple>
                                                 <option value="">Select passion</option>
                                                 <?php
                                                     $language_tags = $main->getAllTags();
@@ -144,12 +144,12 @@ include("page/component/header.php"); ?>
                                                     }
                                                 ?>
                                             </select>
-                                            <div class="alert alert-danger hide">Please select at least 1 option</div>
+                                            <div class="alert alert-danger hide">Please select at least 1 option.</div>
                                         </div>
                                     </div>
                                     <div class="author-description">
                                         <div class="form-group">
-                                            <select name="country[]" id="country" data-placeholder="Please selection up to 5 countries." class="customselect" data-maxitems=5 data-enable-input=true multiple nc-method="addCountry">
+                                            <select name="country[]" id="country" data-placeholder="Please select up to 5 countries." class="customselect" data-maxitems=5 data-enable-input=true multiple nc-method="addCountry">
                                                 <option value="">Select country/city</option>
                                                 <?php
                                                     $category_tags = $main->getAllCountries();
@@ -174,7 +174,7 @@ include("page/component/header.php"); ?>
                                                     }
                                                 ?>
                                             </select>
-                                            <div class="alert alert-danger hide">Please select at least 1 option</div>
+                                            <div class="alert alert-danger hide">Please select at least 1 option.</div>
                                         </div>
                                     </div>
                                 </section>
@@ -184,7 +184,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <hr>
                             <section class="clearfix">
-                                <button type="submit" class="btn btn-primary float-right width-180" id="post_pull" style="z-index:1"><i class="fa fa-refresh"></i> Get Up To Date</button>
+                                <button type="submit" class="btn btn-primary float-right width-180" id="post_pull" style="z-index:1; margin-left:5px;"><i class="fa fa-refresh"></i> Get Up To Date</button>
                                 <h2 style="margin-bottom:0">Featured Stories</h2>
                                 <p class="post_idle" style="display:none">Last pulled on <span class="last_update_datetime"></span></p>
                                 <p class="post_empty" style="display:none">No stories yet, pull stories from your Instagram account now.</p>
@@ -316,11 +316,8 @@ include("page/component/header.php"); ?>
                 _updatingPosts = true;
                 var $grid = $(".items.grid");
 
-                $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date');
-                $(".post_idle").attr({style:"display:none"});
-                $(".post_empty").attr({style:"display:none"});
-                $(".post_waiting").attr({style:"display:none"});
-                $(".post_pulling").removeAttr("style");
+                changeMsg("processing");
+
                 $.ajax({
                     type: 'POST',
                     dataType: 'json',
@@ -344,16 +341,10 @@ include("page/component/header.php"); ?>
                             }
                             if(rs.result.data && rs.result.data.length){
                                 //got result
-                                $(".post_idle").removeAttr("style");
-                                $(".post_empty").attr({style:"display:none"});
-                                $(".post_pulling").attr({style:"display:none"});
-                                $(".post_waiting").attr({style:"display:none"});
+                                changeMsg("pull_done");
                             }else{
                                 //empty
-                                $(".post_idle").attr({style:"display:none"});
-                                $(".post_empty").removeAttr("style");
-                                $(".post_pulling").attr({style:"display:none"});
-                                $(".post_waiting").attr({style:"display:none"});
+                                changeMsg("empty");
                             }
                             $.each(rs.result.data, function(index,value){
                                 var $temp = createPostGridItem(value);
@@ -370,11 +361,7 @@ include("page/component/header.php"); ?>
                 if(_checkUpdating) return;
                 _checkUpdating = true;
 
-                $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
-                $(".post_idle").attr({style:"display:none"});
-                $(".post_empty").attr({style:"display:none"});
-                $(".post_waiting").attr({style:"display:none"});
-                $(".post_pulling").removeAttr("style");
+                changeMsg("processing");
 
                 $.ajax({
                     type: 'POST',
@@ -387,11 +374,8 @@ include("page/component/header.php"); ?>
                     success:function(rs){
                         _checkUpdating = false;
                         if(rs.status == 1){
-                            $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
-                            $(".post_idle").attr({style:"display:none"});
-                            $(".post_empty").attr({style:"display:none"});
-                            $(".post_waiting").attr({style:"display:none"});
-                            $(".post_pulling").removeAttr("style");
+
+                            changeMsg("processing");
 
                             setTimeout(function(){
                                 checkUpdate();
@@ -403,6 +387,14 @@ include("page/component/header.php"); ?>
 
                             pullPosts();
                         }
+                    },
+                    error:function(xhr, status, thrownError){
+                        _checkUpdating = false;
+                        console.log("error");
+                        console.log(thrownError);
+                        setTimeout(function(){
+                            checkUpdate();
+                        },5000);
                     }
                 });
             }
@@ -416,12 +408,7 @@ include("page/component/header.php"); ?>
 
                 cur_page = cur_page ? cur_page + 1: 1;
 
-                $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
-
-                $(".post_idle").attr({style:"display:none"});
-                $(".post_empty").attr({style:"display:none"});
-                $(".post_waiting").attr({style:"display:none"});
-                $(".post_pulling").removeAttr("style");
+                changeMsg("processing");
 
                 $.ajax({
                     type: 'POST',
@@ -437,25 +424,19 @@ include("page/component/header.php"); ?>
                         if(rs.error){
                             console.log(rs.msg);
                         }else{
-                            $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').removeClass("disabled").blur();
                             $grid.attr({'data-page':rs.result.page});
                             if(rs.social_data && rs.social_data.iger && rs.social_data.iger.modified){
                                 $(".last_update_datetime").text(rs.social_data.iger.modified);
                             }
                             if(rs.result.data && rs.result.data.length){
                                 //got result
-                                $(".post_idle").removeAttr("style");
-                                $(".post_empty").attr({style:"display:none"});
-                                $(".post_pulling").attr({style:"display:none"});
-                                $(".post_waiting").attr({style:"display:none"});
+                                changeMsg("pull_done");
                             }else{
                                 //empty
-                                $(".post_idle").attr({style:"display:none"});
-                                $(".post_empty").removeAttr("style");
-                                $(".post_pulling").attr({style:"display:none"});
-                                $(".post_waiting").attr({style:"display:none"});
+                                changeMsg("empty");
                             }
 
+                            $grid.empty();
                             $.each(rs.result.data, function(index,value){
                                 var $temp = createPostGridItem(value);
                                 $grid.append( $temp );
@@ -472,6 +453,33 @@ include("page/component/header.php"); ?>
                 }
             });
 
+            function changeMsg(type){
+                $("#post_pull").addClass("hide");
+                $(".post_idle").attr({style:"display:none"});
+                $(".post_empty").attr({style:"display:none"});
+                $(".post_pulling").attr({style:"display:none"});
+                $(".post_waiting").attr({style:"display:none"});
+                $("#post_pull").html('<i class="fa fa-refresh"></i> Get Up To Date').removeClass("disabled").blur();
+                switch(type){
+                    case "pull_done":
+                        $("#post_pull").removeClass("hide");
+                        $(".post_idle").removeAttr("style");
+                    break;
+                    case "empty":
+                        $("#post_pull").removeClass("hide");
+                        $(".post_empty").removeAttr("style");
+                    break;
+                    case "need_tag":
+                        $(".post_waiting").removeAttr("style");
+                    break;
+                    case "processing":
+                        $("#post_pull").removeClass("hide");
+                        $("#post_pull").html('<i class="fa fa-refresh fa-spin"></i> Get Up To Date').addClass("disabled");
+                        $(".post_pulling").removeAttr("style");
+                    break;
+                }
+            }
+
             function availableForPostPulling(){
                 if(_social_data && 
                    _social_data.iger && 
@@ -480,18 +488,9 @@ include("page/component/header.php"); ?>
                    _social_data.iger.instagrammer_tag && 
                    _social_data.iger.instagrammer_tag.length ){
 
-                    $("#post_pull").removeClass("hide");
-                    $(".post_idle").attr({style:"display:none"});
-                    $(".post_empty").removeAttr("style");
-                    $(".post_pulling").attr({style:"display:none"});
-                    $(".post_waiting").attr({style:"display:none"});
                     return true;
                 }else{
-                    $("#post_pull").addClass("hide");
-                    $(".post_idle").attr({style:"display:none"});
-                    $(".post_empty").attr({style:"display:none"});
-                    $(".post_pulling").attr({style:"display:none"});
-                    $(".post_waiting").removeAttr("style");
+
                     return false;
                 }
             }
@@ -517,18 +516,27 @@ include("page/component/header.php"); ?>
                                     var a = $("#category").parents(".form-group").find(".alert");
                                     a.text("Passion tags updated successfully.").removeClass("hide alert-danger").addClass("alert-success");
                                     setTimeout(function() {
-                                        a.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
+                                        a.text("Please select at least 1 option.").removeClass("alert-success").addClass("alert-danger hide");
                                     },1000);
                                 }
                                 if(data.country_changed){
                                     var b = $("#country").parents(".form-group").find(".alert");
                                     b.text("Country tags updated successfully.").removeClass("hide alert-danger").addClass("alert-success");
                                     setTimeout(function() {
-                                        b.text("Please select at least 1 option").removeClass("alert-success").addClass("alert-danger hide");
+                                        b.text("Please select at least 1 option.").removeClass("alert-success").addClass("alert-danger hide");
                                     },1000);
                                 }
                                 if(data.social_data && data.social_data.iger && data.social_data.iger.modified){
                                     $(".last_update_datetime").text(data.social_data.iger.modified);
+                                }
+                                /*
+                                if(availableForPostPulling()){
+                                    changeMsg("empty");
+                                }else{
+                                    changeMsg("need_tag");
+                                }*/
+                                if($(".post_waiting:visible").length){
+                                    pullPosts();
                                 }
                                 if(data.category_changed || data.country_changed){
                                     setTimeout(function(){
@@ -552,6 +560,8 @@ include("page/component/header.php"); ?>
             if(_social_data && _social_data.iger && _social_data.iger.id){
                 if(availableForPostPulling()){
                     checkUpdate();
+                }else{
+                    changeMsg("need_tag");
                 }
             }
         });

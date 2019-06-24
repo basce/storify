@@ -41,6 +41,7 @@
     <script src="/assets/js/owlcarousel/owl.animate.js"></script>
     <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
     <script src="/assets/js/storify.project.users.js"></script>
     <script src="/assets/js/storify.creator.detail_invite.js"></script>
     <script src="/assets/js/storify.creator.projectlist_invite.js"></script>
@@ -59,9 +60,11 @@ include("page/component/header.php"); ?>
                 <div class="page-title">
                     <div class="container">
                         <h1>Invites received</h1>
-                        <h2>
+                        <h2 class="dynamic_title_text">
 <?php
-                        $total_invites = $main->getProjectManager()->getNumberOfInvitationCreator($current_user->ID);
+                        //$total_invites = $main->getProjectManager()->getNumberOfInvitationCreator($current_user->ID);
+                        $stats = $main->getProjectManager()->getProjectStats($current_user->ID);
+                        $total_invites = $stats["invite"] ? $stats["invite"] : 0;
                         if($total_invites == 0){
                             echo "You have not received any invitations.";
                         }else if($total_invites == 1){
@@ -87,7 +90,7 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <div class="project-items" id="invite_grid" data-page="0" data-sort="date" data-filter="pending">
+                            <div class="project-items" id="invite_grid" data-page="0" data-sort="invitation_closing_date" data-filter="pending">
                             </div>
                             <div class="center">
                                 <a href="#" class="btn btn-primary btn-framed btn-rounded" id="invitationloadmore">Load More</a>
@@ -105,6 +108,34 @@ include("page/component/header.php"); ?>
     <script type="text/javascript">
         $(function(){
             "use strict";
+
+            //add listner on update leftnav
+            storify.core.addListener("menu_project_item_amount_update", function(obj){
+                console.log(obj);
+                if(obj.invite !== false){
+                    $(".left_menu_invite").text("("+obj.invite+")");
+                }
+                if(obj.open !== false){
+                    $(".left_menu_ongoing").text("("+obj.open+")");
+                }
+                if(obj.closed !== false){
+                    $(".left_menu_closed").text("("+obj.closed+")");
+                }
+            });
+
+            //update title
+            storify.core.addListener("menu_project_item_amount_update", function(obj){
+                console.log(obj);
+                if(obj.invite !== false){
+                    if(obj.invite == 0){
+                        $(".dynamic_title_text").text("You have not received any invitations.");
+                    }else if(obj.invite == 1){
+                        $(".dynamic_title_text").text("Say yes to 1 project.");
+                    }else{
+                        $(".dynamic_title_text").text("Say yes to "+obj.invite+" projects.");
+                    }
+                }
+            });
 
             $("#invitationloadmore").click(function(e){
                 e.preventDefault();

@@ -26,6 +26,17 @@ if($current_user->ID){
                 $obj["data"] = $result["data"];
             }
         break;
+        case "getS3PresignedLink":
+            $result = $main->getS3PresignedLink($_POST["project_id"], $current_user->ID, $_POST["type"], "put");
+            if($result["error"]){
+                $obj["error"] = 1;
+                $obj["msg"] = $result["msg"];
+            }else{
+                $obj["error"] = 0;
+                $obj["msg"] = "";
+                $obj["url"] = $result["url"];
+            }
+        break;
         case "getDeliverable":
             $result = $main->getProjectManager()->getDeliverables($_POST["project_id"], $current_user->ID);
             if($result["error"]){
@@ -61,6 +72,47 @@ if($current_user->ID){
                 $obj["no_of_photo"] = $result["no_of_photo"];
             }
         break;
+        case "makeSubmissionFile":
+            //$project_id, $type, $user_id, $filename, $filesize, $filemime
+            $result = $main->getProjectManager()->submission_file_submit($_POST["project_id"], $_POST["type"], $current_user->ID, $_POST["file_name"], $_POST["file_size"], $_POST["file_mime"]);
+            if($result["error"]){
+                $obj["error"] = 1;
+                $obj["msg"] = $result["msg"];
+            }else{
+                if($result["success"]){
+                    //get presigned url
+                    $presigned = $main->getS3UploadPresignedLink($result["key"], $_POST["file_mime"]);
+                    $obj["error"] = 0;
+                    $obj["url"] = $presigned["url"];
+                    $obj["filename"] = $result["filename"];
+                    $obj["id"] = $result["id"];
+                    $obj["msg"] = "presigned URL generated";
+                    $obj["success"] = 1;
+                }else{
+                    $obj["error"] = 0;
+                    $obj["msg"] = $result["msg"];  
+                    $obj["success"] = $result["success"];
+                }
+            }
+        break;
+        case "confirmUpload":
+            //check ownership
+            if($main->getProjectManager()->checkFileOwnerShip($_POST["id"], $current_user->ID)){
+                //is owner
+                $result = $main->getProjectManager()->uploadComplete($_POST["id"], $_POST["caption"], $_POST["type"]);
+                if($result["error"]){
+                    $obj["error"] = 1;
+                    $obj["msg"] = $result["msg"];
+                }else{
+                    $obj["error"] = 0;
+                    $obj["msg"] = $result["msg"];  
+                    $obj["success"] = $result["success"];
+                }    
+            }else{
+                $obj["error"] = 1;
+                $obj["msg"] = "Invalid ownership";
+            }
+        break;
         case "makeSubmission":
             $result = $main->getProjectManager()->submission_submit($_POST["project_id"], $_POST["type"],$current_user->ID, $_POST["URL"], $_POST["remark"]);
             if($result["error"]){
@@ -68,8 +120,28 @@ if($current_user->ID){
                 $obj["msg"] = $result["msg"];
             }else{
                 $obj["error"] = 0;
-                $obj["msg"] = $result["msg"];
+                $obj["msg"] = $result["msg"];  
                 $obj["success"] = $result["success"];
+            }
+        break;
+        case "getDownloadLink":
+            if($main->getProjectManager()->checkFileOwnerShip($_POST["id"], $current_user->ID)){
+                $file_data = $main->getProjectManager()->getFile($_POST["id"]);
+                $url_result = $main->getS3presignedLink($file_data["file_url"]);
+                if($url_result["error"]){
+                    $obj["error"] = 1;
+                    $obj["msg"] = $url_result["msg"];
+                }else{
+                    $obj["error"] = 0;
+                    $obj["filelink"] = $url_result["url"];
+                    $obj["filename"] = $file_data["filename"];
+                    $obj["filesize"] = $file_data["size"];
+                    $obj["filemime"] = $file_data["mime"];
+                    $obj["msg"] = "";
+                }
+            }else{
+                $obj["error"] = 1;
+                $obj["msg"] = "Invalid ownership";
             }
         break;
         case "getUsers":

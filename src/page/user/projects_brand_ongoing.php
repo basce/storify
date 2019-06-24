@@ -294,6 +294,17 @@ include("page/component/header.php"); ?>
                                         <button class="btn btn-outline-secondary edit_addSampleButton" type="button">Add Image</button>
                                     </div>
                                 </div>
+                                <!--
+                                <div class="input-group mb-3">
+                                    <input type="file" class="form-control" id="edit_samples_file" autoComplete="off" placeholder="Upload File.">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary addSampleButton" type="button">Add File</button>
+                                    </div>
+                                </div>
+                                <div class="progressbar hide" style="position:relative;top:-1rem;">
+                                    <div class='progressbar-inner'></div>
+                                </div>
+                                -->
                             </div>
                             <div class="image-groups">
                                 
@@ -481,6 +492,17 @@ include("page/component/header.php"); ?>
                                 <button class="btn btn-outline-secondary addSampleButton" type="button">Add Image</button>
                             </div>
                         </div>
+                        <!--
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="samples_file" autoComplete="off" placeholder="Upload File.">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary addSampleButton" type="button">Add File</button>
+                            </div>
+                        </div>
+                        <div class="progressbar hide" style="position:relative;top:-1rem;">
+                            <div class='progressbar-inner'></div>
+                        </div>
+                        -->
                     </div>
                     <div class="image-groups">
                         
@@ -723,6 +745,56 @@ include("page/component/header.php"); ?>
                 );
             }
 
+            /*
+            var _editUploadingFile = false;
+            function editUploadFile(){
+                if($("#edit_samples_file").val()){
+                    console.log("file is empty");
+                    return;
+                }
+
+                var file = $("#edit_samples_file")[0].files[0];
+
+                if(_editUploadingFile) return;
+                _editUploadingFile = true;
+                $.ajax({
+                    method: "POST",
+                    dataType: 'json',
+                    data: {
+                        method: "uploadTempoaryFile",
+                        type: selectType,
+                        file_name:file.name,
+                        file_size:file.size,
+                        file_mime:file.type,
+                        remark: $("#submission-content .submission_file .submission_description").val()
+                    },
+                    success: function(rs) {
+                        storify.creator.detail._submitting = false;
+                        if (rs.error) {
+                            storify.loading.hide();
+                            if (rs.msg == "cap reached") {
+                                error_alert.text("You cannot submit any more.");
+                            }
+                        } else {
+                            if(rs.success){
+                                //upload file
+                                storify.creator.detail._S3Upload(file, rs.url, function(){
+                                    storify.creator.detail._updateFileStatus(rs.id, caption, selectType, function(){
+                                        storify.creator.detail.resetSubmission();
+                                        storify.creator.detail.getSubmission(selectType);
+                                    }, function(str){
+                                        error_alert.text(str);
+                                    });
+                                });
+                            }else{
+                                error_alert.text(rs.msg);   
+                            }
+                        }
+                    }
+                })
+            }
+            */
+
             function isEditPageReady(silence){
                 var pageReady = true,
                     msg = "";
@@ -853,8 +925,8 @@ include("page/component/header.php"); ?>
                 //$("#edit_closing_date").val(changeDateTime(data.closing_date));
                 //$("#edit_invitation_closing_date").val(changeDateTime(data.invitation_closing_date));
 
-                $("#edit_closing_date").datepicker("update", changeDateTime(data.closing_date));
-                $("#edit_invitation_closing_date").datepicker("update", changeDateTime(data.invitation_closing_date));
+                $("#edit_closing_date").datepicker("update", changeDateTime(data.summary.closing_date));
+                $("#edit_invitation_closing_date").datepicker("update", changeDateTime(data.summary.invitation_closing_date));
 
                 if(data.location && data.location.length){
                     $("#edit_location")[0].selectize.addOption(convertToOption(data.location));

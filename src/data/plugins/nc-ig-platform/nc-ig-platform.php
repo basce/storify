@@ -177,7 +177,7 @@ function NgICPlatform_i18n_edit_page(){
 
 add_action('pods_meta_box_pre', 'NgICPlatform_i18n_edit_page');
 
-function NgICPlatform_i18n_Instagrammer_delete( $params, $pod ){
+function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
   global $wpdb;
   /*
   stdClass Object

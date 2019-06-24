@@ -25,6 +25,29 @@ storify.brand.deliverable = {
 			);
 			$("#reject_submission button.confirmreject").click(storify.brand.deliverable.reject_click);
 		}
+        if (!$("#downloadLinkModal").length) {
+            $("body").append(
+                $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
+                .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
+                    .append($("<div>").addClass("modal-content")
+                        .append($("<div>").addClass("modal-header")
+                            .append($("<h5>").addClass("modal-title").text(""))
+                            .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
+                        )
+                        .append($("<div>").addClass("modal-body")
+                            .append($("<a>").addClass("filename"))
+                            .append($("<div>").addClass("filesize"))
+                            .append($("<div>").addClass("filemime"))
+                        )
+                        .append($("<div>").addClass("modal-footer")
+                            .append(
+                                $("<a>").addClass("btn btn-primary small download").text("download").attr({ target:"_blank", href:""})
+                            )
+                        )
+                    )
+                )
+            );
+        }
 	},
 	_submitting_response:false,
 	response:function($submission_id, $action, $action_remark, callback){
@@ -151,13 +174,11 @@ storify.brand.deliverable = {
             temp_history = null;
 
         if(data.remark){
-            temp_remark = $("<div>").addClass("single_block")
-                                .append($("<label>").text("Remark"))
-                                .append(document.createTextNode(data.remark));
+            temp_remark = $("<div>").addClass("single_block urldescription")
+                                .append($("<p>").text(data.remark));
         }
         if(data.status == "accepted" || data.status == "rejected"){
-            temp_status = $("<div>").addClass("single_block")
-                                .append($("<label>").text("Status"))
+            temp_status = $("<div>").addClass("status_block")
                                 .append($("<span>").addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1)));
             if(data.status == "accepted"){
                 d.addClass("item-accepted");
@@ -187,6 +208,7 @@ storify.brand.deliverable = {
                 );
         }
         if(data.history_id){
+            /*no longer in used*/
             temp_history = $("<a>").attr({href:"#"}).text("history")
                                 .click(function(e){
                                     e.preventDefault();
@@ -200,24 +222,74 @@ storify.brand.deliverable = {
                                 });
         }
 
-        d.append($("<div>").addClass("top_panel")
-	                .append($("<small>").text(data.submit_tt))
-	                .append($("<div>").addClass("single_block")
-	                    .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
-	                    .append($("<input>").attr({type:"text",readonly:true})
-	                        .val(data.URL)
-	                        .click(function(e){
-	                            e.preventDefault();
-	                            this.setSelectionRange(0, this.value.length);
-	                        })
-	                    )
-	                )
-	                .append(temp_remark)
-	                .append(temp_status)
+        if(+data.file_id){
+            d.append($("<div>").addClass("top_panel")
+                    .append($("<small>").text(data.submit_tt))
+                    .append($("<div>").addClass("single_block")
+                        .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<div>").addClass("file-container")
+                            .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable.shortenFileName(data.filename)+" ("+data.mime+")")
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                            .click(function(e){
+                                                e.preventDefault();
+                                                storify.brand.deliverable._showDownloadDialog(data.file_id);
+                                            })
+                                )
+                        )
+                    )
+                    .append(temp_remark)
+                    .append(temp_status)
                     .append(temp_history)
-	        )
-	        .append(temp_action);
+            )
+            .append(temp_action);
+
+        } else {
+            d.append($("<div>").addClass("top_panel")
+                    .append($("<small>").text(data.submit_tt))
+                    .append($("<div>").addClass("single_block")
+                        .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<input>").attr({type:"text",readonly:true})
+                            .val(data.URL)
+                            .click(function(e){
+                                e.preventDefault();
+                                this.setSelectionRange(0, this.value.length);
+                            })
+                        )
+                    )
+                    .append(temp_remark)
+                    .append(temp_status)
+                    .append(temp_history)
+            )
+            .append(temp_action);
+        }
 	    return d;
+    },
+    _showDownloadDialog:function(id){
+        storify.loading.show();
+        $.ajax({
+            method: "POST",
+            dataType: "json",
+            data: {
+                method: "getDownloadLink",
+                id:id
+            },
+            success: function(rs){
+                storify.loading.hide();
+                if(rs.error){
+                    alert(rs.msg);
+                } else {
+                    $("#downloadLinkModal").find(".filename")
+                                                .attr({href:rs.filelink, target:"_blank"})
+                                                .text(storify.brand.deliverable.shortenFileName(rs.filename)+" ("+rs.filemime+")")
+                                                .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
+                    $("#downloadLinkModal").find(".filesize").text("");
+                    $("#downloadLinkModal").find(".filemime").text();
+                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
+                    $("#downloadLinkModal").modal("show");
+                }
+            }
+
+        })
     },
     display:function(odata, callback){
     	$(".deliverable-groups").empty();
@@ -237,11 +309,12 @@ storify.brand.deliverable = {
             video_rejected = 0,
             video_submitted = 0;
 
+        photo_total = parseInt(odata.no_of_photo, 10);
+        video_total = parseInt(odata.no_of_video, 10);
+
         $.each(data, function(index,value){
             withData = true;
-            photo_total += parseInt(odata.no_of_photo, 10);
-            video_total += parseInt(odata.no_of_video, 10);
-            $.each(value, function(index2, value2){
+            $.each(value.data, function(index2, value2){
                 if(value2.type == "photo"){
                     switch(value2.status){
                         case "accepted":
@@ -301,7 +374,7 @@ storify.brand.deliverable = {
                 total_expect = 0,
                 tempuser = storify.project.user.data.slice(0);
 
-            var ctempuser = storify.project.user.getUserDetail(index);
+            var ctempuser = storify.project.user.getUserDetail(value.user_id);
 
             total_expect = parseInt(odata.no_of_photo, 10) + parseInt(odata.no_of_video, 10);
 
@@ -313,10 +386,7 @@ storify.brand.deliverable = {
                 .append($("<h3>").text(ctempuser.display_name))
             );
 
-            if(value.remark){
-                a.append($("<div>").addClass("deliverable-remark").text(value.remark));
-            }
-            $.each(value, function(index2, value2){
+            $.each(value.data, function(index2, value2){
             	switch(value2.status){
             		case "accepted":
             			count_done++;
@@ -383,6 +453,16 @@ storify.brand.deliverable = {
     	var a = "#reject_submission";
         if($(a+" button.confirmreject").attr("data-id")){
             storify.brand.deliverable.response($(a+" button.confirmreject").attr("data-id"), "rejected", $(a+" textarea").val());
+        }
+    },
+    shortenFileName:function(input){
+        var a = input.slice(0, input.lastIndexOf(".")),
+            b = input.slice(input.lastIndexOf("."));
+
+        if(a.length > 27){
+            return a.slice(0,24)+"..."+b;
+        }else{
+            return input;
         }
     }
 };

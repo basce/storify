@@ -97,7 +97,7 @@ storify.creator.projectList = {
             .append($("<div>").addClass("content")
                 .append(title)
                 .append(div_location)
-                .append($("<div>").addClass("description")
+                .append($("<div>").addClass("description one-button")
                     .append(div_description)
                 )
                 .append($("<div>").addClass("actions")
@@ -197,6 +197,11 @@ storify.creator.projectList = {
                     $(".linkify").linkify({
                         target: "_blank"
                     });
+
+                    if(!+rs.result.total){
+                        $grid.append($("<p>").text("No ongoing projects now. Accept your next invite and kickstart a project!"));
+                    }
+                    
                     if(onComplete)onComplete();
                 }
             }

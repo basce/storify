@@ -82,12 +82,12 @@ include("page/component/header.php"); ?>
                         <h2>
                             <?php
                                 $stats = $main->getProjectManager()->getProjectStats($current_user->ID);
-                                if($stats["pending"] == 0){
+                                if($stats["invite"] == 0){
                                     //no pending
                                     echo "You have ".($stats["open"] == 1 ? "1 Open project":$stats["open"]." Open projects")." to complete.";
                                 }else{
                                     //with pending
-                                    echo "Say yes to ".($stats["pending"] == 1 ? "1 project ":$stats["pending"]." projects ")."and complete ".($stats["open"] == 1 ? "1 Open project":$stats["open"]." Open projects").".";
+                                    echo "Say yes to ".($stats["invite"] == 1 ? "1 project ":$stats["invite"]." projects ")."and complete ".($stats["open"] == 1 ? "1 Open project":$stats["open"]." Open projects").".";
                                 }
                             ?>
                         </h2>
