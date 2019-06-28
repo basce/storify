@@ -28,7 +28,30 @@
 <tbody>
 <tr>
 <td style="border-top: solid 1px #d9d9d9;" colspan="2">
-<div style="padding: 15px 0;">{{body}}</div>
+<div style="padding: 15px 0;">
+<p>Hey {{first_name}} (@{{igusername}}),</p>
+<p>{{brand}} would like to invite you to work on {{project_name}}!</p>
+<p>Click <a href="{{project_link}}" target="_blank">here</a> to accept the invitation, or find out more.</p>
+<p>Here's a summary of the project:
+	<ol>
+		<li>Brand: {{brand}}</li>
+		<li>Theme: {{project_name}}</li>
+		<li>Type: {{cash_or_sponsorship}}</li>
+		<li>Entitlement: {{bounty}}</li>
+		<li>Work products: {{number_of_items}}</li>
+		<li>Accept before: {{project_close_date}}</li>
+	</ol>
+</p>
+<p>
+	<a href="{{detail_link}}" target="_blank">DETAILS</a> | <a href="{{accept_link}}" target="_blank">ACCEPT</a>
+</p>
+<p>Check back with us at <a href="mailto:hello@storify.me">hello@storify.me</a> if you have questions about entitlements and scope.</p>
+<p>We look forward to a successful collaboration!</p>
+<p>Cheers,<br>
+People at storify.me<br>
+<small>A creator-brand community made lovingly in Singapore.</small>
+</p>
+</div>
 </td>
 </tr>
 </tbody>

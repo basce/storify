@@ -19,6 +19,7 @@ if(!$wp_user){
 			"email"=>$wp_user->user_email
 		),
 		array(
+			"subject"=>"Reset your Storify password.",
 			"body"=>$emailbody,
 			"text_preview"=>$previewText
 		),

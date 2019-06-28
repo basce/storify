@@ -27,4 +27,19 @@ class job{
 		$query = "UPDATE `".$wpdb->prefix."workjob` SET status = %s WHERE user_id = %d";
 		$wpdb->query($wpdb->prepare($query, $status, $id));
 	}
+
+	public static function checkJobStatus($user_id, $type){
+		global $wpdb;
+
+		$query = "SELECT * FROM `".$wpdb->prefix."workjob` WHERE user_id = %d AND type = %s";
+		$result = $wpdb->get_results($wpdb->prepare($query, $user_id, $type), ARRAY_A);
+
+		if(sizeof($result)){
+			//item exist
+		}else{
+			return array(
+				
+			);
+		}
+	}
 }

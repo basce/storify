@@ -24,6 +24,7 @@ Headers:		'Varela Round', sans-serif;
 
 -------------------------------------------------------------------*/
 /*1. Classes*/
+
 .box-3d{
     height: 250px;
 }
@@ -3436,7 +3437,7 @@ label.required:after {
     margin-left: .5rem;
 }
 textarea.form-control {
-    line-height: 2rem;
+    line-height: 1.5;
 }
 /*4. Universal classes*/
 .background {

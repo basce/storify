@@ -18,6 +18,9 @@
     <link rel="stylesheet" href="/assets/css/datepicker.css">
     <link rel="stylesheet" href="/assets/css/main.css">
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <!-- Theme included stylesheets -->
+    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
     <script>
         window._startTime = new Date().getTime();
 
@@ -55,6 +58,8 @@
     <script src="/assets/js/SendBird.min.js"></script>
     <script src="/assets/js/linkify.min.js"></script>
     <script src="/assets/js/linkify-jquery.min.js"></script>
+    <!-- Main Quill library -->
+    <script src="//cdn.quilljs.com/1.3.6/quill.js"></script>
 <?=get_option("custom_settings_header_js")?>
 </head>
 <body>
@@ -216,14 +221,14 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="edit_project_description" class="required">Details</label>
-                                <textarea class="form-control" id="edit_project_description" rows="3" placeholder="Please provide details to your campaign." required></textarea>
+                                <div class="form-control quill-textarea" id="edit_project_description" placeholder="Please provide details to your campaign." required></div>
                                 <div class="form-width">
                                     <div class="alert alert-danger hide">Some error message</div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="edit_project_short_description">Summary</label>
-                                <textarea class="form-control" id="edit_project_short_description" rows="2" placeholder="Please include a short line to describe your project."></textarea>
+                                <textarea class="form-control" id="edit_project_short_description" rows="1" placeholder="Please include a short line to describe your project."></textarea>
                             </div>
                             <div class="form-group">
                                 <labal for="project_brand">Brand</labal>
@@ -311,7 +316,7 @@ include("page/component/header.php"); ?>
                             </div>
                             <div class="form-group">
                                 <label for="edit_deliverable_brief">Instructions to Creators</label>
-                                <textarea class="form-control" id="edit_deliverable_brief" row="2" placeholder="Provide further details about style, creative angle and other expectations."></textarea>
+                                <div class="form-control quill-textarea" id="edit_deliverable_brief" placeholder="Provide further details about style, creative angle and other expectations."></div>
                             </div>
                         </div>
                     </div>
@@ -378,14 +383,14 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="project_description" class="required">Details</label>
-                        <textarea class="form-control" id="project_description" rows="4" required autoComplete="off" placeholder="Please provide details to your campaign."></textarea>
+                        <div class="form-control quill-textarea" id="project_description" placeholder="Please provide details to your campaign." required></div>
                         <div class="form-width">
                             <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="project_short_description">Summary</label>
-                        <textarea class="form-control" id="project_short_description" rows="2" autoComplete="off" placeholder="Please include a short line to describe your project."></textarea>
+                        <textarea class="form-control" id="project_short_description" rows="1" placeholder="Please include a short line to describe your project."></textarea>
                     </div>
                     <div class="form-group">
                         <labal for="project_brand">Brand</labal>
@@ -451,9 +456,9 @@ include("page/component/header.php"); ?>
                 </div>
                 <div class="col-md-10 offset-md-1" id="add_project_page_2" style="display:none;">
                     <div class="form-group">
-                        <label for="closing_date">Submission Closing Date</label>
+                        <label for="closing_date" class="required">Submission Closing Date</label>
                         <div class="input-group date">
-                            <input type="text" class="form-control" placeholder="dd/mm/yy" autoComplete="off" id="closing_date">
+                            <input type="text" class="form-control" placeholder="dd/mm/yy" autoComplete="off" id="closing_date" required>
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
@@ -509,7 +514,7 @@ include("page/component/header.php"); ?>
                     </div>
                     <div class="form-group">
                         <label for="deliverable_brief">Instructions to Creators</label>
-                        <textarea class="form-control" id="deliverable_brief" row="4" autoComplete="off" placeholder="Provide further details about style, creative angle and other expectations."></textarea>
+                        <div class="form-control quill-textarea" id="deliverable_brief" placeholder="Provide further details about style, creative angle and other expectations."></div>
                     </div>
                 </div>
                 <div class="col-md-10 offset-md-1" id="add_project_page_3" style="display:none">
@@ -561,12 +566,15 @@ include("page/component/header.php"); ?>
                 </div>
                 <div class="col-md-10 offset-md-1" id="add_project_page_4">
                     <div class="form-group">
-                        <label for="invitation_closing_date">Invitation closing date</label>
+                        <label for="invitation_closing_date" class="required">Invitation closing date</label>
                         <div class="input-group date">
-                            <input type="text" class="form-control" autoComplete="off" placeholder="dd/mm/yy" id="invitation_closing_date">
+                            <input type="text" class="form-control" autoComplete="off" placeholder="dd/mm/yy" id="invitation_closing_date" required>
                             <span class="input-group-addon">
                                 <span class="fa fa-calendar"></span>
                             </span>
+                        </div>
+                        <div class="form-width">
+                            <div class="alert alert-danger hide">Some error message</div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -618,7 +626,33 @@ include("page/component/header.php"); ?>
             var _baseurl = "/user@<?=$current_user->ID?>/projects/closed/";
 
         //add project related
-        
+            
+            function _checkIfObjectVisible(a, onVisible){
+                if(a.is(":visible")){
+                    if(onVisible)onVisible();
+                }else{
+                    setTimeout(function(){
+                        _checkIfObjectVisible(a, onVisible);
+                    },10);
+                }
+            }
+
+            $(".quill-textarea").each(function(i,e){
+                _checkIfObjectVisible($(e), function(){
+                    var temp_item = $(e);
+                    var inner_content = temp_item.html();
+                    var temp_quill = new Quill("#"+temp_item.attr("id"), {
+                        placeholder: temp_item.attr("placeholder"),
+                        theme: 'snow'
+                    });
+                    temp_item.data("quill", temp_quill);
+                    /*
+                    if(inner_content){
+                        temp_quill.clipboard.dangerouslyPasteHTML(0, inner_content);
+                    }*/
+                });
+            });
+
             $("#creators").selectize({
                 plugins:['restore_on_backspace', 'no_results'],
                 delimiter:',',
@@ -802,26 +836,36 @@ include("page/component/header.php"); ?>
                 $('#editDialog .alert').addClass("hide");
                 
                 $("#editDialog *[required]").each(function(index,value){
-                    if($(value).val() == ""){
+                    if($(this).data("quill")){
+                        if(!$(this).data("quill").getText().trim().length){
+                            pageReady = false;
+                            msg = "Please fill in all required fields.";
+                            if(!silence){
+                                $(this).parents(".form-group").find(".alert").text(msg).removeClass("hide");
+                            }
+                        }else{
+
+                        }
+                    }else if($(value).val() == ""){
                         pageReady = false;
                         msg = "Please fill in all required fields.";
                         if(!silence){
-                            $(this).parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
+                            $(this).parents(".form-group").find(".alert").text(msg).removeClass("hide");
                         }
                     }
                 });
                 if(!$("#edit_closing_date").val()){
                     pageReady = false;
-                    msg = "Please fill in the closing date";
+                    msg = "Required field - please set the closing date for photo/video submissions.";
                     if(!silence){
-                        $("#edit_closing_date").parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
+                        $("#edit_closing_date").parents(".form-group").find(".alert").text(msg).removeClass("hide");
                     }
                 }
                 if(!$("#edit_invitation_closing_date").val()){
                     pageReady = false;
-                    msg = "Please fill in the invitation closing date";
+                    msg = "Required field - please set the closing date for invitations to be accepted.";
                     if(!silence){
-                        $("#edit_invitation_closing_date").parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
+                        $("#edit_invitation_closing_date").parents(".form-group").find(".alert").text(msg).removeClass("hide");
                     }
                 }
                 if(!silence && msg){
@@ -843,8 +887,8 @@ include("page/component/header.php"); ?>
                 var a = {
                     detail:{
                         name:$("#edit_project_name").val(),
-                        description_brief:$("#edit_project_description").val(),
-                        deliverable_brief:$("#edit_deliverable_brief").val(),
+                        description_brief:$("#edit_project_description").data("quill").container.firstChild.innerHTML,
+                        deliverable_brief:$("#edit_deliverable_brief").data("quill").container.firstChild.innerHTML,
                         short_description:$("#edit_project_short_description").val(),
                         closing_date:$("#edit_closing_date").val(),
                         invitation_closing_date:$("#edit_invitation_closing_date").val()
@@ -941,9 +985,21 @@ include("page/component/header.php"); ?>
                 $("#edit_brand")[0].selectize.setValue(convertToArray(data.brand));
                 $("#edit_tag")[0].selectize.setValue(convertToArray(data.tag));
 
-                $("#edit_project_description").val(data.detail.description_brief);
+                if($("#edit_project_description").data("quill")){
+                    $("#edit_project_description").data("quill").setContents([]);
+                    $("#edit_project_description").data("quill").clipboard.dangerouslyPasteHTML(0, data.detail.description_brief);
+                }else{
+                    $("#edit_project_description").html(data.detail.description_brief);
+                }
+
                 $("#edit_project_short_description").val(data.detail.short_description);
-                $("#edit_deliverable_brief").val(data.detail.deliverable_brief);
+
+                if($("#edit_deliverable_brief").data("quill")){
+                    $("#edit_deliverable_brief").data("quill").setContents([]);
+                    $("#edit_deliverable_brief").data("quill").clipboard.dangerouslyPasteHTML(0, data.detail.deliverable_brief);
+                }else{
+                    $("#edit_deliverable_brief").html(data.detail.deliverable_brief);
+                }
 
                 $("#edit_samples").val("");
                 $("#editDialog .image-groups").empty();
@@ -967,9 +1023,14 @@ include("page/component/header.php"); ?>
                 $("#edit_brand")[0].selectize.setValue();
                 $("#edit_tag")[0].selectize.setValue();
 
-                $("#edit_project_description").val("");
-                $("#edit_project_short_description").val("");
-                $("#edit_deliverable_brief").val("");
+                $("#edit_project_description").data("quill").setContents([]);
+                $("#edit_project_description").data("quill").clipboard.dangerouslyPasteHTML(0, "");
+
+                $("#edit_project_short_description").val();
+
+                $("#edit_deliverable_brief").data("quill").setContents([]);
+                $("#edit_deliverable_brief").data("quill").clipboard.dangerouslyPasteHTML(0, "");
+
                 $("#edit_samples").val("");
                 $("#editDialog .image-groups").empty();
             }
@@ -1030,7 +1091,17 @@ include("page/component/header.php"); ?>
                     //page 1
                     $('#add_project_page_1 .alert').addClass("hide");
                     $('#add_project_page_1 *[required]').each(function(index,value){
-                        if($(value).val() == ""){
+                        if($(this).data("quill")){
+                            if(!$(this).data("quill").getText().trim().length){
+                                pageReady = false;
+                                msg = "Please fill in all required fields.";
+                                if(!silence){
+                                    $(this).parents(".form-group").find(".alert").text("Please fill in all required fields.").removeClass("hide");
+                                }
+                            }else{
+
+                            }
+                        }else if($(value).val() == ""){
                             pageReady = false;
                             msg = "Please fill in all required fields.";
                             if(!silence){
@@ -1046,7 +1117,7 @@ include("page/component/header.php"); ?>
                         pageReady = false;
                         msg = "Please fill in the closing date";
                         if(!silence){
-                            $("#closing_date").parents(".form-group").find(".alert").text("Please fill in the closing date").removeClass("hide");
+                            $("#closing_date").parents(".form-group").find(".alert").text("Required field - please set the closing date for photo/video submissions.").removeClass("hide");
                         }
                     }else if(!(parseInt($("#number_of_photo").val()?$("#number_of_photo").val():0, 10) + parseInt($("#number_of_video").val()?$("#number_of_video").val():0, 10))){
                         //number of video or photos is not set.
@@ -1087,8 +1158,14 @@ include("page/component/header.php"); ?>
                         }
                     }
                 }else if(pageindex == 4){
-                    //check if got at least 1 creator
-                    if($(".creator-groups .creator-item").length){
+                    if(!$("#invitation_closing_date").val()){
+                        //closing date not set
+                        pageReady = false;
+                        msg = "Please fill in the invitation closing date";
+                        if(!silence){
+                            $("#invitation_closing_date").parents(".form-group").find(".alert").text("Required field - please set the closing date for invitations to be accepted.").removeClass("hide");
+                        }
+                    }else if($(".creator-groups .creator-item").length){
                         pageReady = true;
                     }else{
                         msg = "You may invite creator later";
@@ -1129,8 +1206,8 @@ include("page/component/header.php"); ?>
                 var a = {
                     detail:{
                         name:$("#project_name").val(),
-                        description_brief:$("#project_description").val(),
-                        deliverable_brief:$("#deliverable_brief").val(),
+                        description_brief:$("#project_description").data("quill").container.firstChild.innerHTML,
+                        deliverable_brief:$("#deliverable_brief").data("quill").container.firstChild.innerHTML,
                         other_brief:"",
                         short_description:$("#project_short_description").val(),
                         no_of_photo:$("#number_of_photo").val(),
@@ -1228,8 +1305,8 @@ include("page/component/header.php"); ?>
 
                 //page 1
                 $("#project_name").val("");
-                $("#project_description").val("");
-                $("#project_short_description").val("");
+                $("#project_description").data("quill").setContents([]);
+                $("#project_short_description").val();
                 if(_default_country_id){
                     $("#location")[0].selectize.setValue(_default_country_id);
                 }else{
@@ -1245,7 +1322,7 @@ include("page/component/header.php"); ?>
                 $("#video_length").val("");
                 $("#samples").val("");
                 $("#newproject .image-groups").empty();
-                $("#deliverable_brief").val("");
+                $("#deliverable_brief").data("quill").setContents([]);
 
                 //page 3
                 $("#bounty_cash").iCheck("uncheck");

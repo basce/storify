@@ -60,11 +60,13 @@
     content: " :"; }
 .detailcontent h2 {
   margin-bottom: 1rem; }
-.detailcontent pre {
+.detailcontent .linkify {
   white-space: pre-wrap; }
-  .detailcontent pre .linkified {
+  .detailcontent .linkify p {
+    margin-bottom: 0; }
+  .detailcontent .linkify a {
     text-decoration: underline; }
-  .detailcontent pre .linkified:hover {
+  .detailcontent .linkify a:hover {
     text-decoration: none; }
 .detailcontent .sample_groups a {
   display: block;
@@ -962,6 +964,7 @@
       padding-right: 0;
       padding-bottom: 0; }
     .project-items .project-item .content .description.one-button p {
+      word-break: break-all;
       width: calc(100% - 95px); }
     .project-items .project-item .content .description.two-button p {
       width: calc(100% - 165px); }
@@ -1130,6 +1133,9 @@
 
 #newproject .input-group .input-group-append button, #editDialog .input-group .input-group-append button, #newDetailModal .input-group .input-group-append button {
   background-color: black; }
+#newproject input[type="text"], #newproject input[type="file"], #newproject input[type="email"], #newproject input[type="date"], #newproject input[type="time"], #newproject input[type="search"], #newproject input[type="password"], #newproject input[type="number"], #newproject input[type="tel"], #newproject textarea.form-control, #editDialog input[type="text"], #editDialog input[type="file"], #editDialog input[type="email"], #editDialog input[type="date"], #editDialog input[type="time"], #editDialog input[type="search"], #editDialog input[type="password"], #editDialog input[type="number"], #editDialog input[type="tel"], #editDialog textarea.form-control, #newDetailModal input[type="text"], #newDetailModal input[type="file"], #newDetailModal input[type="email"], #newDetailModal input[type="date"], #newDetailModal input[type="time"], #newDetailModal input[type="search"], #newDetailModal input[type="password"], #newDetailModal input[type="number"], #newDetailModal input[type="tel"], #newDetailModal textarea.form-control {
+  box-shadow: 0 0.2rem 1rem 0rem rgba(0, 0, 0, 0.1);
+  border: 0.1rem solid rgba(0, 0, 0, 0.15); }
 #newproject .icheckbox:after, #newproject .iradio:after, #editDialog .icheckbox:after, #editDialog .iradio:after, #newDetailModal .icheckbox:after, #newDetailModal .iradio:after {
   pointer-events: none; }
 #newproject .creator-input .selectized, #editDialog .creator-input .selectized, #newDetailModal .creator-input .selectized {
@@ -1214,6 +1220,21 @@
   margin-bottom: 5px; }
 #newproject .form-group .input-group-addon, #editDialog .form-group .input-group-addon, #newDetailModal .form-group .input-group-addon {
   pointer-events: none; }
+#newproject .quill-textarea, #editDialog .quill-textarea, #newDetailModal .quill-textarea {
+  padding: 0;
+  box-shadow: 0 0.2rem 1rem 0rem rgba(0, 0, 0, 0.1);
+  border: 0.1rem solid rgba(0, 0, 0, 0.15);
+  min-height: 100px; }
+  #newproject .quill-textarea .ql-editor, #editDialog .quill-textarea .ql-editor, #newDetailModal .quill-textarea .ql-editor {
+    font-family: 'Poppins', sans-serif;
+    padding: 1.7rem;
+    font-size: 1.4rem; }
+    #newproject .quill-textarea .ql-editor p, #editDialog .quill-textarea .ql-editor p, #newDetailModal .quill-textarea .ql-editor p {
+      opacity: 1; }
+  #newproject .quill-textarea .ql-editor.ql-blank::before, #editDialog .quill-textarea .ql-editor.ql-blank::before, #newDetailModal .quill-textarea .ql-editor.ql-blank::before {
+    color: rgba(0, 0, 0, 0.55);
+    font-style: normal;
+    left: 1.7rem; }
 
 /* selectize loading icon */
 .selectize-control.loading::before {

@@ -1,0 +1,162 @@
+.project-items .project-item {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  position: relative; }
+  .project-items .project-item .ribbon-featured {
+    right: 0; }
+  .project-items .project-item .wrapper {
+    background-color: #FFF;
+    position: relative; }
+  .project-items .project-item .image {
+    background-image: url(https://cdn.storify.me/data/uploads/2019/03/shutterstock_261892265-1024x1024.jpg);
+    background-position: center center;
+    background-size: cover;
+    border: .6rem solid #FFF;
+    border-radius: .9rem;
+    width: 25rem;
+    position: absolute;
+    height: 100%; }
+    .project-items .project-item .image .tags {
+      padding: .5rem; }
+      .project-items .project-item .image .tags span {
+        padding: .4rem .5rem;
+        z-index: 1;
+        text-decoration: none;
+        text-shadow: none;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: .3s background-color ease;
+        display: inline-block;
+        color: #FFF;
+        outline: none;
+        text-transform: uppercase;
+        border-radius: .2rem;
+        font-family: 'Poppins', sans-serif;
+        background-color: #000;
+        margin-top: .4rem;
+        margin-left: .4rem; }
+    .project-items .project-item .image .price {
+      z-index: 1;
+      padding: .5rem 1.8rem;
+      background-color: #f8f8f8;
+      font-size: 1.6rem;
+      font-weight: 600;
+      position: absolute;
+      top: inherit;
+      border-radius: .3rem;
+      bottom: 1rem;
+      left: 1rem;
+      max-width: 22rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
+  .project-items .project-item .content {
+    padding-left: 26rem;
+    padding-top: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem; }
+    .project-items .project-item .content h3 {
+      font-size: 2.2rem;
+      transition: none;
+      color: #000;
+      text-shadow: none;
+      display: inline-block;
+      margin-bottom: 0;
+      word-break: break-word;
+      width: 100%; }
+      .project-items .project-item .content h3 .meta {
+        margin: 0 0 1rem;
+        opacity: .6;
+        display: block;
+        margin-right: 0;
+        padding-left: 1rem;
+        padding-top: 1rem;
+        right: 0;
+        width: auto;
+        font-size: 1.1rem;
+        background-color: transparent;
+        text-align: right;
+        top: 0;
+        z-index: 1;
+        white-space: nowrap;
+        margin-top: -.2rem;
+        float: right; }
+        .project-items .project-item .content h3 .meta figure {
+          margin: 0 0 .3rem; }
+          .project-items .project-item .content h3 .meta figure i {
+            margin-right: .5rem; }
+      .project-items .project-item .content h3 .tag {
+        font-family: 'Poppins', sans-serif;
+        border-radius: .2rem;
+        text-transform: uppercase;
+        padding: .4rem .5rem;
+        z-index: 1;
+        pointer-events: none;
+        transition: none;
+        opacity: .6;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #000;
+        vertical-align: middle;
+        border: 0.1rem solid rgba(0, 0, 0, 0.3);
+        background-color: transparent;
+        top: -.2rem;
+        position: relative;
+        margin-left: .5rem;
+        word-break: initial;
+        display: inline-block; }
+    .project-items .project-item .content .description {
+      font-size: 1.3rem;
+      height: 12rem;
+      overflow: hidden;
+      padding-top: 6rem;
+      padding-left: 0;
+      padding-right: 0;
+      padding-bottom: 0; }
+    .project-items .project-item .content .description.one-button p {
+      word-break: break-all;
+      width: calc(100% - 95px); }
+    .project-items .project-item .content .description.two-button p {
+      width: calc(100% - 165px); }
+    .project-items .project-item .content .description.three-button p {
+      width: calc(100% - 240px); }
+    .project-items .project-item .content .actions {
+      position: absolute;
+      right: 2rem;
+      bottom: 2rem; }
+      .project-items .project-item .content .actions a {
+        border: .1rem solid #ff0000;
+        padding: 1rem;
+        text-transform: none;
+        font-size: 1.4rem;
+        border-radius: .3rem;
+        z-index: 2;
+        color: #ff0000;
+        transition: .3s background-color ease;
+        margin-right: .5rem;
+        background-color: transparent;
+        display: inline-block; }
+      .project-items .project-item .content .actions a:hover {
+        background-color: #ff0000;
+        color: #fff; }
+
+@media only screen and (max-width: 991px) {
+  .project-items .project-item .image {
+    width: 100%;
+    position: relative;
+    height: 26rem; }
+  .project-items .project-item .content {
+    position: relative;
+    padding: 1rem; }
+    .project-items .project-item .content h4 {
+      width: auto; }
+    .project-items .project-item .content .description {
+      padding-top: 2rem;
+      height: 8rem; }
+
+  #invite_grid .project-item .content {
+    padding-bottom: 8rem; }
+    #invite_grid .project-item .content .description p {
+      width: 100%; } }
+
+/*# sourceMappingURL=project_list.css.map */

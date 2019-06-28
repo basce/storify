@@ -56,12 +56,15 @@
   h2{
     margin-bottom: 1rem;
   }
-  pre{
+  .linkify{
+    p{
+      margin-bottom:0;
+    }
     white-space: pre-wrap;
-    .linkified{
+    a{
       text-decoration:underline;
     }
-    .linkified:hover{
+    a:hover{
       text-decoration:none; 
     }
   }

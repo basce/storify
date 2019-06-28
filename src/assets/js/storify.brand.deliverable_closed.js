@@ -34,13 +34,13 @@ storify.brand.deliverable_closed = {
                             .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
                         )
                         .append($("<div>").addClass("modal-body")
-                            .append($("<a>").addClass("filename"))
+                            .append($("<a>").addClass("filename").attr({download:''}))
                             .append($("<div>").addClass("filesize"))
                             .append($("<div>").addClass("filemime"))
                         )
                         .append($("<div>").addClass("modal-footer")
                             .append(
-                                $("<a>").addClass("btn btn-primary small download").text("download").attr({ target:"_blank", href:""})
+                                $("<a>").addClass("btn btn-primary small download").text("download").attr({ href:"", download:''})
                             )
                         )
                     )
@@ -243,12 +243,12 @@ storify.brand.deliverable_closed = {
                     alert(rs.msg);
                 } else {
                     $("#downloadLinkModal").find(".filename")
-                                                .attr({href:rs.filelink, target:"_blank"})
+                                                .attr({href:rs.filelink, download:rs.filename, target:"_blank"})
                                                 .text(storify.brand.deliverable_closed.shortenFileName(rs.filename)+" ("+rs.filemime+")")
                                                 .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
                     $("#downloadLinkModal").find(".filesize").text("");
                     $("#downloadLinkModal").find(".filemime").text("");
-                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
+                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink, download:rs.filename, target:"_blank"})
                     $("#downloadLinkModal").modal("show");
                 }
             }

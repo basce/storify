@@ -215,8 +215,8 @@ storify.creator.detail_invite = {
                     )
             )
             .append(deliverable_block)
-            .append($("<pre>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<pre>").addClass("linkify").html(data.detail.deliverable_brief))
+            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
+            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief))
             ;
         cont.append(owlImages);
 

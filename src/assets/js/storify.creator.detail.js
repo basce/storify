@@ -433,8 +433,8 @@ storify.creator.detail = {
                 )
             )
             .append(deliverable_block)
-            .append($("<pre>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<pre>").addClass("linkify").html(data.detail.deliverable_brief));
+            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
+            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief));
         cont.append(owlImages);
 
         if (owlImages) {
@@ -592,6 +592,9 @@ storify.creator.detail = {
                     storify.creator.detail._progress(evt.loaded / evt.total);
                }, false);
                return xhr;
+            },
+            beforeSend: function(request) {
+                request.setRequestHeader('Content-Disposition', 'attachment');
             },
             url:url,
             type:"PUT",
@@ -772,12 +775,12 @@ storify.creator.detail = {
                     alert(rs.msg);
                 } else {
                     $("#downloadLinkModal").find(".filename")
-                                                .attr({href:rs.filelink, target:"_blank"})
+                                                .attr({href:rs.filelink, target:"_blank", download:rs.filename})
                                                 .text(storify.creator.detail.shortenFileName(rs.filename)+" ("+rs.filemime+")")
                                                 .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}));
                     $("#downloadLinkModal").find(".filesize").text("");
                     $("#downloadLinkModal").find(".filemime").text("");
-                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink})
+                    $("#downloadLinkModal").find(".download").attr({href:rs.filelink, download:rs.filename})
                     $("#downloadLinkModal").modal("show");
                 }
             }

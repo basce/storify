@@ -163,6 +163,10 @@ $disable-color : #f5f5f5;
 			}
 		}
 	}
+	input[type="text"], input[type="file"], input[type="email"], input[type="date"], input[type="time"], input[type="search"], input[type="password"], input[type="number"], input[type="tel"], textarea.form-control {
+		box-shadow: 0 0.2rem 1rem 0rem rgba(0,0,0, .1);
+    	border: .1rem solid rgba(0,0,0, .15);
+	}
 	.icheckbox:after, .iradio:after{
 		pointer-events:none;
 	}
@@ -278,6 +282,25 @@ $disable-color : #f5f5f5;
 		}
 		.input-group-addon{
 			pointer-events:none;
+		}
+	}
+	.quill-textarea{
+		padding:0;
+		box-shadow: 0 0.2rem 1rem 0rem rgba(0,0,0, .1);
+    	border: .1rem solid rgba(0,0,0, .15);
+    	min-height: 100px;
+		.ql-editor{
+			font-family: 'Poppins', sans-serif;
+			padding: 1.7rem;
+			font-size:1.4rem;
+			p{
+				opacity:1;
+			}
+		}
+		.ql-editor.ql-blank::before{
+			color: rgba(0,0,0,0.55);
+			font-style:normal;
+			left:1.7rem;
 		}
 	}
 }

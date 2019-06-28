@@ -64,6 +64,41 @@ class main{
 		return $this->email_manager;
 	}
 
+	public function sendLambdaBatchEmail($emails, $sender, $template_name){
+		$data = array(
+			"emails"=>$emails,
+			"from"=>$sender,
+			"template"=>$template_name
+		);
+
+		$headers = array(
+			"x-api-key : ".AWS_LAMBDA_SES_SEND_BATCH_EMAIL_API_KEY
+		);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, AWS_LAMBDA_SES_SEND_BATCH_EMAIL_ENDPOINT);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		$output = curl_exec($ch); 
+		curl_close($ch);
+
+		$output_obj = json_decode($output, true);
+		if($output_obj && $output_obj["ResponseMetadata"]){
+			return array(
+				"error"=>0,
+				"msg"=>$output
+			);
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>$output
+			);
+		}
+	}
+
 	public function sendLambdaEmail($receiver, $content, $template_name="storify_basic"){
 		//check if 'to' missing
 		if(! ( isset($receiver) && isset($receiver["email"])) ){
@@ -1977,7 +2012,8 @@ class main{
 				array(
 					'Bucket' => 'ncstorifymeprivate',
 					"Key" => $filekey,
-					"ContentType" => $filemime
+					"ContentType" => $filemime,
+					'ContentDisposition' => 'attachment'
 				)
 			);
 
