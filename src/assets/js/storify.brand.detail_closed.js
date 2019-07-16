@@ -108,7 +108,7 @@ storify.brand.detail_closed = {
         }
     },
     _gettingDetail:false,
-    viewDetail:function(project_id){
+    viewDetail:function(project_id, onComplete){
         if(storify.brand.detail_closed._gettingDetail) return;
         storify.brand.detail_closed._gettingDetail = true;
         storify.brand.detail_closed.addElementIfNotExist();
@@ -138,6 +138,7 @@ storify.brand.detail_closed = {
                                 storify.loading.hide();
                                 storify.brand.detail_closed.createDetail(rs.data);
                                 //$("#detailModal").modal();
+                                if(onComplete)onComplete();
                                 $("#newDetailModal").modal("show");
                                 //setup edit dialog
                             });

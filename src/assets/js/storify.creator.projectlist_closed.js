@@ -3,6 +3,7 @@ storify.creator = storify.creator || {};
 
 storify.creator.projectList_closed = {
     createProjectItem:function(data, project_id){
+        /*
         var div = $("<div>").addClass("project-item").attr({id:project_id}),
             ribbon = $("<div>").addClass("ribbon-featured")
                         .append($("<div>").addClass("ribbon-start"))
@@ -55,11 +56,6 @@ storify.creator.projectList_closed = {
             }
         }
 
-        /*
-        if(data.duesoon){
-            div.append(ribbon);
-        }*/
-
         if(summary.location.length){
             div_location = $("<h4>").addClass("location");
             $.each(summary.location, function(index,value){
@@ -111,6 +107,14 @@ storify.creator.projectList_closed = {
                 )
             )
         )
+        */
+        data.before_time_left = null; // disable ribbon
+        var div = $(storify.template.createListItem(data, project_id, [{classname:"detail", label:"Detail"}]));
+        div.find(".actions .detail").click(function(e){
+            e.preventDefault();
+            storify.creator.detail_closed.viewDetail(project_id);
+        });
+
         return div;
     },
     createPrototypeItem:function(data_pair, project_id){

@@ -1,4 +1,5 @@
 <?php  
+use storify\job as job;
 $email = isset($_POST["email"])?$_POST["email"] : "";
 $password = isset($_POST["password"])?$_POST["password"] : "";
 $name = isset($_POST["name"])?$_POST["name"] : "";
@@ -13,8 +14,13 @@ if($result["error"]){
 	$error_msg = $result["msg"];
 }else{
 	//success
-	
 	$insert_success = true;
+
+	job::add($result["id"], "new_register", array(
+		"userid"=>$result["id"],
+		"name"=>$name,
+		"email"=>$email
+	), 15);
 
 	wp_set_auth_cookie($result["id"], true);
 }

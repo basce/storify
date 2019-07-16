@@ -24,6 +24,25 @@ storify.brand.deliverable_closed = {
 					)
 			);
 		}
+        if( !$("#reject_reason").length ){
+            $("body").append(
+                $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"reject_reason"})
+                    .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
+                        .append($("<div>").addClass("modal-content")
+                            .append($("<div>").addClass("modal-header")
+                                .append($("<h5>").addClass("modal-title").text("Reject Reason"))
+                                .append($("<button>").addClass("close").attr({type:"button","data-dismiss":"modal","aria-label":"Close"}).append($("<span>").attr({"aria-hidden":"hidden"}).html("&times;")))
+                            )
+                            .append($("<div>").addClass("modal-body deliverable_items")
+                                .append($("<p>").addClass("reason"))
+                            )
+                            .append($("<div>").addClass("modal-footer")
+                                .append($("<button>").addClass("btn btn-primary small").attr({"data-dismiss":"modal"}).text("Close"))
+                            )
+                        )
+                    )
+            );
+        }
         if (!$("#downloadLinkModal").length) {
             $("body").append(
                 $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
@@ -142,11 +161,20 @@ storify.brand.deliverable_closed = {
                                 .append($("<p>").text(data.remark));
         }
         if(data.status == "accepted" || data.status == "rejected"){
-            temp_status = $("<div>").addClass("status_block")
-                                .append($("<span>").addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1)));
             if(data.status == "accepted"){
+                temp_status = $("<div>").addClass("status_block")
+                                .append($("<span>").attr({title:data.admin_remark}).addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1)));
                 d.addClass("item-accepted");
             }else{
+                temp_status = $("<div>").addClass("status_block")
+                                .append($("<a>").attr({href:"#", title:data.admin_remark}).addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1))
+                                    .click(function(e){
+                                        e.preventDefault();
+                                        var remark = $(this).attr("title");
+                                        $("#reject_reason .reason").text(remark ? remark : "no reason given.");
+                                        $("#reject_reason").modal("show");
+                                    })
+                                );
                 d.addClass("item-rejected");
             }
         }else{
@@ -191,7 +219,7 @@ storify.brand.deliverable_closed = {
             d.append($("<div>").addClass("top_panel")
                     .append($("<small>").text(data.submit_tt))
                     .append($("<div>").addClass("single_block")
-                        .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-"+storify.core.leadingZero(data.id, 9))).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
                         .append($("<div>").addClass("file-container")
                             .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable_closed.shortenFileName(data.filename)+" ("+data.mime+")")
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
@@ -349,10 +377,12 @@ storify.brand.deliverable_closed = {
 
             a.append($("<div>").addClass("creator_cont")
                 .append($("<div>").addClass("profile-image")
-                            .attr({title:ctempuser.display_name})
+                            .attr({title:ctempuser.igusername + " (" + ctempuser.display_name+ ")"})
                             .css({"background-image":"url("+ctempuser.profile_image+")"})
                 )
-                .append($("<h3>").text(ctempuser.display_name))
+                .append($("<p>").text(" (" + ctempuser.display_name+ ")")
+                            .prepend($("<span>").text("@"+ctempuser.igusername))
+                    )
             );
 
             $.each(value.data, function(index2, value2){

@@ -59,7 +59,7 @@ include("page/component/header.php"); ?>
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-md-4">
-                            <a href="https://www.facebook.com/v3.1/dialog/oauth?client_id=310258729772529&scope=email&redirect_uri=<?=get_home_url()?>/fblogin/&response_type=code&state=<?=session_id()?>" class="btn btn-primary" style="width:100%"><i class="fa fa-facebook"></i> Sign in with Facebook</a>
+                            <a href="https://www.facebook.com/v3.1/dialog/oauth?client_id=310258729772529&scope=email&redirect_uri=https://storify.me/fblogin/&response_type=code&state=<?=session_id()?>" class="btn btn-primary" style="width:100%"><i class="fa fa-facebook"></i> Sign in with Facebook</a>
                         </div>
                     </div>
                     <div class="row justify-content-center">

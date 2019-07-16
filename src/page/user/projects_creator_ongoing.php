@@ -40,6 +40,8 @@
     <script src="/assets/js/owlcarousel/owl.carousel.js"></script>
     <script src="/assets/js/owlcarousel/owl.animate.js"></script>
     <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
+    <script src="/assets/js/storify.template.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
     <script src="/assets/js/storify.creator.detail.js"></script>
     <script src="/assets/js/storify.project.users.js"></script>
@@ -65,7 +67,7 @@ include("page/component/header.php"); ?>
 <?php
                         $total_ongoing = $main->getProjectManager()->getNumberOfOnGoingCreator($current_user->ID);
                         if($total_ongoing == 0){
-                            echo "You have not received any invitations.";
+                            echo "You have no ongoing projects.";
                         }else if($total_ongoing == 1){
                             echo "You have 1 project to complete.";
                         }else{
@@ -208,20 +210,42 @@ include("page/component/header.php"); ?>
         $(function(){
             "use strict";
 
+            var _initial_prompt = true;
+
             $("#ongoingloadmore").click(function(e){
                 e.preventDefault();
-                storify.creator.projectList.getProject();
+                //storify.creator.projectList.getProject();
+                storify.core.getProjectListing(
+                    "#ongoing_grid", 
+                    "#ongoingloadmore", 
+                    "No ongoing projects now. Accept your next invite and kickstart a project!", 
+                    (index,value)=>{
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}]));
+                        div.find(".actions .detail").click(function(e){
+                            e.preventDefault();
+                            storify.creator.detail.viewDetail(value.id);
+                        });
+                        return div;
+                    },
+                    (rs)=>{
+                        alert(rs.msg);
+                    },
+                    ()=>{
+                        if( _initial_prompt && <?=(sizeof($pathquery) >= 4)?"1":"0"?> ){
+                            _initial_prompt = false;
+                            storify.creator.detail.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>, function(){
+                                <?php if(sizeof($pathquery) == 5 && $pathquery[4] == "submit"){ ?>
+                                $("#submission-tab").tab("show");
+                                <?php } ?>
+                            });
+                        }
+                    }
+                )
             });
 
-            storify.creator.projectList.getProject(function(){
-                <?php
-                if(sizeof($pathquery) == 4){
-                    ?>
-                    storify.creator.detail.viewDetail(<?=$pathquery[3]?>);
-                    <?php
-                }
-                ?>
-            });
+            if($("#ongoingloadmore").length){
+                $("#ongoingloadmore").click();
+            }
         });
     </script>
 </body>

@@ -1,4 +1,5 @@
 <?php  
+use storify\job as job;
 $obj = array(
     "error"=>1,
     "msg"=>"unknown"
@@ -95,6 +96,12 @@ if($current_user->ID){
             //save invitation
             if(isset($_POST["data"]["invitation"]) && sizeof($_POST["data"]["invitation"])){
                 $main->getProjectManager()->setInvitationBatch($project_id, $_POST["data"]["invitation"]);
+                foreach( $_POST["data"]["invitation"] as $key=>$uid ){
+                job::add($uid, "project_invite", array(
+                    "creator_id"=>$uid,
+                    "project_id"=>$project_id
+                ), 1);
+            }
             }
             $obj["msg"] = "";
             $obj["project_id"] = $project_id;
@@ -178,6 +185,12 @@ if($current_user->ID){
         break;
         case "sendInvitation":
             $result = $main->getProjectManager()->setInvitationBatch($_POST["project_id"], $_POST["userids"]);
+            foreach( $_POST["userids"] as $key=>$uid ){
+                job::add($uid, "project_invite", array(
+                    "creator_id"=>$uid,
+                    "project_id"=>$_POST["project_id"]
+                ), 1);
+            }
             $obj["error"] = 0;
             $obj["msg"] = "";
             $obj["data"] = $result;
@@ -191,9 +204,19 @@ if($current_user->ID){
                 }else{
                     $obj["error"] = 0;
                     $obj["msg"] = $result["msg"];
+                    if($result["userid"]){
+                        job::cancel($result["userid"], "project_invite", array(
+                            "creator_id"=>$result["userid"],
+                            "project_id"=>$_POST["project_id"]
+                        ));
+                    }
                 }
             }else if($_POST["command_type"] == 2){
                 $result = $main->getProjectManager()->setInvitation($_POST["project_id"], $_POST["id"]);
+                job::add($_POST["id"], "project_invite", array(
+                    "creator_id"=>$_POST["id"],
+                    "project_id"=>$_POST["project_id"]
+                ), 1);
                 $obj["error"] = 0;
                 $obj["msg"] = $result["msg"];
             }else if($_POST["command_type"] == 3){

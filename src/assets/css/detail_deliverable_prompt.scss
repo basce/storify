@@ -27,6 +27,7 @@
     margin-left: -0.5rem;
     cursor: pointer;
     text-decoration: underline;
+    word-break:break-all;
   }
 }
 .section-container{
@@ -92,6 +93,21 @@
   }
 }
 
+#reject_reason{
+  .reason{
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+}
+
+#rejectModal{
+  .modal-body{
+    p{
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  }
+}
 
 #single_invitation_dialog{
   .profile-image{

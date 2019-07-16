@@ -32,16 +32,17 @@ class invitation{
 	public function removeInvitation($invitation_id){
 		global $wpdb;
 
-		$query = "SELECT status FROM `".$this->tbl_invitation."` WHERE id = %d";
-		$invitation_status = $wpdb->get_var($wpdb->prepare($query, $invitation_id));
-		if($invitation_status){
+		$query = "SELECT user_id, status FROM `".$this->tbl_invitation."` WHERE id = %d";
+		$invitation_result  = $wpdb->get_row($wpdb->prepare($query, $invitation_id), ARRAY_A);
+		if(sizeof($invitation_result )){
 			//valid status for remove
-			if($invitation_status == "pending"){
+			if($invitation_result["status"] == "pending"){
 				$query = "UPDATE `".$this->tbl_invitation."` SET status = %s WHERE id = %d";
 				$wpdb->query($wpdb->prepare($query, 'removed', $invitation_id));
 				return array(
 					"error"=>0,
 					"success"=>1,
+					"userid"=>$invitation_result["user_id"],
 					"msg"=>"invitation removed"
 				);
 			}else{

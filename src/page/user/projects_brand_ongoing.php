@@ -49,6 +49,8 @@
     <script src="/assets/js/owlcarousel/owl.animate.js"></script>
     <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
+    <script src="/assets/js/storify.template.js"></script>
     <script src="/assets/js/storify.brand.detail.js"></script>
     <script src="/assets/js/storify.brand.projectlist.js"></script>
     <script src="/assets/js/storify.project.users.js"></script>
@@ -612,9 +614,15 @@ include("page/component/header.php"); ?>
             var _creator = null;
 <?php
             }else if(sizeof($pathquery) == 5){
+                if($pathquery[4] == "submit"){
+?>          var _project_id = <?=$pathquery[3]?>;
+            var _creator = "submit";
+<?php
+                }else{
 ?>          var _project_id = 0;
             var _creator = <?=json_encode($main->getCreatorSingle($pathquery[4]))?>;
 <?php
+                }
             }else{
 ?>          var _project_id = 0;
             var _creator = null;
@@ -1450,6 +1458,7 @@ include("page/component/header.php"); ?>
         $(function(){
             "use strict";
 
+            var _initial_prompt = true;
             $("#addproject").click(function(e){
                 e.preventDefault();
                 $("#newproject").modal("show");
@@ -1518,7 +1527,35 @@ include("page/component/header.php"); ?>
 
             $("#ongoingloadmore").click(function(e){
                 e.preventDefault();
-                storify.brand.projectList.getProject();
+
+                storify.core.getProjectListing(
+                    "#ongoing_grid", 
+                    "#ongoingloadmore", 
+                    "You have not created a project yet. Create one now!", 
+                    (index,value)=>{
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}]));
+                        div.find(".actions .detail").click(function(e){
+                            e.preventDefault();
+                            storify.brand.detail.viewDetail(value.id);
+                        });
+                        return div;
+                    },
+                    (rs)=>{
+                        alert(rs.msg);
+                    },
+                    ()=>{
+                        if( _initial_prompt && <?=(sizeof($pathquery) >= 4)?"1":"0"?>){
+                            _initial_prompt = false;
+                            storify.brand.detail.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>, function(){
+                                <?php if(sizeof($pathquery) == 5 && $pathquery[4] == "submit"){ ?>
+                                $("#submission-tab").tab("show");
+                                <?php } ?>
+                            });
+                        }
+                    }
+                )
+
+                //storify.brand.projectList.getProject();
             });
 
             if($("#ongoingloadmore").length){
@@ -1526,7 +1563,12 @@ include("page/component/header.php"); ?>
             }
 
             if(_project_id){
-                storify.brand.detail.viewDetail(_project_id);
+                storify.brand.detail.viewDetail(_project_id, function(){
+                    _project_id = 0;
+                    if(_creator == "submit"){
+                        $("#submission-tab").tab("show");
+                    }
+                });
             }else if(_creator){
                 addInvitedCreator(_creator);
                 $("#newproject").modal("show");

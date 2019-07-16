@@ -235,7 +235,7 @@ storify.brand.detail = {
         }
     },
     _gettingDetail:false,
-    viewDetail:function(project_id){
+    viewDetail:function(project_id, onComplete){
         if(storify.brand.detail._gettingDetail) return;
         storify.brand.detail._gettingDetail = true;
         storify.brand.detail.addElementIfNotExist();
@@ -265,6 +265,7 @@ storify.brand.detail = {
                                 storify.loading.hide();
                                 storify.brand.detail.createDetail(rs.data);
                                 //$("#detailModal").modal();
+                                if(onComplete)onComplete();
                                 $("#newDetailModal").modal("show");
                                 //setup edit dialog
                                 updateEditProject(rs.data);

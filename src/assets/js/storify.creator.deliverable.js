@@ -197,7 +197,7 @@ storify.creator.deliverable = {
             temp_status = $("<div>").addClass("single_block")
                                 .append($("<label>").text("Status"))
                                 .append($("<span>").addClass("item-status").text(data.response_status))
-                                .append($("<p>").text(data.response_remark))
+                                .append($("<p>").addClass("reject-reason").text(data.response_remark))
                                 .append($("<small>").text(data.response_date));
             d.addClass("item-rejected");
             temp_action = $("<div>").addClass("bottom_panel")

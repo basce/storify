@@ -369,6 +369,10 @@ class project{
 		return $data;
 	}
 
+	public function getInvitationByID($invitation_id){
+		return $this->invitation_manager->getInvitation($invitation_id);
+	}
+
 	public function invitation_response($invitation_id, $action,$userid, $remark){
 		global $wpdb;
 		//check if project not yet close
@@ -1613,11 +1617,11 @@ class project{
 
 		//expired invitation
 		//SELECT a . * , b.invitation_closing_date FROM ( SELECT * FROM  `wp_project_invitation` WHERE STATUS =  "pending" )a LEFT JOIN wp_project b ON a.project_id = b.id WHERE b.invitation_closing_date < NOW() && b.invitation_closing_date != "0000-00-00 00:00:00"
-		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE ( UNIX_TIMESTAMP( b.invitation_closing_date ) ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
+		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE ( UNIX_TIMESTAMP( b.invitation_closing_date ) + 86400 ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
 		$wpdb->query($wpdb->prepare($query, "expired", "pending", "0000-00-00 00:00:00"));
 
 		//expired project
-		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 604800 ) < UNIX_TIMESTAMP() AND status = %s";
+		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 1296000 ) < UNIX_TIMESTAMP() AND status = %s";
 		$ids = $wpdb->get_col($wpdb->prepare($query, "open"));
 
 		if(sizeof($ids)){

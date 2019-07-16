@@ -20,7 +20,7 @@ if(isset($_GET["error"])){
 
         $data = array(
             "client_id"=>"310258729772529",
-            "redirect_uri"=>"https://storify.me/fblogin/",
+            "redirect_uri"=>get_home_url()."fblogin/",
             "client_secret"=>"ba5028fba82a694a79cfa50a89ef92dc",
             "code"=>$_GET["code"]
         );
@@ -61,21 +61,41 @@ if(isset($_GET["error"])){
                     $temp_country = get_user_meta($temp_userObj->ID, 'city_country', true);
                     if(!$temp_country){
                         //country not exist
-                        header("Location: /user@".$temp_userObj->ID."/myprofile#");
+                        header("Location: /user@".$temp_userObj->ID."/profile");
                         exit();
+                    }
+
+                    if(!isset($_SESSION["role_view"])){
+                        //get uesr defautl view
+                        $temp_default_view = get_user_meta($temp_userObj->ID, "default_role", true);
+                        $_SESSION["role_view"] = $temp_default_view;
                     }
                     
                     //redirect user to social if not set
-                    $IGUsernames = $main->getUserIGAccounts($temp_userObj->ID);
-                    if(!sizeof($IGUsernames)){
-                        //social not exist
-                        header("Location: /user@".$temp_userObj->ID."/viewmyself#");
-                        exit();   
+                    if($_SESSION["role_view"] && $_SESSION["role_view"] == "brand"){
+                        header("Location: /user@".$temp_userObj->ID."/projects/ongoing");
+                        exit();
+                    }else{
+                        $IGUsernames = $main->getUserIGAccounts($temp_userObj->ID);
+                        if(!sizeof($IGUsernames)){
+                            //social not exist
+                            header("Location: /user@".$temp_userObj->ID."/showcase");
+                            exit();   
+                        }
                     }
 
-                    //redirect user to dashboard
-                    header("Location: /user@".$temp_userObj->ID."/dashboard#");
-                    exit();
+                    if(isset($_SESSION["landingpage_redirect"])){
+                        $redirect_url = $_SESSION["landingpage_redirect"];
+                        unset($_SESSION["landingpage_redirect"]);
+
+                        //redirect user to dashboard
+                        header("Location: ".$redirect_url);
+                        exit();
+                    }else{
+                        //redirect user to dashboard
+                        header("Location: /user@".$temp_userObj->ID."/performance");
+                        exit();
+                    }
 
                 }else{
                     $result = $main->createUser($me_response["email"], '', $me_response["name"], '','', 0);
@@ -85,7 +105,7 @@ if(isset($_GET["error"])){
                         exit();        
                     }else{
                         wp_set_auth_cookie($result["id"], true); //login
-                        header("Location: /user@".$user_ID."/myprofile#");
+                        header("Location: /user@".$user_ID."/profile");
                         exit();
                     }
                 }

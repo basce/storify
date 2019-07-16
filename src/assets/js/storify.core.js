@@ -41,3 +41,78 @@ storify.core.call = function(type, data, callback){
 		storify.core.debug("type :"+type+", no found, zero registered listerner");
 	}
 }
+
+storify.core.leadingZero = function(str, size){
+	return ('000000000' + str).substr(-size);
+}
+
+storify.core.formatMoney = (n,c,d,t)=>{
+	var c = isNaN(c = Math.abs(c)) ? 2 : c,
+    d = d == undefined ? "." : d,
+    t = t == undefined ? "," : t,
+    s = n < 0 ? "-" : "",
+    i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+    j = (j = i.length) > 3 ? j % 3 : 0;
+
+  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + "";// (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+}
+
+//get data
+
+storify.core._gettingProjectListing = false;
+storify.core.getProjectListing = ( grid_element_id, load_button_element_id, empty_message, projectlistfunc, onError, onComplete)=>{
+	if(storify.core._gettingProjectListing) return;
+	storify.core._gettingProjectListing = true;
+
+	var $grid = $(grid_element_id),
+		cur_page = parseInt($grid.attr("data-page"), 10),
+		sort = $grid.attr("data-sort"),
+		filter = $grid.attr("data-filter"),
+		$load_button = $(load_button_element_id);
+
+	cur_page = cur_page ? cur_page + 1 : 1;
+
+	$load_button.html("Loading <i class=\"fa fa-spinner fa-spin\"></i>");
+	$.ajax({
+		method: "POST",
+		dataType: "json",
+		data: {
+			method: "getProject",
+			filter: filter,
+			page: cur_page,
+			sort: sort
+		},
+		success: function(rs){
+			storify.core._gettingProjectListing = false;
+			if(rs.error){
+				if(onError) onError(rs);
+			}else{
+				$grid.attr({'data-page': rs.result.page});
+				$load_button.text("Load More").blur();
+				if(parseInt(rs.result.page, 10) < parseInt(rs.result.totalpage, 10)){
+					$load_button.css({display:"inline-block"});
+				}else{
+					$load_button.css({display:"none"});
+				}
+
+				$.each(rs.result.data, function(index, value){
+					var div = projectlistfunc(index, value);
+					$grid.append(div);
+					ScrollReveal().reveal(div, storify.slideUp);
+				});
+
+				$(".linkify").linkify({
+					target: "_blank"
+				});
+
+				if(!+rs.result.total){
+					$grid.append($("<p>").text(empty_message));
+				}
+
+				if(onComplete){
+					onComplete();
+				}
+			}
+		}
+	});
+}

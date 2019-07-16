@@ -13,6 +13,7 @@ function getDebugTime(){
 
 include_once("inc/main.php");
 use storify\main as main;
+use storify\job as job;
 use storify\pagesettings as pagesettings;
 
 $main = new main();
@@ -233,7 +234,7 @@ if(sizeof($pathquery) == 0){
                 }
             }
 
-            $error_msg = "invalid authentication.";
+            $error_msg = "Invalid Authentication. You're trying to access a page that doesn't belong to you, please <a href=\"".get_home_url()."/signin\">login</a> to your account and try again.";
             include_once("page/error/index.php");
             exit();
         }

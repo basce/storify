@@ -38,6 +38,7 @@
     <script src="/assets/js/scrollreveal.js"></script>
     <script src="/assets/js/moment.min.js"></script>
     <script src="/assets/js/bootstrap-datepicker.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
     <script src="/assets/js/custom.js"></script>
     <script src="/assets/js/nc_custom.js"></script>
 <?=get_option("custom_settings_header_js")?>

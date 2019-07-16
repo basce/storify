@@ -2,7 +2,132 @@ var storify = storify || {};
 storify.creator = storify.creator || {};
 
 storify.creator.projectList = {
+    createListItem:(data, project_id) => `
+        <div class="project-item" id="${project_id}">
+            ${
+                (before_time_left=>{
+                    if(before_time_left && before_time_left < 129600){
+                        return `
+    <div class="ribbon-featured">
+        <div class="ribbon-start"></div>
+        <div class="ribbon-content">Due Soon</div>
+        <div class="ribbon-end">
+            <figure class="ribbon-shadow"></figure>
+        </div>
+    </div>
+                        `;
+                    }
+                })(data.before_time_left)
+            }
+            <div class="wrapper">
+                <div class="image" ${
+                    (display_image=>{
+                        if(display_image){
+                            return `style="background-image:url(${display_image});"`;
+                        }
+                    })(data.summary.display_image)
+                }>
+                    <div class="tags">${
+                        (brands=>{
+                            if(brands.length){
+                                return brands.map(brand=>{
+                                    if(brand.term_id){
+                                        return `<span data-term_id="${brand.term_id}">${brand.name}</span`;
+                                    }else{
+                                        return ``;
+                                    }
+                                }).join("");
+                            }else{
+                                return ``;
+                            }
+                        })(data.summary.brand)
+                    }</div>
+                    <div title="${
+                        (bounty=>{
+                            if(bounty.length == 2){
+                                return `$${storify.project.formatMoney(bounty[0].value)} & ${bounty[1].value}`;
+                            }else{
+                                if(bounty[0].type == "cash"){
+                                    return `$${storify.project.formatMoney(bounty[0].value)}`;
+                                }else{
+                                    return `$${bounty[0].value}`;
+                                }
+                            }
+                        })(data.summary.bounty)
+                    }" class="price">${
+                        (bounty=>{
+                            if(bounty.length == 2){
+                                return `<i class="fa fa-money" aria-hidden="true"></i> & <i class="fa fa-gift" aria-hidden="true"></i>`;
+                            }else{
+                                if(bounty[0].type == "cash"){
+                                    return `<i class="fa fa-money" aria-hidden="true"></i>`;
+                                }else{
+                                    return `<i class="fa fa-gift" aria-hidden="true"></i>`;
+                                }
+                            }
+                        })(data.summary.bounty)
+                    }</div>
+                </div>
+                <div class="content">
+                    <h3>
+                        <div class="meta">
+                            <figure>
+                                <i class="fa fa-calendar-o"></i> Created ${data.summary.formatted_created_date2}
+                            </figure>
+                            <figure>
+                                <i class="fa fa-calendar-o"></i> Accept ${data.summary.formatted_invitation_closing_date2}
+                            </figure>
+                            <figure>
+                                <i class="fa fa-calendar-o"></i> Delvier ${data.summary.formatted_closing_date2}
+                            </figure>
+                        </div>
+                        ${data.name}
+                        ${
+                            (tags=>{
+                                if(tags.length){
+                                    return tags.map(tag=>{
+                                        return `<span class="tag" data-term_id="${tag.term_id}">${tag.name}</span>`;
+                                    }).join("");
+                                }else{
+                                    return ``;
+                                }
+                            })(data.summary.tag)
+                        }
+                    </h3>
+                    ${
+                        (locations=>{
+                            if(locations.length){
+                                var templocations = locations.map(location=>{
+                                    return `<span data-term_id="${location.term_id}">${location.name}</span>`;
+                                }).join(", ");
+                                return `<h4 class="location">${templocations}</h4>`;
+                            }else{
+                                return ``;
+                            }
+                        })(data.summary.location)
+                    }
+                    <div class="description one-button">
+                        <p class="linkify">
+                            ${
+                                (deliverables=>{
+                                    return deliverables.map( (deliverable, index)=>{
+                                        return `${deliverable.amount} ${deliverable.type == "photo"?`<i class="fa fa-camera" aria-hidden="true"></i>`:`<i class="fa fa-video-camera" aria-hidden="true"></i>`}`;
+                                    }).join(" | ");
+                                })(data.summary.deliverables_ar)
+                            }
+                            <br>
+                            ${data.summary.description}
+                        </p>
+                    </div>
+                    <div class="actions">
+                        <a href="#">Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
     createProjectItem:function(data, project_id){
+        /*
         var div = $("<div>").addClass("project-item").attr({id:project_id}),
             ribbon = $("<div>").addClass("ribbon-featured")
                         .append($("<div>").addClass("ribbon-start"))
@@ -110,33 +235,14 @@ storify.creator.projectList = {
                 )
             )
         )
-        return div;
-    },
-    createPrototypeItem:function(data_pair, project_id){
-        var div = $("<div>").addClass("item prototype_item").css({"background-color":"#FFF","padding":"20px"});
-
-        $.each(data_pair, function(index,value){
-            div.append(
-                $("<div>").addClass("clearfix")
-                    .append($("<label>").text(index))
-                    .append($("<span>").html(value))
-                )
+        */
+        
+        //var div = $(storify.creator.projectList.createListItem(data, project_id));
+        var div = $(storify.template.createListItem(data, project_id, [{classname:"detail", label:"Detail"}]));
+        div.find(".actions .detail").click(function(e){
+            e.preventDefault();
+            storify.creator.detail.viewDetail(project_id);
         });
-
-        //accept and deny button
-        div.append(
-            $("<div>").addClass("")
-                .append(
-                    $("<a>").addClass("btn btn-primary text-caps btn-rounded btn-framed").attr({href:"#"})
-                        .css({"margin-right":"5px"})
-                        .text("Details")
-                        .click(function(e){
-                            e.preventDefault();
-                            storify.creator.detail.viewDetail(project_id);
-                        })
-                    )
-        );
-
         return div;
     },
     _gettingProject:false,
@@ -176,20 +282,6 @@ storify.creator.projectList = {
 
                     $.each(rs.result.data, function(index,value){
 
-                        /*
-                        var $temp = storify.creator.projectList.createPrototypeItem({
-                            "Name":value.name,
-                            "Description":value.summary.description,
-                            "Project Closing Date":value.summary.closing_date,
-                            "Invitation Closing Date":value.summary.invitation_closing_date,
-                            "Bounty":bountytext,
-                            "Deliverables":value.summary.deliverables,
-                            "Deliverables %":value.deliverables.done,
-                            "Location":locationtext.join(", "),
-                            "Tags":tagstext.join(", "),
-                            "Brand":brandtext.join(", ")
-                        }, value.id);
-                        */
                         var $temp = storify.creator.projectList.createProjectItem(value, value.id);
                         $grid.append($temp);
                         ScrollReveal().reveal($temp, storify.slideUp);

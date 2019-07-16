@@ -41,6 +41,8 @@
     <script src="/assets/js/owlcarousel/owl.animate.js"></script>
     <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
+    <script src="/assets/js/storify.template.js"></script>
     <script src="/assets/js/storify.brand.detail_closed.js"></script>
     <script src="/assets/js/storify.brand.invitation_closed.js"></script>
     <script src="/assets/js/storify.brand.deliverable_closed.js"></script>
@@ -102,20 +104,37 @@ include("page/component/header.php"); ?>
         $(function(){
             "use strict";
 
+            var _initial_prompt = true;
+
             $("#closeloadmore").click(function(e){
                 e.preventDefault();
-                storify.brand.projectList_closed.getProject();
+
+                storify.core.getProjectListing(
+                    "#closed_grid",
+                    "#closeloadmore",
+                    "No closed projects yet.",
+                    (index, value)=>{
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}]));
+                        div.find(".actions .detail").click(function(e){
+                            e.preventDefault();
+                            storify.brand.detail_closed.viewDetail(value.id);
+                        });
+                        return div;
+                    },
+                    (rs)=>{
+                        alert(rs.msg);
+                    },
+                    ()=>{
+                        if( _initial_prompt & <?=(sizeof($pathquery)==4)?"1":"0"?> ){
+                            storify.brand.detail_closed.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>);        
+                        }
+                    }
+                )
             });
 
-            storify.brand.projectList_closed.getProject(function(){
-                <?php
-                if(sizeof($pathquery) == 4){
-                    ?>
-                    storify.brand.detail_closed.viewDetail(<?=$pathquery[3]?>);
-                    <?php
-                }
-                ?>
-            });
+            if($("#closeloadmore").length){
+                $("#closeloadmore").click();
+            }
         });
     </script>
 </body>

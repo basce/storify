@@ -42,6 +42,7 @@
     <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
     <script src="/assets/js/storify.loading.js"></script>
     <script src="/assets/js/storify.core.js"></script>
+    <script src="/assets/js/storify.template.js"></script>
     <script src="/assets/js/storify.project.users.js"></script>
     <script src="/assets/js/storify.creator.detail_invite.js"></script>
     <script src="/assets/js/storify.creator.projectlist_invite.js"></script>
@@ -109,6 +110,10 @@ include("page/component/header.php"); ?>
         $(function(){
             "use strict";
 
+            storify.creator.projectList_invite.addElementIfNotExist();
+
+            var _initial_prompt = true;
+
             //add listner on update leftnav
             storify.core.addListener("menu_project_item_amount_update", function(obj){
                 console.log(obj);
@@ -139,7 +144,43 @@ include("page/component/header.php"); ?>
 
             $("#invitationloadmore").click(function(e){
                 e.preventDefault();
-                storify.creator.projectList_invite.getProject();
+
+                storify.core.getProjectListing(
+                    "#invite_grid",
+                    "#invitationloadmore",
+                    "No invites yet. But press on, we are working hard to showcase your work to the brands you love.",
+                    (index, value)=>{
+                        console.log(value);
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}, {classname:"accept", label:"Accept"}, {classname:"reject", label:"Reject"}]));
+                        div.find(".actions .detail").click(function(e){
+                            e.preventDefault();
+                            storify.creator.detail_invite.viewDetail(value.id);
+                        });
+                        div.find(".actions .accept").click(function(e){
+                            e.preventDefault();
+                            $("#acceptModal .deadline").text(value.summary.formatted_closing_date2);
+                            storify.creator.projectList_invite.acceptInvitation(value.invitation_id);
+                        });
+                        div.find(".actions .reject").click(function(e){
+                            e.preventDefault();
+                            $("#rejectModal input[name='invitation_id']").val(value.invitation_id);
+                            $("#rejectModal").attr({"data-project_id":value.id})
+                            $("#rejectModal").modal("show");
+                        });
+
+                        return div;
+                    },
+                    (er)=>{
+                        alert(er.msg);
+                    },
+                    ()=>{
+                        if( _initial_prompt && <?=(sizeof($pathquery) == 4)?"1":"0"?>){
+                            _initial_prompt = false;
+                            storify.creator.detail_invite.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>);
+                        }
+                    }
+
+                );
             });
 
             if($("#invitationloadmore").length){

@@ -1,9 +1,12 @@
 <?php
 //iglogin
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-namespace iglogin;
 use \InstagramScraper\Instagram as Instagram;
 use \InstagramScraper\Exception\InstagramNotFoundException as InstagramNotFoundException;
+use storify\job as job;
 
 if(isset($_GET["error"])){
     header("Location: /user@".$current_user->ID."/social/?error=".$_GET["error"]);
@@ -17,7 +20,7 @@ if(isset($_GET["error"])){
             "client_id"=>'cb5c39433c444e3fb8161f72e632ea19',
             "client_secret"=>'e3f9cc618e6d41998e253ddd9efef96b',
             "grant_type"=>"authorization_code",
-            "redirect_uri"=>"https://storify.me/iglogin/",
+            "redirect_uri"=>get_home_url()."/iglogin/",
             "code"=>$_GET["code"]
         );
         curl_setopt($ch, CURLOPT_URL, 'https://api.instagram.com/oauth/access_token');
@@ -34,7 +37,7 @@ if(isset($_GET["error"])){
         if(isset($igData["error_message"])){
             header("Location: /user@".$current_user->ID."/showcase/?error=".$igData["error_message"]);
             exit();
-        }else{
+        }else if(isset($igData["user"]) && isset($igData["user"]["username"]) ){
             $igname = $main->setUserIGAccount($current_user->ID, $igData["user"]["username"]);
 
             $instagram = new Instagram();
@@ -371,9 +374,42 @@ if(isset($_GET["error"])){
 
             //add country tag
             $pod2 = pods("instagrammer_fast", $instagrammer_id);
-            $pod2->add_to("instagrammer_country", $temp_id);            
+            $pod2->add_to("instagrammer_country", $temp_id);
+
+            //check if passive job exist, send email if yes.
+            $result = job::getPassiveJob($current_user->ID, "waiting_for_ig");
+            if(sizeof($result)){
+
+                $email_result = $main->sendLambdaBatchEmail(
+                    array(
+                        array(
+                            "to"=>array(
+                                "name"=>$current_user->display_name,    
+                                "email"=>$current_user->user_email
+                            ),
+                            "data"=>array(
+                                "first_name"=>$current_user->first_name ? $current_user->first_name : $current_user->display_name,
+                                "igusername"=>$igname,
+                                "social_showcase_page_link"=>get_home_url()."/user@".$current_user->ID."/showcase",
+                                "invited_project_page_link"=>get_home_url()."/user@".$current_user->ID."/projects/invited",
+                                "text_preview"=>"Hey ".( $current_user->first_name ? $current_user->first_name : $current_user->display_name )." (@".$igname."), Your Instagram account has been linked successfully."
+                            )
+                        )
+                    ), 
+                    array(
+                        "name"=>"Storify",
+                        "email"=>"hello@storify.me"
+                    ),
+                    "storify_connected_with_ig"
+                );
+
+                job::updatePassiveJob($result["id"], "complete");
+            }
             
             header("Location: /user@".$current_user->ID."/showcase/".$igname);
+            exit();
+        }else{
+            header("Location: /user@".$current_user->ID."/showcase/?error=IG%20Error,username%20is%20empty");
             exit();
         }
     }catch(Exception $e){

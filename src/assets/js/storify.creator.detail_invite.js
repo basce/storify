@@ -222,7 +222,7 @@ storify.creator.detail_invite = {
 
         var _interval = setInterval(function(args) {
             // body
-            if(owlImages.parent().is(":visible")){
+            if(owlImages && owlImages.parent() && owlImages.parent().is(":visible")){
                 console.log("owlimage done");
                 owlImages.owlCarousel({
                     loop:false,

@@ -4,7 +4,6 @@
 		<meta http-equiv="Content-Type" content="text/html;UTF-8" />
 	</head>
 	<body style="margin: 0px; background-color: #F4F3F4; font-family: Helvetica, Arial, sans-serif; font-size:12px;" text="#444444" bgcolor="#F4F3F4" link="#21759B" alink="#21759B" vlink="#21759B" marginheight="0" topmargin="0" marginwidth="0" leftmargin="0">
-<div style="display:none;">Sign up successful! You are on storify.me!</div>
 <table border="0" width="100%" cellspacing="0" cellpadding="0" bgcolor="#F4F3F4">
 <tbody>
 <tr>
@@ -31,14 +30,23 @@
 <td style="border-top: solid 1px #d9d9d9;" colspan="2">
 <div style="padding: 15px 0;">
 <p>Hey {{first_name}} (@{{igusername}}),</p>
-<p>Your Instagram account has been linked successfully.</p>
-<p>
-<ol>
-	<li>View your Social Showcase at <a href="https://storify.me/{{igusername}}" target="_blank">https://storify.me/{{igusername}}</a>. This page is updated automatically every other day or week. If you would like to keep it up to date yourself, visit Account ➜ Settings ➜ <a href="{{social_showcase_page_link}}" target="_blank">Social Showcase</a> and click on 'Keep Up To Date'.</li>
-	<li>Receive and accept invites for projects and collaborations - these requests will be listed at Account ➜ Boards ➜ Projects ➜ <a href="{{invited_project_page_link}}" target="_blank">Invites</a>.</li>
-</ol>
+<p>High fives! You have accepted an invite to work for {{brand}} on {{project_name}}!</p>
+<p>Work hard, make a beautiful story and send in your work products by {{project_close_date}}. To submit your work, click <a href="{{submit_link}}" target="_blank">here</a>.</p>
+<p>This is what it's all about:
+	<ol>
+		<li>Brand: {{brand}}</li>
+		<li>Theme: {{project_name}}</li>
+		<li>Type: {{cash_or_sponsorship}}</li>
+		<li>Entitlement: {{bounty}}</li>
+		<li>Work products: {{number_of_items}}</li>
+		<li>Deliver by: {{project_close_date}}</li>
+	</ol>
 </p>
-<p>We look forward to working with you soon! If you have feedback for us, send it over to <a href="mailto:hello@storify.me">hello@storify.me</a>!</p>
+<p>
+	<a href="{{detail_link}}" target="_blank">DETAILS</a> | <a href="{{submit_link}}" target="_blank">SUBMIT</a>
+</p>
+<p>Check back with us at <a href="mailto:hello@storify.me">hello@storify.me</a> if you have questions about this project.</p>
+<p>We look forward to beautiful stories!</p>
 <p>Cheers,<br>
 People at storify.me<br>
 <small>A creator-brand community made lovingly in Singapore.</small>

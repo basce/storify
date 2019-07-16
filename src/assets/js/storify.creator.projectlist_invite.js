@@ -68,6 +68,7 @@ storify.creator.projectList_invite = {
         }
     },
     createProjectItem:function(data, project_id, invitation_id){
+        /*
         var div = $("<div>").addClass("project-item").attr({id:project_id}),
             ribbon = $("<div>").addClass("ribbon-featured")
                         .append($("<div>").addClass("ribbon-start"))
@@ -192,7 +193,24 @@ storify.creator.projectList_invite = {
                 )
             )
         )
+        */
 
+        var div = $(storify.template.createListItem(data, project_id, [{classname:"detail", label:"Detail"}, {classname:"accept", label:"Accept"}, {classname:"reject", label:"Reject"}]));
+        div.find(".actions .detail").click(function(e){
+            e.preventDefault();
+            storify.creator.detail_invite.viewDetail(project_id);
+        });
+        div.find(".actions .accept").click(function(e){
+            e.preventDefault();
+            $("#acceptModal .deadline").text(summary.formatted_closing_date2);
+            storify.creator.projectList_invite.acceptInvitation(invitation_id);
+        });
+        div.find(".actions .reject").click(function(e){
+            e.preventDefault();
+            $("#rejectModal input[name='invitation_id']").val(invitation_id);
+            $("#rejectModal").attr({"data-project_id":project_id})
+            $("#rejectModal").modal("show");
+        });
         return div;
     },
     createPrototypeItem:function(data_pair, project_id){

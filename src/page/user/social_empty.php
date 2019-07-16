@@ -86,7 +86,7 @@ include("page/component/header.php"); ?>
                                 }?>
                             </div>
                             <div class="text-right">
-                                <a href="https://api.instagram.com/oauth/authorize/?client_id=cb5c39433c444e3fb8161f72e632ea19&redirect_uri=https%3A%2F%2Fstorify.me%2Figlogin%2F&response_type=code" class="btn btn-primary">Connect</a>
+                                <a href="https://api.instagram.com/oauth/authorize/?client_id=cb5c39433c444e3fb8161f72e632ea19&redirect_uri=<?=urlencode(get_home_url())?>%2Figlogin%2F&response_type=code" class="btn btn-primary">Connect</a>
                             </div>
                         <hr>
                         </div>

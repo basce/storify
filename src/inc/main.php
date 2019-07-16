@@ -89,6 +89,7 @@ class main{
 		if($output_obj && $output_obj["ResponseMetadata"]){
 			return array(
 				"error"=>0,
+				"status"=>$output_obj["Status"],
 				"msg"=>$output
 			);
 		}else{

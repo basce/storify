@@ -312,7 +312,7 @@ storify.creator.detail = {
             .append(div);
     },
     _gettingDetail: false,
-    viewDetail: function(project_id) {
+    viewDetail: function(project_id, onComplete) {
         if (storify.creator.detail._gettingDetail) return;
         storify.creator.detail._gettingDetail = true;
         storify.creator.detail.addElementIfNotExist();
@@ -341,6 +341,7 @@ storify.creator.detail = {
                             storify.creator.detail.resetSubmission();
                             storify.creator.detail.getSubmission();
                             $("#newDetailModal .modal-body").scrollTop(0);
+                            if(onComplete)onComplete();
                             $("#newDetailModal").modal();
                         });
                     });
