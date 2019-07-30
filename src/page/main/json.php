@@ -24,7 +24,7 @@ switch($_REQUEST["method"]){
 	case "add_new_project":
 		if(isset($current_user) && $current_user->ID){
 			if($_SESSION["role_view"] == "brand"){
-				if(!$main->isBrandVerified($current_user->ID)){
+				if($main->isBrandVerified($current_user->ID)){
 					//check userid exist
 					$result = $main->getCreatorSingle($_POST["item_id"]);
 					if(sizeof($result)){

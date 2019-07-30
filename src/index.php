@@ -209,6 +209,28 @@ if(sizeof($pathquery) == 0){
     }else if($pathquery[0] == "test_email"){
         include_once("page/test/test_email.php");
         exit();
+    }else if($pathquery[0] == "project" && sizeof($pathquery) > 1){
+
+        if(!$current_user->ID){
+            header("Location: /login");
+            exit();
+        }else{
+            $result = $main->getProjectManager()->getProjectLink($pathquery[1], $current_user->ID);
+            if($result["redirect"]){
+                $main->changeDefaultRole($result["role"],$current_user->ID);
+                if(sizeof($pathquery) > 2){
+                    header("Location: ".$result["redirect"]."/".$pathquery[2]);
+                }else{
+                    header("Location: ".$result["redirect"]);
+                }
+                exit();
+            }else{
+                //is null
+                $error_msg = "Invalid link. You're trying to access a page that doesn't exist.";
+                include_once("page/error/index.php");
+                exit();
+            }
+        }
     }
 
     $result = $main->getSingleIger($pathquery[0]);

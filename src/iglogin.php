@@ -380,6 +380,7 @@ if(isset($_GET["error"])){
             $result = job::getPassiveJob($current_user->ID, "waiting_for_ig");
             if(sizeof($result)){
 
+                /*
                 $email_result = $main->sendLambdaBatchEmail(
                     array(
                         array(
@@ -402,8 +403,13 @@ if(isset($_GET["error"])){
                     ),
                     "storify_connected_with_ig"
                 );
+                */
 
-                job::updatePassiveJob($result["id"], "complete");
+                job::add($current_user->ID, "ig_connect", array(  // add job 
+                    "userid"=>$current_user->ID
+                ), 0); // execute as soon as possible
+
+                job::updatePassiveJob($result["id"], "complete"); //
             }
             
             header("Location: /user@".$current_user->ID."/showcase/".$igname);

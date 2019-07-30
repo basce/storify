@@ -1,4 +1,6 @@
-<!doctype html>
+<?php
+use storify\staticparam as staticparam;
+?><!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -255,13 +257,14 @@ include("page/component/header.php"); ?>
                             <?php
                                 $country_tags = $main->getAllCountriesInUsed(true);
                                 $default_country_id = 0;
+
                                 foreach($country_tags as $key=>$value){
                                     //auto add the user current country
                                     //get full name from short name ( since it is storing short name for user data )
                                     $temp_val = "";
-                                    if($current_user_meta && $current_user_meta["city_country"] && sizeof($current_user_meta["city_country"])){
+                                    if($current_user_meta && $current_user_meta["city_country"] && sizeof($current_user_meta["city_country"]) && isset(staticparam::$user_country_ar[$current_user_meta["city_country"][0]])){
                                         //get fullname
-                                        $temp_val = $user_country_ar[$current_user_meta["city_country"][0]];
+                                        $temp_val = staticparam::$user_country_ar[$current_user_meta["city_country"][0]];
                                     }
                                     if($value["name"] == $temp_val){
                                         $default_country_id = $value["term_id"];
@@ -423,7 +426,7 @@ include("page/component/header.php"); ?>
                             $temp_val = "";
                             if($current_user_meta && $current_user_meta["city_country"] && sizeof($current_user_meta["city_country"])){
                                 //get fullname
-                                $temp_val = $user_country_ar[$current_user_meta["city_country"][0]];
+                                $temp_val = staticparam::$user_country_ar[$current_user_meta["city_country"][0]];
                             }
                             if($value["name"] == $temp_val){
                                 $default_country_id = $value["term_id"];
@@ -609,26 +612,28 @@ include("page/component/header.php"); ?>
             var APP_ID = '68CE9863-C07D-4505-A659-F384AB1DE478';
             var sb = new SendBird({appId: APP_ID});
 <?php
-            if(sizeof($pathquery) == 4 ){
-?>          var _project_id = <?=$pathquery[3]?>;
-            var _creator = null;
-<?php
-            }else if(sizeof($pathquery) == 5){
-                if($pathquery[4] == "submit"){
-?>          var _project_id = <?=$pathquery[3]?>;
-            var _creator = "submit";
-<?php
-                }else{
-?>          var _project_id = 0;
+            if(sizeof($pathquery) > 3){
+                if($pathquery[3] == "new" && isset($pathquery[4])){
+                    //add new project
+                    ?>
+            var _project_id = 0;
             var _creator = <?=json_encode($main->getCreatorSingle($pathquery[4]))?>;
-<?php
+                    <?php
+                }else{
+                    // project id exist
+                    ?>
+            var _project_id = <?=$pathquery[3]?>;
+            var _creator = <?=isset($pathquery[4])?"'".$pathquery[4]."'":"null"?>;
+                    <?php
                 }
             }else{
-?>          var _project_id = 0;
+                ?>
+            var _project_id = 0;
             var _creator = null;
-<?php
+                <?php
             }
-?>            
+?>
+
             var _project_users = null;
             var _default_country_id = <?=$default_country_id?>;
             var _baseurl = "/user@<?=$current_user->ID?>/projects/closed/";
@@ -1544,13 +1549,31 @@ include("page/component/header.php"); ?>
                         alert(rs.msg);
                     },
                     ()=>{
-                        if( _initial_prompt && <?=(sizeof($pathquery) >= 4)?"1":"0"?>){
+                        if( _initial_prompt && _project_id){
                             _initial_prompt = false;
-                            storify.brand.detail.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>, function(){
-                                <?php if(sizeof($pathquery) == 5 && $pathquery[4] == "submit"){ ?>
-                                $("#submission-tab").tab("show");
-                                <?php } ?>
+                            storify.brand.detail.viewDetail(_project_id, function(){
+                                <?php
+                                    if(sizeof($pathquery) > 4){
+                                        switch($pathquery[4]){
+                                            case "submit":
+                                            ?>$("#submission-tab").tab("show");<?php
+                                            break;
+                                            case "final":
+                                            ?>$("#final-tab").tab("show");<?php
+                                            break;
+                                            case "creator":
+                                            ?>$("#creator-tab").tab("show");<?php
+                                            break;
+                                            case "bounty":
+                                            ?>$("#bounty-tab").tab("show");<?php
+                                            break;
+                                        }
+                                    }
+                                ?>
                             });
+                        }else if(_creator){
+                            addInvitedCreator(_creator);
+                            $("#newproject").modal("show");
                         }
                     }
                 )
@@ -1560,18 +1583,6 @@ include("page/component/header.php"); ?>
 
             if($("#ongoingloadmore").length){
                 $("#ongoingloadmore").click();
-            }
-
-            if(_project_id){
-                storify.brand.detail.viewDetail(_project_id, function(){
-                    _project_id = 0;
-                    if(_creator == "submit"){
-                        $("#submission-tab").tab("show");
-                    }
-                });
-            }else if(_creator){
-                addInvitedCreator(_creator);
-                $("#newproject").modal("show");
             }
         });
     </script>

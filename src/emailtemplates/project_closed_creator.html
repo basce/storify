@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html;UTF-8" />
 	</head>
 	<body style="margin: 0px; background-color: #F4F3F4; font-family: Helvetica, Arial, sans-serif; font-size:12px;" text="#444444" bgcolor="#F4F3F4" link="#21759B" alink="#21759B" vlink="#21759B" marginheight="0" topmargin="0" marginwidth="0" leftmargin="0">
-<div class="display:none">Invites for {{project_name}} has closed! Great stories are coming!</div>
+<div class="display:none">{{project_name}} by {{brand}} is closed!</div>
 <table border="0" width="100%" cellspacing="0" cellpadding="0" bgcolor="#F4F3F4">
 <tbody>
 <tr>
@@ -30,23 +30,18 @@
 <tr>
 <td style="border-top: solid 1px #d9d9d9;" colspan="2">
 <div style="padding: 15px 0;">
-<p>Hey {{first_name}},</p>
-<p>Yippee! {{project_name}} is progressing well. Invites have closed on {{invite_close_date}}, work has begun and great stories are coming!</p>
-<p>{{number_of_people_with_is}} working on the project! View your team <a href="{{creator_link}}" target="_blank">here</a>.</p>
-<p>We're sure you know, but here's what it's about:
-	<ol>
-		<li>Brand: {{brand}}</li>
-		<li>Theme: {{project_name}}</li>
-		<li>Type: {{cash_or_sponsorship}}</li>
-		<li>Entitlement: {{bounty}}</li>
-		<li>Work products: {{number_of_items}}</li>
-		<li>Receive submissions by: {{submission_close_date}}</li>
-	</ol>
-</p>
+<p>Hey {{first_name}} (@{{igusername}}),</p>
+<p>Yippee! Thank you for the hard work!  It's been great and {{project_name}} by {{brand}} is now closed.</p>
+<p>{{submission_payment_sentence}}</p>
+{{submission_payment_detail_list}}
+<hr>
+<p>Final Due: S$ {{payment_total}}</p>
+<p>You will receive your payment within 5 working days from {{project_close_date}}.</p>
 <p>
-	<a href="{{submit_link}}" target="_blank">SUBMISSIONS</a>
+	<a href="{{final_link}}" target="_blank">FINAL</a>
 </p>
-<p>Check back with us at <a href="mailto:hello@storify.me">hello@storify.me</a> if you have questions about this project. We're feeling excited and looking forward to submissions.</p>
+<p>Thank you from everyone of us and see you at the next project!</p>
+<p>Check back with us at <a href="mailto:hello@storify.me">hello@storify.me</a> if you have questions!</p>
 <p>Cheers,<br>
 People at storify.me<br>
 <small>A creator-brand community made lovingly in Singapore.</small>

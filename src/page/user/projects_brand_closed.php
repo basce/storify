@@ -100,7 +100,28 @@ include("page/component/header.php"); ?>
     <script type="text/javascript">
         var APP_ID = '68CE9863-C07D-4505-A659-F384AB1DE478';
         var sb = new SendBird({appId: APP_ID});
-
+<?php
+            if(sizeof($pathquery) > 3){
+                if($pathquery[3] == "new" && isset($pathquery[4])){
+                    //add new project
+                    ?>
+            var _project_id = 0;
+            var _creator = <?=json_encode($main->getCreatorSingle($pathquery[4]))?>;
+                    <?php
+                }else{
+                    // project id exist
+                    ?>
+            var _project_id = <?=$pathquery[3]?>;
+            var _creator = <?=isset($pathquery[4])?"'".$pathquery[4]."'":"null"?>;
+                    <?php
+                }
+            }else{
+                ?>
+            var _project_id = 0;
+            var _creator = null;
+                <?php
+            }
+?>
         $(function(){
             "use strict";
 
@@ -125,8 +146,27 @@ include("page/component/header.php"); ?>
                         alert(rs.msg);
                     },
                     ()=>{
-                        if( _initial_prompt & <?=(sizeof($pathquery)==4)?"1":"0"?> ){
-                            storify.brand.detail_closed.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>);        
+                        if( _initial_prompt && _project_id ){
+                            storify.brand.detail_closed.viewDetail(_project_id, function(){
+                                <?php
+                                    if(sizeof($pathquery) > 4){
+                                        switch($pathquery[4]){
+                                            case "submit":
+                                            ?>$("#submission-tab").tab("show");<?php
+                                            break;
+                                            case "final":
+                                            ?>$("#final-tab").tab("show");<?php
+                                            break;
+                                            case "creator":
+                                            ?>$("#creator-tab").tab("show");<?php
+                                            break;
+                                            case "bounty":
+                                            ?>$("#bounty-tab").tab("show");<?php
+                                            break;
+                                        }
+                                    }
+                                ?>
+                            });
                         }
                     }
                 )

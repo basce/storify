@@ -325,6 +325,70 @@ class project{
 		$this->deliverable_manager->updateDeliverables($deliverable_pairs);
 	}
 
+	public function getProjectLink($project_id, $user_id){
+		global $wpdb;
+
+		//check if in project role
+		$query = "SELECT role FROM `".$wpdb->prefix."project_user` WHERE project_id = %d AND user_id = %d";
+		$role = $wpdb->get_var($wpdb->prepare($query, $project_id, $user_id));
+
+		if($role){
+			//role exist
+
+			if($role == "admin"){
+				$query = "SELECT status FROM `".$wpdb->prefix."project` WHERE id = %d";
+				$project_status = $wpdb->get_var($wpdb->prepare($query, $project_id));
+				if($project_status == "close"){
+					//should only have open and close two status
+					return array(
+						"role"=>"brand",
+						"redirect"=>"/user@".$user_id."/projects/closed/".$project_id
+					);
+				}else{
+					//should be closed. if it's not, might need to check is there a function to remove user from project.
+					return array(
+						"role"=>"brand",
+						"redirect"=>"/user@".$user_id."/projects/ongoing/".$project_id
+					);
+				}
+			}else{
+				$query = "SELECT status FROM `".$wpdb->prefix."project_status` WHERE project_id = %d AND user_id = %d";
+				$project_status = $wpdb->get_var($wpdb->prepare($query, $project_id, $user_id));
+				if($project_status == "open"){
+					return array(
+						"role"=>"creator",
+						"redirect"=>"/user@".$user_id."/projects/ongoing/".$project_id
+					);
+				}else{
+					//should be closed. if it's not, might need to check is there a function to remove user from project.
+					return array(
+						"role"=>"creator",
+						"redirect"=>"/user@".$user_id."/projects/closed/".$project_id
+					);
+				}
+			}
+		}else{
+
+			//role not exist, check invitation
+			$query = "SELECT status FROM `".$wpdb->prefix."project_invitation` WHERE project_id = %d AND user_id = %d";
+			$status = $wpdb->get_var($wpdb->prepare($query, $project_id, $user_id));
+
+			if($status == "pending"){
+				//invitation still active
+				return array(
+					"role"=>"creator",
+					"redirect"=>"/user@".$user_id."/projects/invited/".$project_id
+				);
+			}else{
+				//invitation no exist, or expired, or had been rejected
+				return array(
+					"role"=>null,
+					"redirect"=>null
+				);
+			}
+		}
+	}
+
 	public function isProjectOwner($project_id, $user_id){
 		global $wpdb;
 
@@ -771,10 +835,10 @@ class project{
 		//check owner
 	}
 
-	public function getProjectDetail($project_id, $user_id){
+	public function getProjectDetail($project_id, $user_id, $force = false){
 		global $wpdb;
 
-		if($this->user_manager->isUserInProject($project_id, $user_id) || $this->invitation_manager->isUserInInvitation($project_id, $user_id)){
+		if($force || $this->user_manager->isUserInProject($project_id, $user_id) || $this->invitation_manager->isUserInInvitation($project_id, $user_id)){
 			$query = "SELECT name, closing_date, invitation_closing_date, created_by FROM `".$this->tbl_project."` WHERE id = %d";
 			$project = $wpdb->get_row($wpdb->prepare($query, $project_id), ARRAY_A);			
 

@@ -64,6 +64,42 @@ class main{
 		return $this->email_manager;
 	}
 
+	public function sendLambdaBatchEmail_test($emails, $sender, $template_name){
+		$data = array(
+			"emails"=>$emails,
+			"from"=>$sender,
+			"template"=>$template_name
+		);
+
+		$headers = array(
+			"x-api-key : ".AWS_LAMBDA_SES_SEND_BATCH_EMAIL_API_KEY_TEST
+		);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, AWS_LAMBDA_SES_SEND_BATCH_EMAIL_ENDPOINT_TEST);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		$output = curl_exec($ch); 
+		curl_close($ch);
+
+		$output_obj = json_decode($output, true);
+		if($output_obj && $output_obj["ResponseMetadata"]){
+			return array(
+				"error"=>0,
+				"status"=>$output_obj["Status"],
+				"msg"=>$output
+			);
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>$output
+			);
+		}
+	}
+
 	public function sendLambdaBatchEmail($emails, $sender, $template_name){
 		$data = array(
 			"emails"=>$emails,
@@ -1769,8 +1805,7 @@ class main{
 	}
 
 	function isBrandVerified($user_id){
-		global $current_user;
-		return get_user_meta($current_user->ID, "brand_verified", true);
+		return get_user_meta($user_id, "brand_verified", true);
 	}
 
 	/**
@@ -1995,6 +2030,13 @@ class main{
 		}else{
 
 		}
+	}
+
+	function addWorkJobLog($msg, $data){
+		global $wpdb;
+
+		$query = "INSERT INTO `".$wpdb->prefix."workjoblog` ( msg, raw_data ) VALUES ( %s, %s )";
+		$wpdb->query($wpdb->prepare($query, $msg, json_encode($data)));
 	}
 
 	function getS3UploadPresignedLink($filekey, $filemime){
