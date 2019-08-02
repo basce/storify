@@ -215,20 +215,30 @@ if(sizeof($pathquery) == 0){
             header("Location: /login");
             exit();
         }else{
-            $result = $main->getProjectManager()->getProjectLink($pathquery[1], $current_user->ID);
-            if($result["redirect"]){
-                $main->changeDefaultRole($result["role"],$current_user->ID);
-                if(sizeof($pathquery) > 2){
-                    header("Location: ".$result["redirect"]."/".$pathquery[2]);
-                }else{
-                    header("Location: ".$result["redirect"]);
-                }
+            if($pathquery[1] == "invited"){
+                $main->changeDefaultRole("creator",$current_user->ID);
+                header("Location: /user@".$current_user->ID."/projects/invited");
+                exit();
+            }else if($pathquery[1] == "new"){
+                $main->changeDefaultRole("brand",$current_user->ID);
+                header("Location: /user@".$current_user->ID."/projects/ongoing/new");
                 exit();
             }else{
-                //is null
-                $error_msg = "Invalid link. You're trying to access a page that doesn't exist.";
-                include_once("page/error/index.php");
-                exit();
+                $result = $main->getProjectManager()->getProjectLink($pathquery[1], $current_user->ID);
+                if($result["redirect"]){
+                    $main->changeDefaultRole($result["role"],$current_user->ID);
+                    if(sizeof($pathquery) > 2){
+                        header("Location: ".$result["redirect"]."/".$pathquery[2]);
+                    }else{
+                        header("Location: ".$result["redirect"]);
+                    }
+                    exit();
+                }else{
+                    //is null
+                    $error_msg = "Invalid link. You're trying to access a page that doesn't exist.";
+                    include_once("page/error/index.php");
+                    exit();
+                }
             }
         }
     }

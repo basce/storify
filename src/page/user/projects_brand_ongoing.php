@@ -613,12 +613,20 @@ include("page/component/header.php"); ?>
             var sb = new SendBird({appId: APP_ID});
 <?php
             if(sizeof($pathquery) > 3){
-                if($pathquery[3] == "new" && isset($pathquery[4])){
+                if($pathquery[3] == "new" ){
                     //add new project
+                    if(isset($pathquery[4])){
                     ?>
             var _project_id = 0;
             var _creator = <?=json_encode($main->getCreatorSingle($pathquery[4]))?>;
                     <?php
+                    }else{
+                        ?>
+            var _project_id = 0;
+            var _creator = "new";
+                    <?php
+                    }
+                    
                 }else{
                     // project id exist
                     ?>
@@ -1538,7 +1546,7 @@ include("page/component/header.php"); ?>
                     "#ongoingloadmore", 
                     "You have not created a project yet. Create one now!", 
                     (index,value)=>{
-                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}]));
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
                             storify.brand.detail.viewDetail(value.id);
@@ -1572,7 +1580,11 @@ include("page/component/header.php"); ?>
                                 ?>
                             });
                         }else if(_creator){
-                            addInvitedCreator(_creator);
+                            if(_creator == "new"){
+
+                            }else{
+                                addInvitedCreator(_creator);
+                            }                            
                             $("#newproject").modal("show");
                         }
                     }

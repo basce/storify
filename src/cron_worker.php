@@ -175,71 +175,13 @@ foreach( $batchEmailTask as $key => $value ){
 }
 
 if(sizeof($batchEmailTask)){
+	print_r($batchEmailTask);
 	$main->addWorkJobLog("Total ".sizeof($batchEmailTask)." Sent", $batchEmailTask);
+}else{
+	print_r("no batch email");
 }
 
 //all worker function
-/*
-function worker_job_project_invite_expire_before_1($data){
-	global $wpdb, $main;
-	// template name : storify_invite_close_before_1_creator
-
-	//$data["project_id"]
-	// get project data
-	$project = $main->getProjectManager()->getProjectDetail($data["project_id"], null, true);
-
-	// get creators data ( from invitation list )
-	$invited_creators = $main->getProjectManager()->getInvitationList($data["project_id"]);
-
-	// create 
-	$pass_data = array();
-
-	foreach($invited_creators as $key=>$value){
-		//only interest on invitation pending
-		if($value["invitation_status"] == "pending"){
-
-			$value["igusername"]
-			$user = get_user_by('id', $value["user_id"]);
-
-			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
-			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
-
-			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
-			$email_url = $user->user_email;
-
-			$data = array(
-				"to"=>array(
-					"name"=>$email_name,
-					"email"=>$email_url
-				),
-				"data"=>array(
-					"brand"=>$brand,
-					"project_name"=>$project_name,
-					"invite_close_date"=>"",
-					"first_name"=>$first_name,
-					"igusername"=>$igusername,
-					
-					
-					"cash_or_sponsorship"=>$cash_or_sponsorship,
-					"bounty"=>$bounty,
-					"number_of_items"=>$number_of_items,
-					"detail_link"=>$project_link,
-					"text_preview"=>"Pity! @".$igusername." has declined to work on ".$project_link."."
-				)
-			);
-		}else{
-			//ignore
-		}
-	}
-
-	return array(
-		"complete"=>1,
-		"type"=>"emails",
-		"emaildatas"=>$pass_data
-	);
-}
-*/
-
 function worker_job_project_invite_reject_brand($data){
 	global $wpdb, $main;
 
@@ -270,7 +212,7 @@ function worker_job_project_invite_reject_brand($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? "https://staging.storify.me/user@".$admin->ID."/projects/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/project/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -362,7 +304,7 @@ function worker_job_project_invite_reject_creator($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? "https://staging.storify.me/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -459,7 +401,7 @@ function worker_job_project_invite_accept_brand($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? "https://staging.storify.me/user@".$admin->ID."/projects/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$admin->ID."/projects/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -554,7 +496,7 @@ function worker_job_project_invite_accept_creator($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? "https://staging.storify.me/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -649,7 +591,7 @@ function worker_job_project_invite($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? "https://staging.storify.me/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
