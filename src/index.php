@@ -115,11 +115,15 @@ if(sizeof($pathquery) == 0){
     }else if($pathquery[0] == "signin"){
         $pageSettings = $pageManager->getSettings("signin");
         if(isset($_POST) && sizeof($_POST)){
-
             include_once("page/login/func-login.php");
             if($login_success){
-                header("Location: /user@".$user_ID."/collections");
-                exit();
+                if($login_redirect){
+                    header("Location: ".$login_redirect);
+                    exit();
+                }else{
+                    header("Location: /user@".$user_ID."/collections");
+                    exit();
+                }
             }else{
                 include_once("page/login/index.php");
                 exit();      
@@ -210,9 +214,8 @@ if(sizeof($pathquery) == 0){
         include_once("page/test/test_email.php");
         exit();
     }else if($pathquery[0] == "project" && sizeof($pathquery) > 1){
-
         if(!$current_user->ID){
-            header("Location: /login");
+            header("Location: /signin?redirect=".$_SERVER['REQUEST_URI']);
             exit();
         }else{
             if($pathquery[1] == "invited"){
@@ -235,10 +238,47 @@ if(sizeof($pathquery) == 0){
                     exit();
                 }else{
                     //is null
-                    $error_msg = "Invalid link. You're trying to access a page that doesn't exist.";
+                    $error_msg = "Invalid Authentication. You're trying to access a page that doesn't belong to you, please <a href=\"".get_home_url()."/signin?redirect=".$_SERVER['REQUEST_URI']."\">login</a> to your account and try again.";
                     include_once("page/error/index.php");
                     exit();
                 }
+            }
+        }
+    }else if(sizeof($pathquery) >= 2 && $pathquery[0] == "user" ){
+        if(!$current_user->ID){
+            header("Location: /signin?redirect=".$_SERVER['REQUEST_URI']);
+            exit();
+        }else{
+            switch($pathquery[1]){
+                case "showcase":
+                    $main->changeDefaultRole("creator",$current_user->ID);
+                    header("Location: /user@".$current_user->ID."/showcase");
+                    exit();
+                break;
+                case "collections":
+                    header("Location: /user@".$current_user->ID."/collections");
+                    exit();
+                break;
+                case "profile":
+                    header("Location: /user@".$current_user->ID."/profile");
+                    exit();
+                break;
+                case "password":
+                    header("Location: /user@".$current_user->ID."/password");
+                    exit();
+                break;
+                case "projects":
+                    if(sizeof($pathquery) == 3){
+                        if($pathquery[2] == "invited"){
+                            $main->changeDefaultRole("creator",$current_user->ID);
+                        }
+                        header("Location: /user@".$current_user->ID."/projects/".$pathquery[2]);
+                        exit();
+                    }else{
+                        header("Location: /user@".$current_user->ID."/projects");
+                        exit();
+                    }
+                break;
             }
         }
     }
@@ -253,10 +293,14 @@ if(sizeof($pathquery) == 0){
     //check if with user id
     $userID = $main->parseUserTerm($pathquery[0]);
     if($userID == -1){
-        header("Location: /login");
+        header("Location: /signin?redirect=".$_SERVER['REQUEST_URI']);
         exit();
     }else if($userID){
-        if(!($current_user->ID && $current_user->ID == $userID)){
+        if(!$current_user->ID){
+            header("Location: /signin?redirect=".$_SERVER['REQUEST_URI']);
+            exit();
+        }
+        if($current_user->ID != $userID){
 
             //check if a group page, if yes, redirect
             if(sizeof($pathquery) > 3 ){
@@ -266,7 +310,7 @@ if(sizeof($pathquery) == 0){
                 }
             }
 
-            $error_msg = "Invalid Authentication. You're trying to access a page that doesn't belong to you, please <a href=\"".get_home_url()."/signin\">login</a> to your account and try again.";
+            $error_msg = "Invalid Authentication. You're trying to access a page that doesn't belong to you, please <a href=\"".get_home_url()."/signin?redirect=".$_SERVER['REQUEST_URI']."\">login</a> to your account and try again.";
             include_once("page/error/index.php");
             exit();
         }

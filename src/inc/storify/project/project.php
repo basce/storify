@@ -26,6 +26,7 @@ use storify\project\summary as summary;
 use storify\project\tag as tag;
 use storify\project\user as user;
 use storify\project\status as status;
+use storify\job as job;
 
 class project{
 
@@ -511,7 +512,7 @@ class project{
 		global $wpdb;
 
 		if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
-			$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE created_by = %d AND status = %s";
+			$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE hide = 0 AND created_by = %d AND status = %s";
 	        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
 	        $total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
 
@@ -521,9 +522,9 @@ class project{
 	        );
 		}else{
 			//get ongoing and close number
-	        $query = "SELECT COUNT(*) FROM ( SELECT * FROM `".$wpdb->prefix."project_invitation` WHERE user_id = %d ) a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE a.status = %s AND b.status = %s";
+	        $query = "SELECT COUNT(*) FROM ( SELECT * FROM `".$wpdb->prefix."project_invitation` WHERE user_id = %d ) a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE b.hide = 0 AND a.status = %s AND b.status = %s";
 	        $total_invite = $wpdb->get_var($wpdb->prepare($query, $user_id, "pending", "open"));
-	        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_status` WHERE user_id = %d AND status = %s";
+	        $query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_status` a LEFT JOIN `".$wpdb->prefix."project` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.status = %s";
 	        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
 	        $total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
 
@@ -689,7 +690,7 @@ class project{
 				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
 				$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
+				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
 				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "open", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 			break;
 			case "close":
@@ -697,7 +698,7 @@ class project{
 				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
 				$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
+				$query = "SELECT b.*, UNIX_TIMESTAMP( b.closing_date ) - UNIX_TIMESTAMP() as `before_time_left`, c.summary FROM `".$this->status_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
 				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "close", ($page-1)*$pagesize, $pagesize), ARRAY_A);
 			break;
 		}
@@ -760,19 +761,19 @@ class project{
 
 		switch($filter){
 			case "ongoing":
-				$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE a.user_id = %d AND a.role = %s AND b.status = %s";
+				$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND b.status = %s";
 				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "admin", "open"));
 				$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.role = %s AND b.status = %s".$orderByCond." LIMIT %d, %d";
+				$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND b.status = %s".$orderByCond." LIMIT %d, %d";
 				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "admin", "open", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
 			break;
 			case "close":
-				$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )";
+				$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )";
 				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "admin", "complete", "close"));
 				$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )".$orderByCond." LIMIT %d, %d";
+				$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )".$orderByCond." LIMIT %d, %d";
 				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "admin", "complete", "close", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
 			break;
 		}
@@ -806,12 +807,12 @@ class project{
 		global $wpdb;
 
 		//filter ongoing , complete
-		$query = "SELECT COUNT(*) FROM ( SELECT c.*, d.role FROM ( SELECT a.*, b.summary FROM ( SELECT * FROM `".$this->tbl_project."` WHERE id IN ( SELECT project_id FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d ) OR id IN ( SELECT project_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) ) a LEFT JOIN `".$this->summary_manager->getSummaryTable()."` b ON a.id = b.project_id ) c LEFT JOIN ( SELECT project_id, role, user_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) d ON c.id = d.project_id ) e LEFT JOIN ( SELECT project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND ( status != %s OR status != %s ) ) f ON e.id = f.project_id";
+		$query = "SELECT COUNT(*) FROM ( SELECT c.*, d.role FROM ( SELECT a.*, b.summary FROM ( SELECT * FROM `".$this->tbl_project."` WHERE hide = 0 AND id IN ( SELECT project_id FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d ) OR id IN ( SELECT project_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) ) a LEFT JOIN `".$this->summary_manager->getSummaryTable()."` b ON a.id = b.project_id ) c LEFT JOIN ( SELECT project_id, role, user_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) d ON c.id = d.project_id ) e LEFT JOIN ( SELECT project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND ( status != %s OR status != %s ) ) f ON e.id = f.project_id";
 		$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, $user_id, $user_id, $user_id, "removed", "rejected"));
 		$totalpage = ceil($totalsize / $pagesize);
 
 		//get projectid
-		$query = "SELECT e.*, f.status FROM ( SELECT c.*, d.role FROM ( SELECT a.*, b.summary FROM ( SELECT * FROM `".$this->tbl_project."` WHERE id IN ( SELECT project_id FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d ) OR id IN ( SELECT project_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) ) a LEFT JOIN `".$this->summary_manager->getSummaryTable()."` b ON a.id = b.project_id ) c LEFT JOIN ( SELECT project_id, role, user_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) d ON c.id = d.project_id ) e LEFT JOIN ( SELECT project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND ( status != %s OR status != %s )) f ON e.id = f.project_id LIMIT %d, %d";
+		$query = "SELECT e.*, f.status FROM ( SELECT c.*, d.role FROM ( SELECT a.*, b.summary FROM ( SELECT * FROM `".$this->tbl_project."` WHERE hide = 0 AND id IN ( SELECT project_id FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d ) OR id IN ( SELECT project_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) ) a LEFT JOIN `".$this->summary_manager->getSummaryTable()."` b ON a.id = b.project_id ) c LEFT JOIN ( SELECT project_id, role, user_id FROM `".$this->user_manager->getTable()."` WHERE user_id = %d ) d ON c.id = d.project_id ) e LEFT JOIN ( SELECT project_id, status FROM `".$this->invitation_manager->getInvitationTable()."` WHERE user_id = %d AND ( status != %s OR status != %s )) f ON e.id = f.project_id LIMIT %d, %d";
 
 		$data = $wpdb->get_results($wpdb->prepare($query, $user_id, $user_id, $user_id, $user_id, "removed", "rejected", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
 
@@ -1230,6 +1231,26 @@ class project{
 		return $this->submission_manager->getFileKey($key_id);
 	}
 
+	public function isSubmissionComplete($creator_id, $project_id){
+		global $wpdb;
+
+		$query = "SELECT no_of_photo, no_of_video FROM `".$this->detail_manager->getProjectDetailTable()."` WHERE project_id = %d";
+		$data = $wpdb->get_row($wpdb->prepare($query, $project_id), ARRAY_A);
+
+		$total_item = $data["no_of_photo"] + $data["no_of_video"];
+
+		//get numbe rof submitted items, but not rejected item
+		$query = "SELECT COUNT(*) FROM `".$this->submission_manager->getSubmissionTable()."` WHERE project_id = %d AND creator_id = %d AND status != %s";
+
+		$num_submitted_type = $wpdb->get_var($wpdb->prepare($query, $project_id, $creator_id, "rejected"));
+
+		if($num_submitted_type == $total_item){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	public function uploadComplete($key_id, $caption, $type){
 		global $wpdb;
 		//insert into submission
@@ -1254,7 +1275,15 @@ class project{
 		}
 
 		if($num_submitted_type < $cap_submitted_type){
-			return $this->submission_manager->submitFile($result["project_id"], $type, $result["user_id"], $key_id, $caption);
+			$submission_result = $this->submission_manager->submitFile($result["project_id"], $type, $result["user_id"], $key_id, $caption);
+			if($this->isSubmissionComplete($result["user_id"], $result["project_id"])){
+				// send notification when all items is done.
+		        job::addUpdate("submission_complete_".$result["project_id"]."_".$result["user_id"], "submission_complete", array(
+		            "project_id"=>$result["project_id"],
+		            "creator_id"=>$result["user_id"]
+		        ), 300); //5 mins
+			}
+			return $submission_result;
 		}else{
 			return array(
 				"error"=>1,
@@ -1286,7 +1315,9 @@ class project{
 		}
 
 		if($num_submitted_type < $cap_submitted_type){
-			return $this->submission_manager->addFileKey($project_id, $user_id, $filename, $filesize, $filemime);
+
+			$submission_result = $this->submission_manager->addFileKey($project_id, $user_id, $filename, $filesize, $filemime);
+			return $submission_result;
 		}else{
 			return array(
 				"error"=>1,
@@ -1319,7 +1350,16 @@ class project{
 		}
 
 		if($num_submitted_type < $cap_submitted_type){
-			return $this->submission_manager->submitText($project_id, $type, $user_id, $url, $remark);
+
+			$submission_result = $this->submission_manager->submitText($project_id, $type, $user_id, $url, $remark);
+			if($this->isSubmissionComplete($user_id, $project_id)){
+				// send notification when all items is done.
+		        job::addUpdate("submission_complete_".$project_id."_".$user_id, "submission_complete", array(
+		            "project_id"=>$project_id,
+		            "creator_id"=>$user_id
+		        ), 300); //5 mins
+			}
+			return $submission_result;
 		}else{
 			return array(
 				"error"=>1,
@@ -1341,6 +1381,12 @@ class project{
 			//finish all task
 			$this->changeUserStatus($submission_detail["project_id"], $submission_detail["creator_id"], "close", $admin_user_id);
 		}
+
+		// send notification when review is made.
+        job::addUpdate("project_status_change_".$submission_detail["project_id"]."_".$submission_detail["creator_id"], "project_status_change", array(
+            "project_id"=>$submission_detail["project_id"],
+            "creator_id"=>$submission_detail["creator_id"]
+        ), 300); //5 mins
 
 		
 		return $result;
@@ -1482,6 +1528,11 @@ class project{
 
 			$query = "UPDATE `".$this->tbl_project."` SET status = %s WHERE id = %d";
 			$wpdb->query($wpdb->prepare($query, "close", $project_id));
+
+			job::addFlag("project_close_".$project_id);
+			job::add(0, "project_close", array(
+		        "project_id"=>$project_id
+		    ), 1);
 			
 			return array(
 				"error"=>0,
@@ -1506,6 +1557,18 @@ class project{
 				$users = $this->user_manager->getUsers($project_id);
 				foreach($users as $key=>$value){
 					if($value["role"] == "creator"){
+						//if previously is open
+						if($this->status_manager->getStatus($value["user_id"], $project_id) == "open"){
+							//previous open status, and change to close
+							job::add(0, "project_close", array(
+						        "project_id"=>$project_id,
+						        "creator_only"=>$value["user_id"]
+						    ), 1);
+
+						    job::add(0, "project_payment_confirm", array(
+						    	"project_id"=>$project_id
+						    ), 1);
+						}
 						$this->status_manager->updateStatus($value["user_id"], $project_id, "close");
 						$query = "SELECT id FROM `".$this->submission_manager->getSubmissionTable()."` WHERE project_id = %d AND creator_id = %d AND status = %s";
 						$opening_items = $wpdb->get_col($wpdb->prepare($query, $project_id, $value["user_id"], ""));
@@ -1541,6 +1604,18 @@ class project{
 
 		if($user_role == "admin"){
 			//get bounty
+			//if previously is open
+			if($status == "close" && $this->status_manager->getStatus($user_id, $project_id) == "open"){
+				//previous open status, and change to close
+				job::add(0, "project_close", array(
+			        "project_id"=>$project_id,
+			        "creator_only"=>$user_id
+			    ), 1);
+
+			    job::add(0, "project_payment_confirm", array(
+			    	"project_id"=>$project_id
+			    ), 1);
+			}
 			$this->status_manager->updateStatus($user_id, $project_id, $status);
 			if($status == "close"){
 				$query = "SELECT id FROM `".$this->submission_manager->getSubmissionTable()."` WHERE project_id = %d AND creator_id = %d AND status = %s";
@@ -1681,11 +1756,11 @@ class project{
 
 		//expired invitation
 		//SELECT a . * , b.invitation_closing_date FROM ( SELECT * FROM  `wp_project_invitation` WHERE STATUS =  "pending" )a LEFT JOIN wp_project b ON a.project_id = b.id WHERE b.invitation_closing_date < NOW() && b.invitation_closing_date != "0000-00-00 00:00:00"
-		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE ( UNIX_TIMESTAMP( b.invitation_closing_date ) + 86400 ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
+		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND ( UNIX_TIMESTAMP( b.invitation_closing_date ) + 86400 ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
 		$wpdb->query($wpdb->prepare($query, "expired", "pending", "0000-00-00 00:00:00"));
 
 		//expired project
-		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 1296000 ) < UNIX_TIMESTAMP() AND status = %s";
+		$query = "SELECT id FROM `".$this->tbl_project."` WHERE ( UNIX_TIMESTAMP( closing_date ) + 1296000 ) < UNIX_TIMESTAMP() AND status = %s AND hide = 0";
 		$ids = $wpdb->get_col($wpdb->prepare($query, "open"));
 
 		if(sizeof($ids)){

@@ -124,7 +124,7 @@ include("page/component/header.php"); ?>
                     "No closed projects yet.",
                     (index, value)=>{
                         value.before_time_left = null; //disable ribbon
-                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}]));
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
                             storify.creator.detail_closed.viewDetail(value.id);

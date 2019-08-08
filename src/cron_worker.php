@@ -257,15 +257,14 @@ function worker_job_project_invite_reject_brand($data){
 			"email"=>$email_url
 		),
 		"data"=>array(
-			"first_name"=>$admin->first_name ? $admin->first_name : $admin->display_name,
 			"igusername"=>$igusername,
-			"brand"=>$brand,
 			"project_name"=>$project_name,
+			"first_name"=>$admin->first_name ? $admin->first_name : $admin->display_name,
+			"brand"=>$brand,
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
 			"number_of_items"=>$number_of_items,
-			"detail_link"=>$project_link,
-			"text_preview"=>"Pity! @".$igusername." has declined to work on ".$project_link."."
+			"detail_link"=>$project_link
 		)
 	);
 
@@ -304,7 +303,7 @@ function worker_job_project_invite_reject_creator($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/project/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -349,15 +348,13 @@ function worker_job_project_invite_reject_creator($data){
 			"email"=>$user->user_email
 		),
 		"data"=>array(
-			"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
-			"igusername"=>$igusername,
 			"brand"=>$brand,
 			"project_name"=>$project_name,
-			"project_link"=>$project_link,
+			"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
+			"igusername"=>$igusername,
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
-			"number_of_items"=>$number_of_items,
-			"text_preview"=>"Hey ".($user->first_name ? $user->first_name : $user->display_name)." (@".$igusername."), Pity! You have declined to work on ".$project_name." for ".$brand."."
+			"number_of_items"=>$number_of_items
 		)
 	);
 
@@ -401,7 +398,7 @@ function worker_job_project_invite_accept_brand($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$admin->ID."/projects/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/project/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -446,18 +443,16 @@ function worker_job_project_invite_accept_brand($data){
 			"email"=>$email_url
 		),
 		"data"=>array(
-			"first_name"=>$admin->first_name ? $admin->first_name : $admin->display_name,
 			"igusername"=>$igusername,
-			"brand"=>$brand,
 			"project_name"=>$project_name,
-			"project_link"=>$project_link,
+			"first_name"=>$admin->first_name ? $admin->first_name : $admin->display_name,
+			"brand"=>$brand,
+			"submit_link"=>$project_link."/submit",
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
 			"number_of_items"=>$number_of_items,
-			"project_close_date"=>$project["data"]["summary"]["formatted_closing_date2"],
-			"detail_link"=>$project_link,
-			"submit_link"=>$project_link."/submit",
-			"text_preview"=>"High fives! @".$igusername." has accepted your invite to work on ".$project_name."! Lots of hard work and a beautiful story beckon."
+			"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])), //actually is submission close date
+			"detail_link"=>$project_link
 		)
 	);
 
@@ -496,7 +491,7 @@ function worker_job_project_invite_accept_creator($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/project/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -541,18 +536,16 @@ function worker_job_project_invite_accept_creator($data){
 			"email"=>$user->user_email
 		),
 		"data"=>array(
-			"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
 			"igusername"=>$igusername,
-			"brand"=>$brand,
 			"project_name"=>$project_name,
-			"project_link"=>$project_link,
+			"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
+			"brand"=>$brand,
+			"submit_link"=>$project_link."/submit",
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
 			"number_of_items"=>$number_of_items,
-			"project_close_date"=>$project["data"]["summary"]["formatted_closing_date2"],
-			"detail_link"=>$project_link,
-			"submit_link"=>$project_link."/submit",
-			"text_preview"=>"Hey ".($user->first_name ? $user->first_name : $user->display_name)." (@".$igusername."), High fives! You have accepted an invite to work for ".$brand." on ".$project_name."!"
+			"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])), //actually is submission
+			"detail_link"=>$project_link
 		)
 	);
 
@@ -591,7 +584,7 @@ function worker_job_project_invite($data){
 		$brand = "Someone";
 	}
 	$project_name = isset($project["data"]) && isset($project["data"]["summary"]) && isset($project["data"]["summary"]["name"]) ? $project["data"]["summary"]["name"] : "N/A";
-	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/user@".$user->ID."/projects/invited/".$project["data"]["detail"]->id : "N/A";
+	$project_link = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->id) ? get_home_url()."/project/".$project["data"]["detail"]->id : "N/A";
 	$bounty_type = isset($project["data"]) && isset($project["data"]["detail"]) && isset($project["data"]["detail"]->bounty_type) ? $project["data"]["detail"]->bounty_type : "N/A";
 
 	//calculate cash & others
@@ -639,15 +632,14 @@ function worker_job_project_invite($data){
 			"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
 			"igusername"=>$igusername,
 			"brand"=>$brand,
-			"project_name"=>$project_name,
 			"project_link"=>$project_link,
+			"project_name"=>$project_name,
+			"invite_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["invitation_closing_date"])),
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
 			"number_of_items"=>$number_of_items,
-			"project_close_date"=>$project["data"]["summary"]["formatted_invitation_closing_date2"],
 			"detail_link"=>$project_link,
-			"accept_link"=>$project_link,
-			"text_preview"=>"Hey ".($user->first_name ? $user->first_name : $user->display_name)." (@".$igusername."), ".$brand." would like to invite you to work on ".$project_name."!"
+			"accept_link"=>$project_link
 		)
 	);
 
@@ -678,8 +670,8 @@ function worker_job_ig_connect($data){
 			"data"=>array(
 				"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
 				"igusername"=>$igusername,
-				"social_showcase_page_link"=>get_home_url()."/user@".$user->ID."/showcase",
-				"invited_project_page_link"=>get_home_url()."/user@".$user->ID."/invited"
+				"social_showcase_page_link"=>get_home_url()."/user/showcase",
+				"invited_project_page_link"=>get_home_url()."/user/projects/invited"
 			)
 		);
 		return array(
@@ -727,8 +719,8 @@ function worker_job_new_register($data){
 			"data"=>array(
 				"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
 				"igusername"=>$igusername,
-				"social_showcase_page_link"=>get_home_url()."/user@".$user->ID."/showcase",
-				"invited_project_page_link"=>get_home_url()."/user@".$user->ID."/projects/invited"
+				"social_showcase_page_link"=>get_home_url()."/user/showcase",
+				"invited_project_page_link"=>get_home_url()."/user/projects/"
 			)
 		);
 		return array(
@@ -751,7 +743,7 @@ function worker_job_new_register($data){
 			),
 			"data"=>array(
 				"first_name"=>$user->first_name ? $user->first_name : $user->display_name,
-				"social_showcase_page_link"=>get_home_url()."/user@".$user->ID."/showcase"
+				"social_showcase_page_link"=>get_home_url()."/user/showcase"
 			)
 		);
 

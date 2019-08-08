@@ -4,6 +4,7 @@ storify.creator = storify.creator || {};
 storify.creator.deliverable = {
 	addElementIfNotExist:function(){
 		if( !$("#update_submission").length ){
+            /*
 			$("body").append(
 				$("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"update_submission"})
 					.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
@@ -37,7 +38,41 @@ storify.creator.deliverable = {
 						)
 					)
 			);
-			$("#update_submission button.confirmsubmission").click(storify.creator.deliverable.submitclick);
+            */
+
+            var div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Submission`,
+                    bodyhtml:`
+                    <div class="main_block">
+                        <div class="input_group">
+                            <div class="label">URL</div>
+                            <input type="text" class="form-control input-url" />
+                        </div>
+                        <div class="input_group">
+                            <div class="label">Instruction (optional)</div>
+                            <textarea class="form-control input-instruction" rows="4"></textarea>
+                        </div>
+                    </div>
+                    <div class="reply_block">
+                        <label>Status</label>
+                        <span class="value input-status">Reject</span>
+                        <p class="reason_value"></p>
+                        <small class="input-date"></small>
+                    </div>
+                    <div class="history_block"></div>
+                    `
+                },
+                "update_submission",
+                [   
+                    {
+                        label:"Update",
+                        attr:{type:"button", class:"btn btn-primary small confirmsubmission"}
+                    }
+                ]
+            ));
+
+            div.find(".actions .confirmsubmission").click(storify.creator.deliverable.submitclick);
 		}
 	},
     displayDialog:function(data){

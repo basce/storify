@@ -280,7 +280,8 @@
   .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-rejected {
     border-color: #dc3545; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item.item-rejected .item-status {
-      color: #dc3545; }
+      color: #dc3545;
+      text-decoration: underline; }
   .deliverable-group .deliverable-creator-group::after {
     content: "";
     display: block;

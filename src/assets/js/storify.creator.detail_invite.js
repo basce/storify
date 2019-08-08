@@ -3,6 +3,7 @@ storify.creator = storify.creator || {};
 
 storify.creator.detail_invite = {
     addElementIfNotExist:function(){
+        /*
         if( !$("#detailModal").length ){
             $("body").append(
                 $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"detailModal"})
@@ -23,7 +24,8 @@ storify.creator.detail_invite = {
                         )
                     )
             );
-        }     
+        } 
+        */    
         if( !$("#newDetailModal").length ){
             $("body").append(
                 $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"newDetailModal"})

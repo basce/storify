@@ -109,77 +109,6 @@ include("page/component/header.php"); ?>
         </section>
     <?php include("page/component/footer.php"); ?>
     </div>
-
-    <!--
-    <div class="modal" tabindex="-1" role="dialog" id="completionDialog">
-        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Completion</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="table_top">
-                        <div class="user_col">Creator</div>
-                        <div class="completion_col">Deliverables</div>
-                        <div class="bounty_col">Bounty</div>
-                        <div class="action_col">Action</div>
-                    </div>
-                    <div class="completion_items">
-                        <div class="completion_item">
-                            <div class="user_col">
-                                <div class="user_profile" style="background-image: url(https://cdn.storify.me/data/uploads/2019/01/stefanlim.jpg);"></div>
-                                <div class="user_name">ansda asds</div>
-                            </div>
-                            <div class="completion_col">
-                                <div class="items">
-                                    <div class="item photo complete">
-                                              <div class="icon"></div>
-                                        <div class="icon_name"></div>
-                                    </div>
-                                    <div class="item photo">
-                                        <div class="icon"></div>
-                                        <div class="icon_name"></div>
-                                    </div>
-                                    <div class="item photo">
-                                        <div class="icon"></div>
-                                        <div class="icon_name"></div>
-                                    </div>
-                                    <div class="item photo">
-                                        <div class="icon"></div>
-                                        <div class="icon_name"></div>
-                                    </div>
-                                    <div class="item photo">
-                                        <div class="icon"></div>
-                                        <div class="icon_name"></div>
-                                    </div>
-                                </div>
-                                <div class="completion_summary">
-                                    1 complete out of 6 items
-                                </div>
-                            </div>
-                            <div class="bounty_col">
-                                <div class="bounty_cont">
-                                    <div class="cash">50</div>
-                                    <div class="gift">$50 Voucher</div>
-                                </div>
-                            </div>
-                            <div class="action_col">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="random3" value="close">
-                                    <label class="form-check-label" for="random3">Close</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    -->
-
     <div class="modal" tabindex="-1" role="dialog" id="editDialog" style="z-index:1051">
         <div class="modal-dialog modal-dialog-centered modal-custom-xl" role="document">
             <div class="modal-content">
@@ -304,17 +233,6 @@ include("page/component/header.php"); ?>
                                         <button class="btn btn-outline-secondary edit_addSampleButton" type="button">Add Image</button>
                                     </div>
                                 </div>
-                                <!--
-                                <div class="input-group mb-3">
-                                    <input type="file" class="form-control" id="edit_samples_file" autoComplete="off" placeholder="Upload File.">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary addSampleButton" type="button">Add File</button>
-                                    </div>
-                                </div>
-                                <div class="progressbar hide" style="position:relative;top:-1rem;">
-                                    <div class='progressbar-inner'></div>
-                                </div>
-                                -->
                             </div>
                             <div class="image-groups">
                                 
@@ -502,17 +420,6 @@ include("page/component/header.php"); ?>
                                 <button class="btn btn-outline-secondary addSampleButton" type="button">Add Image</button>
                             </div>
                         </div>
-                        <!--
-                        <div class="input-group mb-3">
-                            <input type="file" class="form-control" id="samples_file" autoComplete="off" placeholder="Upload File.">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary addSampleButton" type="button">Add File</button>
-                            </div>
-                        </div>
-                        <div class="progressbar hide" style="position:relative;top:-1rem;">
-                            <div class='progressbar-inner'></div>
-                        </div>
-                        -->
                     </div>
                     <div class="image-groups">
                         
@@ -799,56 +706,6 @@ include("page/component/header.php"); ?>
                             )
                 );
             }
-
-            /*
-            var _editUploadingFile = false;
-            function editUploadFile(){
-                if($("#edit_samples_file").val()){
-                    console.log("file is empty");
-                    return;
-                }
-
-                var file = $("#edit_samples_file")[0].files[0];
-
-                if(_editUploadingFile) return;
-                _editUploadingFile = true;
-                $.ajax({
-                    method: "POST",
-                    dataType: 'json',
-                    data: {
-                        method: "uploadTempoaryFile",
-                        type: selectType,
-                        file_name:file.name,
-                        file_size:file.size,
-                        file_mime:file.type,
-                        remark: $("#submission-content .submission_file .submission_description").val()
-                    },
-                    success: function(rs) {
-                        storify.creator.detail._submitting = false;
-                        if (rs.error) {
-                            storify.loading.hide();
-                            if (rs.msg == "cap reached") {
-                                error_alert.text("You cannot submit any more.");
-                            }
-                        } else {
-                            if(rs.success){
-                                //upload file
-                                storify.creator.detail._S3Upload(file, rs.url, function(){
-                                    storify.creator.detail._updateFileStatus(rs.id, caption, selectType, function(){
-                                        storify.creator.detail.resetSubmission();
-                                        storify.creator.detail.getSubmission(selectType);
-                                    }, function(str){
-                                        error_alert.text(str);
-                                    });
-                                });
-                            }else{
-                                error_alert.text(rs.msg);   
-                            }
-                        }
-                    }
-                })
-            }
-            */
 
             function isEditPageReady(silence){
                 var pageReady = true,
@@ -1294,7 +1151,7 @@ include("page/component/header.php"); ?>
                             alert(rs.msg);
                         }else{
                             //no error
-                            $("#ongoing_grid").attr({"data-sort":"id","data-page":0});
+                            $("#ongoing_grid").attr({"data-sort":"closing_date","data-page":0});
                             $("#ongoing_grid").empty();
 
                             //also need to clear all data
@@ -1314,9 +1171,25 @@ include("page/component/header.php"); ?>
                                 }
                             }
 
-                            storify.brand.projectList.getProject(function(){
-                                storify.brand.detail.viewDetail(rs.project_id);
-                            });
+                            storify.core.getProjectListing(
+                                "#ongoing_grid", 
+                                "#ongoingloadmore", 
+                                "You have not created a project yet. Create one now!", 
+                                (index,value)=>{
+                                    var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
+                                    div.find(".actions .detail").click(function(e){
+                                        e.preventDefault();
+                                        storify.brand.detail.viewDetail(value.id);
+                                    });
+                                    return div;
+                                },
+                                (rs2)=>{
+                                    alert(rs2.msg);
+                                },
+                                ()=>{
+                                    storify.brand.detail.viewDetail(rs.project_id);
+                                }
+                            );
                         }
                     }
                 })
@@ -1588,7 +1461,7 @@ include("page/component/header.php"); ?>
                             $("#newproject").modal("show");
                         }
                     }
-                )
+                );
 
                 //storify.brand.projectList.getProject();
             });

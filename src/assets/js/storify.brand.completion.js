@@ -4,6 +4,7 @@ storify.brand = storify.brand || {};
 storify.brand.completion = {
 	addElementIfNotExist:function(){
 		if( !$("#finalizeDialog").length ){
+			var div;
 			/*
 			$("body").append($("<modal>").addClass("modal").attr({tabindex:-1,role:"dialog", id:"completionDialog"})
 				.append($("<div>").addClass("modal-dialog modal-dialog-centered modal-xl").attr({role:"document"})
@@ -38,7 +39,7 @@ storify.brand.completion = {
 				)
 			);
 			*/
-
+			/*
 			$("body").append($("<modal>").addClass("modal").attr({tabindex:-1,role:"dialog", id:"finalizeDialog"})
 				.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
 					.append($("<div>").addClass("modal-content")
@@ -111,6 +112,81 @@ storify.brand.completion = {
 					)
 				)
 			);
+			*/
+
+			div = $(storify.template.simpleModal(
+				{
+					titlehtml:`Pay for submission`,
+					bodyhtml:`<p>This will confirm this submission and we will arrange to pay the Creator.</p>`	
+				},
+				"finalizeDialog",
+				[
+					{
+						label:"Cancel",
+						attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+					},
+					{
+						label:"Confirm",
+						attr:{type:"button", class:"btn btn-primary small confirm"}	
+					}
+				]
+			));
+			div.find(".actions .confirm").click(function(e){
+				e.preventDefault();
+                var project_id = $(this).attr("data-project_id"),
+                	user_id = $(this).attr("data-user_id");
+                storify.brand.completion.completeCompletion(project_id, user_id);
+			});
+			$("body").append(div);
+
+			div = $(storify.template.simpleModal(
+				{
+					titlehtml:`Pay for all submissions`,
+					bodyhtml:`<p>This will confirm all submissions and we will arrange to pay all Creators.</p>`	
+				},
+				"finalizeAllDialog",
+				[
+					{
+						label:"Cancel",
+						attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+					},
+					{
+						label:"Confirm",
+						attr:{type:"button", class:"btn btn-primary small confirm"}	
+					}
+				]
+			));
+			div.find(".actions .confirm").click(function(e){
+				 e.preventDefault();
+                var project_id = $(this).attr("data-project_id");
+                storify.brand.completion.completeCompletionAll(project_id);
+			});
+			$("body").append(div);
+
+			div = $(storify.template.simpleModal(
+				{
+					titlehtml:`Close project`,
+					bodyhtml:`<p>This project is done. We will close it now.</p>`	
+				},
+				"closeProjectDialog",
+				[
+					{
+						label:"Cancel",
+						attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+					},
+					{
+						label:"Confirm",
+						attr:{type:"button", class:"btn btn-primary small confirm"}	
+					}
+				]
+			));
+			div.find(".actions .confirm").click(function(e){
+				e.preventDefault();
+                var project_id = $(this).attr("data-project_id");
+                storify.brand.completion.closeProject(project_id);
+			});
+			$("body").append(div);
+
 		}
 	},
 	createCompletionItem:function(data){

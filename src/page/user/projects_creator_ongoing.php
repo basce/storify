@@ -220,7 +220,7 @@ include("page/component/header.php"); ?>
                     "#ongoingloadmore", 
                     "No ongoing projects now. Accept your next invite and kickstart a project!", 
                     (index,value)=>{
-                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}]));
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
                             storify.creator.detail.viewDetail(value.id);

@@ -64,6 +64,10 @@ if($current_user->ID){
             }
             $main->getProjectManager()->edit_save($project_id, $_POST["data"]);
             //save sample
+
+            job::addUpdate("project_brief_change_".$project_id, "project_brief_update", array(
+                "project_id"=>$project_id
+            ), 300); //5 mins
             
             $obj["error"] = 0;
             $obj["msg"] = "";
@@ -169,6 +173,7 @@ if($current_user->ID){
         break;
         case "response_submission":
             $result = $main->getProjectManager()->submission_admin_response($_POST["submission_id"], $current_user->ID, $_POST["status"], $_POST["status_remark"]);
+
             if($result["error"]){
                 $obj["error"] = 1;
                 $obj["msg"] = $result["msg"];
@@ -240,6 +245,7 @@ if($current_user->ID){
         break;
         case "closeProject":
             $result = $main->getProjectManager()->close_project($_POST["project_id"], $current_user->ID);
+
             $obj["error"] = $result["error"];
             $obj["msg"] = $result["msg"];
             $obj["userid"] = $current_user->ID;

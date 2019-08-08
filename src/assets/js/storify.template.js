@@ -8,7 +8,7 @@ storify.template.createListItem = (data, project_id, actions) => `
         <div class="project-item" id="${project_id}">
             ${
                 (before_time_left=>{
-                    if(before_time_left && before_time_left < 129600){
+                    if(before_time_left){
                         return `
 		    <div class="ribbon-featured">
 		        <div class="ribbon-start"></div>
@@ -21,7 +21,7 @@ storify.template.createListItem = (data, project_id, actions) => `
                     }else{
                     	return ``;
                     }
-                })(data.before_time_left)
+                })(data.duesoon)
             }
             <div class="wrapper">
                 <div class="image" ${
@@ -84,7 +84,7 @@ storify.template.createListItem = (data, project_id, actions) => `
                                 <i class="fa fa-calendar-o"></i> Accept ${data.summary.formatted_invitation_closing_date2}
                             </figure>
                             <figure>
-                                <i class="fa fa-calendar-o"></i> Delvier ${data.summary.formatted_closing_date2}
+                                <i class="fa fa-calendar-o"></i> Deliver ${data.summary.formatted_closing_date2}
                             </figure>
                         </div>
                         ${data.name}
@@ -152,3 +152,41 @@ storify.template.createListItem = (data, project_id, actions) => `
             </div>
         </div>
     `;
+
+storify.template.simpleModal = (data, modal_id, actions) => `
+    <modal class="modal show" tabindex="-1" role="dialog" id="${modal_id}">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">${data.titlehtml}</h5>
+                    <button type="button" data-dismiss="modal" aria-label="Close" class="close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ${data.bodyhtml}
+                </div>
+                <div class="modal-footer">
+                    <div class="actions">
+                    ${
+                            (actions=>{
+                                if(actions.length){
+                                    return actions.map(action=>{
+                                        if(action.attr){
+                                            var button = `<button `+ Object.entries(action.attr).map(attr=>{return attr[0]+ `="` + attr[1] + `"`}).join(" ") + ` >`+action.label+`</button>`;
+                                            return button;
+                                        }else{
+                                            return ``;
+                                        }
+                                    }).join(" ");
+                                }else{
+                                    return ``;
+                                }
+                            })(actions)
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </modal>
+`;

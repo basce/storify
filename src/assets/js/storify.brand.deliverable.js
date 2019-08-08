@@ -3,69 +3,78 @@ storify.brand = storify.brand || {};
 
 storify.brand.deliverable = {
 	addElementIfNotExist:function(){
+        var div;
 		if( !$("#reject_submission").length ){
-			$("body").append(
-				$("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"reject_submission"})
-					.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
-						.append($("<div>").addClass("modal-content")
-							.append($("<div>").addClass("modal-header")
-								.append($("<h5>").addClass("modal-title").text("Reject Submission"))
-								.append($("<button>").addClass("close").attr({type:"button","data-dismiss":"modal","aria-label":"Close"}).append($("<span>").attr({"aria-hidden":"hidden"}).html("&times;")))
-							)
-							.append($("<div>").addClass("modal-body deliverable_items")
-								.append($("<h3>").text("Let us know why the Creator's submission is rejected so that he or she can update the submission accordingly. (Optional)"))
-								.append($("<textarea>").addClass("form-control").attr({rows:4}))
-							)
-							.append($("<div>").addClass("modal-footer")
-								.append($("<button>").addClass("btn btn-primary small").attr({"data-dismiss":"modal"}).text("Cancel"))
-								.append($("<button>").addClass("btn btn-primary small confirmreject").text("Reject"))
-							)
-						)
-					)
-			);
-			$("#reject_submission button.confirmreject").click(storify.brand.deliverable.reject_click);
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Reject Submission`,
+                    bodyhtml:`
+                    <h3>Let us know why the Creator's submission is rejected so that he or she can update the submission accordingly. (Optional)</h3>
+                    <textarea class="form-control" rows="4"></textarea>
+                    `
+                },
+                "reject_submission",
+                [   
+                    {
+                        label:"Cancel",
+                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                    },
+                    {
+                        label:"Reject",
+                        attr:{type:"button", class:"btn btn-primary small confirmreject"}
+                    }
+                ]
+            ));
+
+            div.find(".actions .confirmreject").click(storify.brand.deliverable.reject_click);
+
+            $("body").append(div);
 		}
         if( !$("#reject_reason").length ){
-            $("body").append(
-                $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"reject_reason"})
-                    .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
-                        .append($("<div>").addClass("modal-content")
-                            .append($("<div>").addClass("modal-header")
-                                .append($("<h5>").addClass("modal-title").text("Reject Reason"))
-                                .append($("<button>").addClass("close").attr({type:"button","data-dismiss":"modal","aria-label":"Close"}).append($("<span>").attr({"aria-hidden":"hidden"}).html("&times;")))
-                            )
-                            .append($("<div>").addClass("modal-body deliverable_items")
-                                .append($("<p>").addClass("reason"))
-                            )
-                            .append($("<div>").addClass("modal-footer")
-                                .append($("<button>").addClass("btn btn-primary small").attr({"data-dismiss":"modal"}).text("Close"))
-                            )
-                        )
-                    )
-            );
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Reject Submission`,
+                    bodyhtml:`
+                    <p class="reason"></p>
+                    `
+                },
+                "reject_reason",
+                [   
+                    {
+                        label:"Edit",
+                        attr:{type:"button", class:"btn btn-primary small edit"}
+                    },
+                    {
+                        label:"Close",
+                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                    }
+                ]
+            ));
+
+            div.find(".actions .edit").click(storify.brand.deliverable.edit_reason);
+
+            $("body").append(div);
         }
         if (!$("#downloadLinkModal").length) {
-            $("body").append(
-                $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
-                .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
-                    .append($("<div>").addClass("modal-content")
-                        .append($("<div>").addClass("modal-header")
-                            .append($("<h5>").addClass("modal-title").text(""))
-                            .append($("<button>").addClass("close").attr({ type: "button", "data-dismiss": "modal", "aria-label": "Close" }).append($("<span>").attr({ "aria-hidden": "true" }).html("&times")))
-                        )
-                        .append($("<div>").addClass("modal-body")
-                            .append($("<a>").addClass("filename").attr({download:''}))
-                            .append($("<div>").addClass("filesize"))
-                            .append($("<div>").addClass("filemime"))
-                        )
-                        .append($("<div>").addClass("modal-footer")
-                            .append(
-                                $("<a>").addClass("btn btn-primary small download").text("download").attr({ href:"", download:''})
-                            )
-                        )
-                    )
-                )
-            );
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:``,
+                    bodyhtml:`
+                    <a class="filename" download></a>
+                    <div class="filesize"></div>
+                    <div class="filemime"></div>
+                    `
+                },
+                "downloadLinkModal",
+                [   
+                    {
+                        label:"download",
+                        attr:{type:"button", class:"btn btn-primary small download", href:"", download:""}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
         }
 	},
 	_submitting_response:false,
@@ -95,6 +104,7 @@ storify.brand.deliverable = {
                     storify.brand.completion.getCompletion(storify.project._project_id);
                     storify.brand.deliverable.getList(function(){
                         $("#reject_submission").modal("hide");
+                        $(".item-rejected[data-id='"+$submission_id+"'] a.item-status").click();
                         if( typeof callback === "function" ){
 							callback();
 						}
@@ -185,7 +195,7 @@ storify.brand.deliverable = {
     },
     createDeliverableItem:function(data){
     	storify.brand.deliverable.addElementIfNotExist();
-    	var d = $("<div>").addClass("deliverable-creator-item"),
+    	var d = $("<div>").addClass("deliverable-creator-item").attr({"data-id":data.id}),
             temp_creator = storify.project.user.getUserDetail(data.creator_id),
             temp_remark = null,
             temp_status = null,
@@ -209,10 +219,15 @@ storify.brand.deliverable = {
                                         e.preventDefault();
                                         var remark = $(this).attr("title");
                                         $("#reject_reason .reason").text(remark ? remark : "no reason given.");
+
+                                        $("#reject_submission textarea").val(remark ? remark : "");
+                                        $("#reject_submission button.confirmreject").attr({"data-id":data.id});
+
                                         $("#reject_reason").modal("show");
                                     })
                                 );
                 d.addClass("item-rejected");
+                $("#reject_reason button.edit").attr({"data-id":data.id});
             }
         }else{
             d.addClass("item-pending");
@@ -276,7 +291,7 @@ storify.brand.deliverable = {
             d.append($("<div>").addClass("top_panel")
                     .append($("<small>").text(data.submit_tt))
                     .append($("<div>").addClass("single_block")
-                        .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<label>").append($("<span>").css({opacity:0.65}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
                         .append($("<input>").attr({type:"text",readonly:true})
                             .val(data.URL)
                             .click(function(e){
@@ -485,6 +500,10 @@ storify.brand.deliverable = {
         if($(a+" button.confirmreject").attr("data-id")){
             storify.brand.deliverable.response($(a+" button.confirmreject").attr("data-id"), "rejected", $(a+" textarea").val());
         }
+    },
+    edit_reason:function(e){
+        $("#reject_reason").modal("hide");
+        $("#reject_submission").modal("show");
     },
     shortenFileName:function(input){
         var a = input.slice(0, input.lastIndexOf(".")),

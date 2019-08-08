@@ -151,7 +151,7 @@ include("page/component/header.php"); ?>
                     "No invites yet. But press on, we are working hard to showcase your work to the brands you love.",
                     (index, value)=>{
                         console.log(value);
-                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Detail"}, {classname:"accept", label:"Accept"}, {classname:"reject", label:"Reject"}]));
+                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}, {classname:"accept", label:"Accept"}, {classname:"reject", label:"Reject"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
                             storify.creator.detail_invite.viewDetail(value.id);

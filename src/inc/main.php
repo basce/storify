@@ -86,7 +86,8 @@ class main{
 		curl_close($ch);
 
 		$output_obj = json_decode($output, true);
-		if($output_obj && $output_obj["ResponseMetadata"]){
+		//print_r($output);
+		if($output_obj && isset($output_obj["ResponseMetadata"])){
 			return array(
 				"error"=>0,
 				"status"=>$output_obj["Status"],

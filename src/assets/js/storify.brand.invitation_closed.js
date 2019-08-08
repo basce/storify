@@ -4,6 +4,7 @@ storify.brand = storify.brand || {};
 storify.brand.invitation_closed = {
 	addElementIfNotExist:function(){
 		if( !$("#single_invitation_dialog").length ){
+			/*
 			$("body").append(
 				$("<modal>").addClass("modal")
 					.attr({tabindex:"-1", role:"dialog", id:"single_invitation_dialog"})
@@ -70,6 +71,41 @@ storify.brand.invitation_closed = {
 			);
 
 			$("#single_invitation_dialog .modal-footer button").click(storify.brand.invitation_closed.dialog_click);
+			*/
+
+			var div = $(storify.template.simpleModal(
+				{
+					titlehtml:`Manage Invitation`,
+					bodyhtml:`
+					<div class="container">
+						<div class="row">
+							<div class="col-3">
+								<div class="profile-image"></div>
+							</div>
+							<div class="col-9">
+								<div>
+									<strong></strong>
+								</div>
+								<div>Status : <span class="status"></span>
+								</div>
+								<div class="remark">
+								</div>
+							</div>
+						</div>
+					</div>`
+				},
+				"single_invitation_dialog",
+				[
+					{
+						label:"Invite",
+						attr:{type:"button", class:"btn btn-primary invitation_dialog_button"}
+					}
+				]
+			));
+
+			div.find(".actions .invitation_dialog_button").click(storify.brand.invitation_closed.dialog_click);
+
+			$("body").append(div);
 		}
 	},
 	_updatingInvitation:false,
@@ -131,33 +167,24 @@ storify.brand.invitation_closed = {
         $(a+" .modal-body strong").empty()
         	.append($("<a>").attr({href:"/"+data.igusername, target:"_blank"}).text('@'+data.igusername))
         	.append(document.createTextNode(" ("+data.user_email+ ")"));
+
         switch(data.invitation_status){
         	case "rejected":
         		b.addClass("item-rejected").text("Rejected");
-        		$(a+" .profile-image").addClass("item-rejected");
-        		c.text("ok").attr({"data-id":data.user_id, "data-command_type":3});
         	break;
         	case "accepted":
-        		/*
         		b.addClass("item-accepted").text("Accepted");
-        		c.text("Remove Creator from Project").attr({"data-id":data.user_id, "data-command_type":3});
-        		*/
-        		b.addClass("item-accepted").text("Accepted");
-        		$(a+" .profile-image").addClass("item-accepted");
-        		c.text("Ok").attr({"data-id":data.user_id, "data-command_type":3});
         	break;
         	case "expired":
         		b.addClass("item-expired").text("Expired");
-        		$(a+" .profile-image").addClass("item-expired");
-        		c.text("Resend Invitation").attr({"data-id":data.user_id, "data-command_type":2});
         	break;
         	case "pending":
         	default:
         		b.addClass("item-pending").text("Waiting");
-        		$(a+" .profile-image").addClass("item-pending");
-        		c.text("ok").attr({"data-id":data.invitation_id, "data-command_type":3});
         	break;
         }
+        $(a+" .profile-image").addClass("item-pending");
+        c.text("ok").attr({"data-id":data.invitation_id, "data-command_type":3});
         if(data.remark){
         	$(a+" .remark").css({display:"block"}).text(data.remark);
         }else{

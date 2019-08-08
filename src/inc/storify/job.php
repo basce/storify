@@ -28,22 +28,22 @@ class job{
 	public static function add($user_id, $type, $data, $after){
 		global $wpdb;
 
-		$query = "INSERT INTO `".$wpdb->prefix."workjob` ( user_id, type, data, after, status ) VALUES ( %d, %s, %s, DATE_ADD(NOW(), INTERVAL %d MINUTE), %s )";
+		$query = "INSERT INTO `".$wpdb->prefix."workjob` ( user_id, type, data, after, status ) VALUES ( %d, %s, %s, FROM_UNIXTIME( UNIX_TIMESTAMP() + %d ), %s )";
 		$wpdb->query($wpdb->prepare($query, $user_id, $type, json_encode($data), $after, "new"));
 	}
 
 	public static function addUpdate($unique_code, $type, $data, $after){
-		global $wpdbl
+		global $wpdb;
 
 		$query = "SELECT id FROM `".$wpdb->prefix."workjob` WHERE unique_code = %s AND type = %s";
 		$job_id = $wpdb->get_var($wpdb->prepare($query, $unique_code, $type));
 		if($job_id){
 			//job exist, update with new after and data
-			$query = "UPDATE `".$wpdb->prefix."workjob` SET data = %s, after = DATE_ADD(NOW(), INTERVAL %d MINUTE), status = %s WHERE id = %d";
+			$query = "UPDATE `".$wpdb->prefix."workjob` SET data = %s, after = FROM_UNIXTIME( UNIX_TIMESTAMP() + %d ), status = %s WHERE id = %d";
 			$wpdb->query($wpdb->prepare($query, json_encode($data), $after, "new", $job_id)); //reset status back to new
 		}else{
 			//job not exist
-			$query = "INSERT INTO `".$wpdb->prefix."workjob` ( unique_code, type, data, after, status ) VALUES ( %s, %s, %s, DATE_ADD(NOW(), INTERVAL %d MINUTE), %s )";
+			$query = "INSERT INTO `".$wpdb->prefix."workjob` ( unique_code, type, data, after, status ) VALUES ( %s, %s, %s, FROM_UNIXTIME( UNIX_TIMESTAMP() + %d ), %s )";
 			$wpdb->query($wpdb->prepare($query, $unique_code, $type, json_encode($data), $after, "new"));
 		}
 	}
@@ -126,5 +126,19 @@ class job{
 				"exist"=>0
 			);
 		}
+	}
+
+	public static function addFlag($flag){
+		global $wpdb;
+
+		$query = "INSERT INTO `".$wpdb->prefix."flag` ( flag ) VALUES ( %s )";
+		$wpdb->query($wpdb->prepare($query, $flag));
+	}
+
+	public static function checkFlagExist($flag){
+		global $wpdb;
+
+		$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."flag` WHERE flag = %s";
+		return $wpdb->get_var($wpdb->prepare($query, $flag));
 	}
 }

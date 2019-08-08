@@ -32,6 +32,7 @@ storify.creator.detail_closed = {
         }
         */
         if( !$("#deliverableModal").length ){
+            /*
             $("body").append(
                 $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"deliverableModal"})
                     .append($("<div>").addClass("modal-dialog modal-xl").attr({role:"document"})
@@ -47,6 +48,18 @@ storify.creator.detail_closed = {
                         )
                     )
             );
+            */
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:``,
+                    bodyhtml:`<div class="deliverable-groups"></div>`
+                },
+                "deliverableModal",
+                []
+            ));
+
+            $("body").append(div);
         }
         if( !$("#newDetailModal").length ){
             $("body").append(
@@ -132,6 +145,7 @@ storify.creator.detail_closed = {
             });
         }   
         if( !$("#rejectModal").length ){
+            /*
             $("body").append(
                 $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"rejectModal"})
                     .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
@@ -151,8 +165,26 @@ storify.creator.detail_closed = {
                         )
                     )
             );
+            */
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:``,
+                    bodyhtml:``
+                },
+                "rejectModal",
+                [   
+                    {
+                        label:"ok",
+                        attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
         }
         if (!$("#downloadLinkModal").length) {
+            /*
             $("body").append(
                 $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
                 .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
@@ -174,6 +206,27 @@ storify.creator.detail_closed = {
                     )
                 )
             );
+            */
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:``,
+                    bodyhtml:`
+                    <a class="filename" download></a>
+                    <div class="filesize"></div>
+                    <div class="filemime"></div>
+                    `
+                },
+                "downloadLinkModal",
+                [   
+                    {
+                        label:"download",
+                        attr:{type:"button", class:"btn btn-primary small download", href:"", download:""}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
         }
     },
     createBountyTable:function(detail){

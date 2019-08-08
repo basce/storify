@@ -1,6 +1,7 @@
 <?php  
 $email = isset($_POST["email"])?$_POST["email"] : "";
 $password = isset($_POST["password"])?$_POST["password"] : "";
+$login_redirect = isset($_POST["redirect"])?$_POST["redirect"]: "";
 
 $result = wp_signon(array(
 	"user_login"=>$email,

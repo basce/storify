@@ -182,6 +182,8 @@ foreach( $batchEmailTask as $key => $value ){
 					//sent fail
 					job::updateBatch($job_ids,"retry");
 				}
+			}else{
+				print_r($email_result);
 			}
 		}else{
 			//no data
@@ -320,6 +322,7 @@ function worker_job_project_close($data){
 	foreach($creators_submission as $key=>$value){
 		$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 		$igusername = $wpdb->get_var($wpdb->prepare($query, $value["creator_id"]));
+		$igusername = $igusername ? $igusername : "igusername";
 
 		if(sizeof($value["data"])){
 			foreach($value["data"] as $key2=>$value2){
@@ -363,94 +366,164 @@ function worker_job_project_close($data){
 
 	$payment_total += sizeof($creators_submission) * 99;
 
-	foreach($users as $key=>$value){
-		if($value["role"] == "admin"){
+	if(!isset($data["creator_only"])){ // if creator_only, no admin email
+		foreach($users as $key=>$value){
+			if($value["role"] == "admin"){
 
-			$user = get_user_by('id', $value["user_id"]);
+				$user = get_user_by('id', $value["user_id"]);
 
-			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
-			$email_url = $user->user_email;
+				$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
+				$email_url = $user->user_email;
 
-			$item_data = array(
-				"to"=>array(
-					"name"=>$email_name,
-					"email"=>$email_url
-				),
-				"data"=>array(
-					"project_name"=>$project_name,
-					"first_name"=>$first_name,
-					"brand"=>$brand,
-					"submissions_payment_detail_list"=>$submissions_payment_detail_list,
-					"submissions_payment_detail_list_plain"=>$submissions_payment_detail_list_plain,
-					"payment_total"=>$payment_total,
-					"final_link"=>$project_link."/final",
-					"new_project_link"=>get_home_url()."/project/new",
-					"submission_complete_list"=>"<p>".$summary_line."</p>".$submissions_payment_detail_list,
-					"submission_complete_list_plain"=>$summary_line."\n".$submissions_payment_detail_list_plain,
-					"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
-					"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
-					"submit_link"=>$project_link."/submit"
-				)
-			);
+				$item_data = array(
+					"to"=>array(
+						"name"=>$email_name,
+						"email"=>$email_url
+					),
+					"data"=>array(
+						"project_name"=>$project_name,
+						"first_name"=>$first_name,
+						"brand"=>$brand,
+						"submissions_payment_detail_list"=>$submissions_payment_detail_list,
+						"submissions_payment_detail_list_plain"=>$submissions_payment_detail_list_plain,
+						"payment_total"=>$payment_total,
+						"final_link"=>$project_link."/final",
+						"new_project_link"=>get_home_url()."/project/new",
+						"submission_complete_list"=>"<p>".$summary_line."</p>".$submissions_payment_detail_list,
+						"submission_complete_list_plain"=>$summary_line."\n".$submissions_payment_detail_list_plain,
+						"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
+						"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
+						"submit_link"=>$project_link."/submit"
+					)
+				);
 
-			$pass_data[] = array(
-				"template"=>"storify_project_close_brand",
-				"data"=>$item_data
-			);
+				$pass_data[] = array(
+					"template"=>"storify_project_close_brand",
+					"data"=>$item_data
+				);
 
-		}else{
-			//ignore
-		}
-	}
-
-	//creator
-
-	foreach($creators_submission as $key=>$value){
-		if(sizeof($value["creator_data_sentence"])){
-			$user = get_user_by('id', $value["creator_id"]);
-
-			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
-			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["creator_id"]));
-
-			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
-			$email_url = $user->user_email;
-
-			$submission_payment_sentence = $brand." has accepted ".( sizeof($value["creator_data_sentence"]) == 1 ? "1 submission" : sizeof($value["creator_data_sentence"])." submissions" )." and you will receive S$".$value["total_amount"].".";
-			$submission_payment_detail_list = "";
-			$submission_payment_detail_list_plain = "";
-
-			$submission_payment_detail_list = "<p><ol>";
-			$count = 1;
-			foreach($value["creator_data_sentence"] as $key2=>$value2){
-				$submission_payment_detail_list .= "<li>".$value2."</li>";
-				$submission_payment_detail_list_plain .= "\n".$count.") ".$value2;
-				$count++;
+			}else{
+				//ignore
 			}
-			$submission_payment_detail_list = "</ol></p>";
+		}
 
-			$item_data = array(
-				"to"=>array(
-					"name"=>$email_name,
-					"email"=>$email_url
-				),
-				"data"=>array(
-					"project_name"=>$project_name,
-					"brand"=>$brand,
-					"first_name"=>$first_name,
-					"igusername"=>$igusername,
-					"submission_payment_sentence"=>$submission_payment_sentence,
-					"submission_payment_detail_list"=>$submission_payment_detail_list,
-					"submission_payment_detail_list_plain"=>$submission_payment_detail_list_plain,
-					"payment_total"=>$value["total_amount"],
-					"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
-					"final_link"=>$project_link."/final"
-				)
-			);
+		//creator
+		foreach($creators_submission as $key=>$value){
+			if(sizeof($value["creator_data_sentence"])){
+				//if user is in exlude list, skip email
 
-			$pass_data[] = array(
-				"template"=>"storify_project_close_creator",
-				"data"=>$item_data
-			);
+				if(job::checkFlagExist("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"])){
+					continue;
+				}
+
+				job::addFlag("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"]);
+
+				$user = get_user_by('id', $value["creator_id"]);
+
+				$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
+				$igusername = $wpdb->get_var($wpdb->prepare($query, $value["creator_id"]));
+				$igusername = $igusername ? $igusername : "igusername";
+
+				$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
+				$email_url = $user->user_email;
+
+				$submission_payment_sentence = $brand." has accepted ".( sizeof($value["creator_data_sentence"]) == 1 ? "1 submission" : sizeof($value["creator_data_sentence"])." submissions" )." and you will receive S$".$value["total_amount"].".";
+				$submission_payment_detail_list = "";
+				$submission_payment_detail_list_plain = "";
+
+				$submission_payment_detail_list = "<p><ol>";
+				$count = 1;
+				foreach($value["creator_data_sentence"] as $key2=>$value2){
+					$submission_payment_detail_list .= "<li>".$value2."</li>";
+					$submission_payment_detail_list_plain .= "\n".$count.") ".$value2;
+					$count++;
+				}
+				$submission_payment_detail_list = "</ol></p>";
+
+				$item_data = array(
+					"to"=>array(
+						"name"=>$email_name,
+						"email"=>$email_url
+					),
+					"data"=>array(
+						"project_name"=>$project_name,
+						"brand"=>$brand,
+						"first_name"=>$first_name,
+						"igusername"=>$igusername,
+						"submission_payment_sentence"=>$submission_payment_sentence,
+						"submission_payment_detail_list"=>$submission_payment_detail_list,
+						"submission_payment_detail_list_plain"=>$submission_payment_detail_list_plain,
+						"payment_total"=>$value["total_amount"],
+						"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
+						"final_link"=>$project_link."/final"
+					)
+				);
+
+				$pass_data[] = array(
+					"template"=>"storify_project_close_creator",
+					"data"=>$item_data
+				);
+			}
+		}
+	}else{
+		// single creator
+
+		foreach($creators_submission as $key=>$value){
+			if(sizeof($value["creator_data_sentence"]) && $value["creator_id"] == $data["creator_only"]){
+				//if user is in exlude list, skip email
+
+				if(job::checkFlagExist("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"])){
+					continue;
+				}
+
+				job::addFlag("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"]);
+
+				$user = get_user_by('id', $value["creator_id"]);
+
+				$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
+				$igusername = $wpdb->get_var($wpdb->prepare($query, $value["creator_id"]));
+				$igusername = $igusername ? $igusername : "igusername";
+
+				$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
+				$email_url = $user->user_email;
+
+				$submission_payment_sentence = $brand." has accepted ".( sizeof($value["creator_data_sentence"]) == 1 ? "1 submission" : sizeof($value["creator_data_sentence"])." submissions" )." and you will receive S$".$value["total_amount"].".";
+				$submission_payment_detail_list = "";
+				$submission_payment_detail_list_plain = "";
+
+				$submission_payment_detail_list = "<p><ol>";
+				$count = 1;
+				foreach($value["creator_data_sentence"] as $key2=>$value2){
+					$submission_payment_detail_list .= "<li>".$value2."</li>";
+					$submission_payment_detail_list_plain .= "\n".$count.") ".$value2;
+					$count++;
+				}
+				$submission_payment_detail_list = "</ol></p>";
+
+				$item_data = array(
+					"to"=>array(
+						"name"=>$email_name,
+						"email"=>$email_url
+					),
+					"data"=>array(
+						"project_name"=>$project_name,
+						"brand"=>$brand,
+						"first_name"=>$first_name,
+						"igusername"=>$igusername,
+						"submission_payment_sentence"=>$submission_payment_sentence,
+						"submission_payment_detail_list"=>$submission_payment_detail_list,
+						"submission_payment_detail_list_plain"=>$submission_payment_detail_list_plain,
+						"payment_total"=>$value["total_amount"],
+						"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
+						"final_link"=>$project_link."/final"
+					)
+				);
+
+				$pass_data[] = array(
+					"template"=>"storify_project_close_creator",
+					"data"=>$item_data
+				);
+			}
 		}
 	}
 
@@ -520,6 +593,14 @@ function worker_job_project_payment_confirm($data){
 
 	$pass_data = array();
 
+	if(!$cash){
+		return array(
+			"complete"=>1,
+			"type"=>"emails",
+			"emaildatas"=>$pass_data
+		);
+	}
+
 	//get summary 
 	$query = "SELECT id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d AND creator_id = %d AND status = %s ORDER BY id ASC";
 	$submissions = $wpdb->get_results($wpdb->prepare($query, $data["project_id"], $data["creator_id"], "accepted"), ARRAY_A);
@@ -545,6 +626,7 @@ function worker_job_project_payment_confirm($data){
 
 	$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 	$igusername = $wpdb->get_var($wpdb->prepare($query, $data["creator_id"]));
+	$igusername = $igusername ? $igusername : "igusername";
 
 	$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 	$email_url = $user->user_email;
@@ -724,6 +806,7 @@ function worker_job_project_status_change($data){
 
 	$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 	$igusername = $wpdb->get_var($wpdb->prepare($query, $data["creator_id"]));
+	$igusername = $igusername ? $igusername : "igusername";
 
 	$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 	$email_url = $user->user_email;
@@ -878,6 +961,7 @@ function worker_job_project_summary($data){
 		foreach($creators_submission as $key=>$value){
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["creator_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			if(sizeof($value["data"])){
 				foreach($value["data"] as $key2=>$value2){
@@ -1070,6 +1154,7 @@ function worker_job_submission_complete($data){
 
 		$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 		$igusername = $wpdb->get_var($wpdb->prepare($query, $value["creator_id"]));
+		$igusername = $igusername ? $igusername : "igusername";
 
 		$sub_sentence = "";
 		if($project["data"]["detail"]->no_of_photo == 0){
@@ -1136,6 +1221,7 @@ function worker_job_submission_complete($data){
 
 	$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 	$igusername = $wpdb->get_var($wpdb->prepare($query, $data["creator_id"]));
+	$igusername = $igusername ? $igusername : "igusername";
 
 	$item_data = array(
 		"to"=>array(
@@ -1324,10 +1410,19 @@ function worker_job_submission_close($data){
 							
 		}else if($value["role"] == "creator"){
 
+			//skip creator that is closed 
+			$query = "SELECT COUNT(*) as `cnt` WHERE `".$wpdb->prefix."_project_status` WHERE user_id = %d AND project_id = %d AND status = %s";
+			if($wpdb->get_var($wpdb->prepare($query, $value["user_id"], $project["data"]["detail"]->id, "close"))){
+
+				continue;
+				
+			}
+
 			$user = get_user_by('id', $value["user_id"]);
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -1492,10 +1587,19 @@ function worker_job_submission_closing_before_1($data){
 	foreach($users as $key=>$value){
 		if($value["role"] == "creator"){
 
+			//skip creator that is closed 
+			$query = "SELECT COUNT(*) as `cnt` WHERE `".$wpdb->prefix."_project_status` WHERE user_id = %d AND project_id = %d AND status = %s";
+			if($wpdb->get_var($wpdb->prepare($query, $value["user_id"], $project["data"]["detail"]->id, "close"))){
+
+				continue;
+				
+			}
+
 			$user = get_user_by('id', $value["user_id"]);
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -1600,10 +1704,19 @@ function worker_job_submission_closing_before_3($data){
 	foreach($users as $key=>$value){
 		if($value["role"] == "creator"){
 
+			//skip creator that is closed 
+			$query = "SELECT COUNT(*) as `cnt` WHERE `".$wpdb->prefix."_project_status` WHERE user_id = %d AND project_id = %d AND status = %s";
+			if($wpdb->get_var($wpdb->prepare($query, $value["user_id"], $project["data"]["detail"]->id, "close"))){
+
+				continue;
+				
+			}
+
 			$user = get_user_by('id', $value["user_id"]);
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -1717,10 +1830,18 @@ function worker_job_project_brief_update($data){
 	foreach($users as $key=>$value){
 		if($value["role"] == "creator"){
 
+			//skip creator that is closed 
+			$query = "SELECT COUNT(*) as `cnt` WHERE `".$wpdb->prefix."_project_status` WHERE user_id = %d AND project_id = %d AND status = %s";
+			if($wpdb->get_var($wpdb->prepare($query, $value["user_id"], $project["data"]["detail"]->id, "close"))){
+
+				continue;
+
+			}
 			$user = get_user_by('id', $value["user_id"]);
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -1764,6 +1885,7 @@ function worker_job_project_brief_update($data){
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -1925,6 +2047,7 @@ function worker_job_project_invite_expired($data){
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -2034,6 +2157,7 @@ function worker_job_project_invite_expire_before_1($data){
 
 			$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
 			$igusername = $wpdb->get_var($wpdb->prepare($query, $value["user_id"]));
+			$igusername = $igusername ? $igusername : "igusername";
 
 			$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 			$email_url = $user->user_email;
@@ -2046,7 +2170,7 @@ function worker_job_project_invite_expire_before_1($data){
 				"data"=>array(
 					"brand"=>$brand,
 					"project_name"=>$project_name,
-					"invite_close_date"=>"",
+					"invite_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["invitation_closing_date"])),
 					"first_name"=>$first_name,
 					"igusername"=>$igusername,
 					"project_link"=>$project_link,

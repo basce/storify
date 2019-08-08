@@ -4,6 +4,7 @@ storify.brand = storify.brand || {};
 storify.brand.invitation = {
 	addElementIfNotExist:function(){
 		if( !$("#single_invitation_dialog").length ){
+			/*
 			$("body").append(
 				$("<modal>").addClass("modal")
 					.attr({tabindex:"-1", role:"dialog", id:"single_invitation_dialog"})
@@ -68,8 +69,41 @@ storify.brand.invitation = {
 							)
 					)
 			);
+			*/
 
-			$("#single_invitation_dialog .modal-footer button").click(storify.brand.invitation.dialog_click);
+			var div = $(storify.template.simpleModal(
+				{
+					titlehtml:`Manage Invitation`,
+					bodyhtml:`
+					<div class="container">
+						<div class="row">
+							<div class="col-3">
+								<div class="profile-image"></div>
+							</div>
+							<div class="col-9">
+								<div>
+									<strong></strong>
+								</div>
+								<div>Status : <span class="status"></span>
+								</div>
+								<div class="remark">
+								</div>
+							</div>
+						</div>
+					</div>`
+				},
+				"single_invitation_dialog",
+				[
+					{
+						label:"Invite",
+						attr:{type:"button", class:"btn btn-primary invitation_dialog_button"}
+					}
+				]
+			));
+
+			div.find(".actions .invitation_dialog_button").click(storify.brand.invitation.dialog_click);
+
+			$("body").append(div);
 		}
 	},
 	_updatingInvitation:false,

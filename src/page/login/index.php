@@ -47,8 +47,13 @@ $header_without_toggle_button = true;
 include("page/component/header.php"); ?>
                 <div class="page-title">
                     <div class="container">
-                        <h1>Sign in</h1>
-                        <h2>Hello! Welcome back. Here's to many great stories.</h2>
+                        <?php if( isset($_GET["redirect"]) && $_GET["redirect"] ){ ?>
+                            <h1>Please sign in!</h1>
+                            <h2>Hello! Members only. Please authenticate here.</h2>
+                        <?php }else{ ?>
+                            <h1>Sign in</h1>
+                            <h2>Hello! Welcome back. Here's to many great stories.</h2>
+                        <?php } ?>
                     </div>
                     <!--end container-->
                 </div>
@@ -81,6 +86,7 @@ include("page/component/header.php"); ?>
                                     <div class="input-group-row">
                                         <label for="email" class="col-form-label required">Enter your email address</label>
                                         <input name="email" type="email" class="form-control" id="email" placeholder="Email">
+                                        <input name="redirect" type="hidden" value="<?=isset($_GET["redirect"])?$_GET["redirect"]:""?>">
                                     </div>
                                     <div class="alert alert-danger hide">This field is required.</div>
                                 </div>

@@ -3,7 +3,9 @@ storify.brand = storify.brand || {};
 
 storify.brand.deliverable_closed = {
 	addElementIfNotExist:function(){
+        var div;
 		if( !$("#reject_submission").length ){
+            /*
 			$("body").append(
 				$("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"reject_submission"})
 					.append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
@@ -22,9 +24,36 @@ storify.brand.deliverable_closed = {
 							)
 						)
 					)
-			);
+			);*/
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Reject Submission`,
+                    bodyhtml:`
+                    <h3>Provide a reason why the submission is rejected so creator can make amendment according to you comments. (optional)</h3>
+                    <textarea class="form-control" rows="4"></textarea>
+                    `
+                },
+                "reject_submission",
+                [   
+                    {
+                        label:"Cancel",
+                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                    },
+                    {
+                        label:"Reject",
+                        attr:{type:"button", class:"btn btn-primary small confirmreject"}
+                    }
+                ]
+            ));
+
+            div.find(".actions .confirmreject").click(storify.brand.invitation_closed.dialog_click);
+
+            $("body").append(div);
 		}
         if( !$("#reject_reason").length ){
+
+            /*
             $("body").append(
                 $("<modal>").addClass("modal").attr({tabindex:-1, role:"dialog", id:"reject_reason"})
                     .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({role:"document"})
@@ -41,9 +70,28 @@ storify.brand.deliverable_closed = {
                             )
                         )
                     )
-            );
+            );*/
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Reject Reason`,
+                    bodyhtml:`
+                    <p class="reason"></p>
+                    `
+                },
+                "reject_reason",
+                [   
+                    {
+                        label:"Close",
+                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
         }
         if (!$("#downloadLinkModal").length) {
+            /*
             $("body").append(
                 $("<modal>").addClass("modal").attr({ tabindex: -1, role: "dialog", id: "downloadLinkModal" })
                 .append($("<div>").addClass("modal-dialog modal-dialog-centered").attr({ role: "document" })
@@ -65,6 +113,27 @@ storify.brand.deliverable_closed = {
                     )
                 )
             );
+            */
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:``,
+                    bodyhtml:`
+                    <a class="filename" download></a>
+                    <div class="filesize"></div>
+                    <div class="filemime"></div>
+                    `
+                },
+                "downloadLinkModal",
+                [   
+                    {
+                        label:"download",
+                        attr:{type:"button", class:"btn btn-primary small download", href:"", download:""}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
         }
 	},
     _gettingHistory:false,
@@ -239,7 +308,7 @@ storify.brand.deliverable_closed = {
             d.append($("<div>").addClass("top_panel")
     	                .append($("<small>").text(data.submit_tt))
     	                .append($("<div>").addClass("single_block")
-    	                    .append($("<label>").text("Submission").prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+    	                    .append($("<label>").append($("<span>").css({opacity:0.65}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
     	                    .append($("<input>").attr({type:"text",readonly:true})
     	                        .val(data.URL)
     	                        .click(function(e){
