@@ -416,7 +416,7 @@ function worker_job_project_close($data){
 					continue;
 				}
 
-				job::addFlag("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"]);
+				job::addFlag("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"],$project["data"]["detail"]->id,$value["creator_id"]);
 
 				$user = get_user_by('id', $value["creator_id"]);
 
@@ -476,7 +476,7 @@ function worker_job_project_close($data){
 					continue;
 				}
 
-				job::addFlag("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"]);
+				job::addFlag("project_close_".$project["data"]["detail"]->id."_".$value["creator_id"],$project["data"]["detail"]->id,$value["creator_id"]);
 
 				$user = get_user_by('id', $value["creator_id"]);
 
@@ -1015,31 +1015,40 @@ function worker_job_project_summary($data){
 				$first_name = $email_name = $user->first_name ? $user->first_name : $user->display_name;
 				$email_url = $user->user_email;
 
-				$item_data = array(
-					"to"=>array(
-						"name"=>$email_name,
-						"email"=>$email_url
-					),
-					"data"=>array(
-						"project_name"=>$project_name,
-						"first_name"=>$first_name,
-						"submission_complete_list"=>"<p>".$summary_line_1."<br />".$summary_line_2."</p>".$submission_complete_list,
-						"submission_complete_list_plain"=>$summary_line_1."\n".$summary_line_2.$submission_complete_list_plain,
-						"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
-						"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
-						"submit_link"=>$project_link."/submit"
-					)
-				);
+				if(job::checkFlagExist("project_submission_complete_".$project["data"]["detail"]->id)){
+					// flag found, skip email
+				}else{
+					$item_data = array(
+						"to"=>array(
+							"name"=>$email_name,
+							"email"=>$email_url
+						),
+						"data"=>array(
+							"project_name"=>$project_name,
+							"first_name"=>$first_name,
+							"submission_complete_list"=>"<p>".$summary_line_1."<br />".$summary_line_2."</p>".$submission_complete_list,
+							"submission_complete_list_plain"=>$summary_line_1."\n".$summary_line_2.$submission_complete_list_plain,
+							"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
+							"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
+							"submit_link"=>$project_link."/submit"
+						)
+					);
 
-				$pass_data[] = array(
-					"template"=>"storify_submission_status_change_brand",
-					"data"=>$item_data
-				);
+					$pass_data[] = array(
+						"template"=>"storify_submission_status_change_brand",
+						"data"=>$item_data
+					);
+				}
 
 			}else{
 				//ignore
 			}
 		}
+	}
+
+	//add flag if all submission is approved.
+	if( ( $total_photo_submission + $total_video_submission - $photos_accepted_requested - $videos_accepted_requested ) == 0 ){
+		job::addFlag("project_submission_complete_".$project["data"]["detail"]->id, $project["data"]["detail"]->id);
 	}
 
 	return array(

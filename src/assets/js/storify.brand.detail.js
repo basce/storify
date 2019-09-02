@@ -367,13 +367,17 @@ storify.brand.detail = {
             });
 
             var list_bountytext = "";
+            var list_bountyicon = "";
             if(list_summary.bounty.length == 2){
-                list_bountytext = "$" + list_summary.bounty[0].value + " & " + list_summary.bounty[1].value;
+                list_bountytext = "$" + storify.project.formatMoney(list_summary.bounty[0].value) + " & " + list_summary.bounty[1].value;
+                list_bountyicon = '<i class="fa fa-money" aria-hidden="true"></i> & <i class="fa fa-gift" aria-hidden="true"></i>';
             }else{
                 if(list_summary.bounty[0].type == "cash"){
-                    list_bountytext = "$" + list_summary.bounty[0].value;
+                    list_bountytext = "$" + storify.project.formatMoney(list_summary.bounty[0].value);
+                    list_bountyicon = '<i class="fa fa-money" aria-hidden="true"></i>';
                 }else{
                     list_bountytext = list_summary.bounty[0].value;
+                    list_bountyicon = '<i class="fa fa-gift" aria-hidden="true"></i>';
                 }
             }
 
@@ -415,7 +419,7 @@ storify.brand.detail = {
             list_item.append($("<div>").addClass("wrapper")
                 .append(list_div_image
                     .append(list_brand_tags)
-                    .append($("<div>").attr({title:list_bountytext}).addClass("price").text(list_bountytext))
+                    .append($("<div>").attr({title:list_bountytext}).addClass("price").html(list_bountyicon))
                 )
                 .append($("<div>").addClass("content")
                     .append(list_title)
@@ -434,7 +438,7 @@ storify.brand.detail = {
                 )
             )
         }
-        //bramd
+        //brand
         var brandtext = [];
         if(data.summary.brand && data.summary.brand.length){
             $.each(data.summary.brand, function(index, value){

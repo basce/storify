@@ -130,7 +130,7 @@ foreach($project_ids as $key=>$value){
 
 	}else{
 		// send whole project close email
-		job::addFlag("project_close_".$value);
+		job::addFlag("project_close_".$value, $value);
 		job::add(0, "project_close", array(
 	        "project_id"=>$value
 	    ), 1);

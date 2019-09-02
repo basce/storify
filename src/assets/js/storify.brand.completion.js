@@ -123,11 +123,11 @@ storify.brand.completion = {
 				[
 					{
 						label:"Cancel",
-						attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+						attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
 					},
 					{
 						label:"Confirm",
-						attr:{type:"button", class:"btn btn-primary small confirm"}	
+						attr:{href:"#", class:"btn btn-primary small confirm"}	
 					}
 				]
 			));
@@ -148,11 +148,11 @@ storify.brand.completion = {
 				[
 					{
 						label:"Cancel",
-						attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+						attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
 					},
 					{
 						label:"Confirm",
-						attr:{type:"button", class:"btn btn-primary small confirm"}	
+						attr:{href:"#", class:"btn btn-primary small confirm"}	
 					}
 				]
 			));
@@ -172,11 +172,11 @@ storify.brand.completion = {
 				[
 					{
 						label:"Cancel",
-						attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+						attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
 					},
 					{
 						label:"Confirm",
-						attr:{type:"button", class:"btn btn-primary small confirm"}	
+						attr:{href:"#", class:"btn btn-primary small confirm"}	
 					}
 				]
 			));

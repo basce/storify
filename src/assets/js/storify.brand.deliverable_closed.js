@@ -28,7 +28,7 @@ storify.brand.deliverable_closed = {
 
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:`Reject Submission`,
+                    titlehtml:`Updates Needed`,
                     bodyhtml:`
                     <h3>Provide a reason why the submission is rejected so creator can make amendment according to you comments. (optional)</h3>
                     <textarea class="form-control" rows="4"></textarea>
@@ -38,11 +38,11 @@ storify.brand.deliverable_closed = {
                 [   
                     {
                         label:"Cancel",
-                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                        attr:{href:"#",class:"btn btn-primary small", "data-dismiss":"modal"}
                     },
                     {
                         label:"Reject",
-                        attr:{type:"button", class:"btn btn-primary small confirmreject"}
+                        attr:{href:"#",class:"btn btn-primary small confirmreject"}
                     }
                 ]
             ));
@@ -74,7 +74,7 @@ storify.brand.deliverable_closed = {
 
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:`Reject Reason`,
+                    titlehtml:`Updates Needed`,
                     bodyhtml:`
                     <p class="reason"></p>
                     `
@@ -83,7 +83,7 @@ storify.brand.deliverable_closed = {
                 [   
                     {
                         label:"Close",
-                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                        attr:{href:"#",class:"btn btn-primary small", "data-dismiss":"modal"}
                     }
                 ]
             ));
@@ -127,8 +127,8 @@ storify.brand.deliverable_closed = {
                 "downloadLinkModal",
                 [   
                     {
-                        label:"download",
-                        attr:{type:"button", class:"btn btn-primary small download", href:"", download:""}
+                        label:"Download",
+                        attr:{class:"btn btn-primary small download", href:"#", download:""}
                     }
                 ]
             ));
@@ -228,6 +228,9 @@ storify.brand.deliverable_closed = {
         if(data.remark){
             temp_remark = $("<div>").addClass("single_block urldescription")
                                 .append($("<p>").text(data.remark));
+        }else{
+            temp_remark = $("<div>").addClass("single_block urldescription")
+                                .append($("<p>").append($("<i>").text("No caption entered.")));
         }
         if(data.status == "accepted" || data.status == "rejected"){
             if(data.status == "accepted"){

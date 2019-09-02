@@ -11,9 +11,13 @@ require_once(__DIR__.'/storify/bookmark.php');
 require_once(__DIR__.'/storify/pagesettings.php');
 require_once(__DIR__.'/storify/notification.php');
 require_once(__DIR__.'/storify/job.php');
+require_once(__DIR__.'/storify/stripe.php');
+require_once(__DIR__.'/storify/business_group.php');
 require_once(__DIR__.'/storify/project/project.php');
 require_once(__DIR__."/noisycrayons/phpemail/mailer.php");
 require_once(__DIR__."/vendor/autoload.php");
+
+\Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
 use storify\project as project;
 use storify\bookmark as bookmark;
@@ -2039,6 +2043,99 @@ class main{
 		$query = "INSERT INTO `".$wpdb->prefix."workjoblog` ( msg, raw_data ) VALUES ( %s, %s )";
 		$wpdb->query($wpdb->prepare($query, $msg, json_encode($data)));
 	}
+/*
+	function removeAWSImage($filename){
+		global $as3cf;
+
+		if($as3cf){
+			$acl = $as3cf->get_aws()->get_default_acl();
+			$s3Client = $as3cf->get_s3client();
+			try{
+				$s3Client->delete_object(array(
+					'Bucket' => $as3cf->get_setting('bucket'),
+					'Key' => $filename
+				));
+				return array(
+					"error"=>0,
+					"msg"=>""
+				);
+			}catch(Exception $e){
+				return array(
+					"error"=>1,
+					"msg"=>$e->getMessage()
+				);
+			}			
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>"Missing aws3 plugins"
+			);
+		}
+	}
+
+	function handleUploadedSquareImage($file, $target_min_size){
+		global $as3cf; //require amazon-s3 wp plugin
+
+		$image = wp_get_image_editor($file["tmp_name"]);
+
+		if(! is_wp_error($image) ){
+			$size = $image->get_size();
+			$type = $file["type"];
+
+			$min_size = $size["width"] > $size["height"] ? $size["height"] : $size["width"];
+			$min_size = $min_size > $target_min_size ? $target_min_size : $min_size;
+
+			$image->resize($min_size, $min_size, true);
+
+			$upload_dir = wp_upload_dir();
+			$file_name = time().$file["name"];
+			$destfilename = $upload_dir["basedir"].'/tmp/'.$file_name;
+			$image->save($destfilename);
+
+			if($as3cf){
+				$acl = $as3cf->get_aws()->get_default_acl();
+				$aws_filename = \AS3CF_Utils::trailingslash_prefix('profiles') . $file_name;
+				$args = array(
+					'Bucket'		=> $as3cf->get_setting('bucket'),
+					'Key'			=> $aws_filename,
+					'SourceFile'	=> $destfilename,
+					'ACL'			=> $acl,
+					'ContentType'	=> $type,
+					'CacheControl'  => 'max-age=31536000',
+					'Expires'       => date( 'D, d M Y H:i:s O', time() + 31536000 ),
+				);
+
+				$s3Client = $as3cf->get_s3client();
+
+				try{
+					$s3Client->upload_object($args);
+					unlink($destfilename);
+					return array(
+						"error"=>0,
+						"msg"=>"",
+						"filename"=>$aws_filename
+					);
+				}catch(Exception $e){
+					return array(
+						"error"=>1,
+						"msg"=>$e->getMessage(),
+						"filename"=>$destfilename
+					);
+				}
+			}else{
+				return array(
+					"error"=>1,
+					"msg"=>"Missing aws3 plugins"
+				);
+			}
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>$image->get_error_message()
+			);
+		}
+
+	} */
 
 	function getS3UploadPresignedLink($filekey, $filemime){
 		$s3 = new \Aws\S3\S3Client(array(

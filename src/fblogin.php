@@ -20,7 +20,7 @@ if(isset($_GET["error"])){
 
         $data = array(
             "client_id"=>"310258729772529",
-            "redirect_uri"=>get_home_url()."fblogin/",
+            "redirect_uri"=>get_home_url()."/fblogin/",
             "client_secret"=>"ba5028fba82a694a79cfa50a89ef92dc",
             "code"=>$_GET["code"]
         );
@@ -117,7 +117,7 @@ if(isset($_GET["error"])){
             }
             
         }else{
-            $error_msg = $response_obj["error"]["message"];
+            $error_msg = json_encode(array("call"=>'https://graph.facebook.com/v3.1/oauth/access_token?'.http_build_query($data), "response"=>$response_obj));
             include_once("page/error/index.php");
             exit();
         }

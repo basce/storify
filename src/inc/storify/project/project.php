@@ -420,7 +420,7 @@ class project{
 		SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `wp_project_invitation` a LEFT JOIN ( SELECT m1.* FROM `wp_project_invitation_response` m1 LEFT JOIN `wp_project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL) b ON a.id = b.invitation_id WHERE project_id = 1
 		 */
 		
-		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, user_email, action, remark, REPLACE(REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/'), 'https://staging.storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, b.user_email, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g ON f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s AND f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
+		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, user_email, action, remark, REPLACE(REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/'), 'https://staging.storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, b.user_email, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g ON f.user_id = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s AND f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
 
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43, "removed", "closed"), ARRAY_A); // field_id 43 is the profile image for instagrammer_fast
 
@@ -586,7 +586,6 @@ class project{
 			default:
 				$orderByCond = " ORDER BY b.invitation_closing_date ASC";
 			break;
-
 		}
 
 		if($filter == "all"){
@@ -715,7 +714,7 @@ class project{
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
-			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
+			$data[$key]["duesoon"] = ( ($filter != "close") && ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 )  ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
 		}
 
@@ -790,7 +789,7 @@ class project{
 			$data[$key]["summary"]["formatted_created_date"] = date('j M y H:i',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["formatted_created_date2"] = date('d-m-y',strtotime($data[$key]["summary"]["created_date"]));
 			$data[$key]["summary"]["created_timestamp"] = strtotime($data[$key]["summary"]["created_date"]);
-			$data[$key]["duesoon"] = ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ? true : false;
+			$data[$key]["duesoon"] = ( ($filter != "close") && ( strtotime($data[$key]["summary"]["closing_date"]) - time() ) < 172800 ) ? true : false;
 			$data[$key]["deliverables"] = $this->getDeliverablesStats($value["id"], $user_id);
 		}
 
@@ -1388,7 +1387,6 @@ class project{
             "creator_id"=>$submission_detail["creator_id"]
         ), 300); //5 mins
 
-		
 		return $result;
 	}
 
@@ -1529,11 +1527,13 @@ class project{
 			$query = "UPDATE `".$this->tbl_project."` SET status = %s WHERE id = %d";
 			$wpdb->query($wpdb->prepare($query, "close", $project_id));
 
-			job::addFlag("project_close_".$project_id);
+			job::addFlag("project_close_".$project_id, $project_id);
 			job::add(0, "project_close", array(
 		        "project_id"=>$project_id
 		    ), 1);
 			
+			//close project
+
 			return array(
 				"error"=>0,
 				"msg"=>"silent operation"
@@ -1568,6 +1568,7 @@ class project{
 						    job::add(0, "project_payment_confirm", array(
 						    	"project_id"=>$project_id
 						    ), 1);
+						    //credit to user
 						}
 						$this->status_manager->updateStatus($value["user_id"], $project_id, "close");
 						$query = "SELECT id FROM `".$this->submission_manager->getSubmissionTable()."` WHERE project_id = %d AND creator_id = %d AND status = %s";
@@ -1748,6 +1749,71 @@ class project{
 				"msg"=>"require admin access",
 				"data"=>NULL
 			);
+		}
+	}
+
+	public function calculateCash($project_id, $user_id){
+		global $wpdb;
+
+		// get project data
+		$project = $this->getProjectDetail($project_id, null, true);
+
+		//check if in project role
+		$query = "SELECT role FROM `".$wpdb->prefix."project_user` WHERE project_id = %d AND user_id = %d";
+		$role = $wpdb->get_var($wpdb->prepare($query, $project_id, $user_id));
+
+		if($role == "admin"){
+			//get submissions
+			$query = "SELECT id, creator_id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d ORDER BY id ASC";
+			$submissions = $wpdb->get_results($wpdb->prepare($query, $project_id), ARRAY_A);
+
+			$paymentTotal = 0;
+
+			$creators_submission = array();
+			foreach($submissions as $key=>$value){
+				if(!isset($creators_submission[$value["creator_id"]])){
+					$creators_submission[$value["creator_id"]] = array(
+						"creator_id"=>$value["creator_id"],
+						"total_items"=>0,
+						"total_photos"=>0,
+						"total_videos"=>0,
+						"total_amount"=>0,
+						"data"=>array(),
+						"data_sentence"=>array(),
+						"creator_data_sentence"=>array()
+					);
+				}
+				
+				if($value["status"] == "accepted"){
+					if($value["type"] == "photo" && $project["data"]["detail"]->cost_per_photo){
+						$paymentTotal += $project["data"]["detail"]->cost_per_photo;
+					}
+					if($value["type"] == "video" && $project["data"]["detail"]->cost_per_video){
+						$paymentTotal += $project["data"]["detail"]->cost_per_video;
+					}
+				}
+			}
+			return -1 * ( $paymentTotal + sizeof($creators_submission) * 99 ) ;
+
+		}else{
+
+			//get submissions
+			$query = "SELECT id, creator_id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d AND creator_id = %d ORDER BY id ASC";
+			$submissions = $wpdb->get_results($wpdb->prepare($query, $project_id, $user_id), ARRAY_A);
+
+			$paymentTotal = 0;
+
+			foreach($submission as $key => $value){
+				if($value["status"] == "accepted"){
+					if($value["type"] == "photo" && $project["data"]["detail"]->cost_per_photo){
+						$paymentTotal += $project["data"]["detail"]->cost_per_photo;
+					}
+					if($value["type"] == "video" && $project["data"]["detail"]->cost_per_video){
+						$paymentTotal += $project["data"]["detail"]->cost_per_video;
+					}	
+				}
+			}
+			return $paymentTotal;
 		}
 	}
 

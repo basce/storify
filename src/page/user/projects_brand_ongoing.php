@@ -22,7 +22,15 @@ use storify\staticparam as staticparam;
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <!-- Theme included stylesheets -->
     <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        .ql-clipboard{
+            position: fixed;
+            display: none;
 
+            left: 50%;
+            top: 50%;
+        }
+    </style>
     <script>
         window._startTime = new Date().getTime();
 
@@ -1419,7 +1427,7 @@ include("page/component/header.php"); ?>
                     "#ongoingloadmore", 
                     "You have not created a project yet. Create one now!", 
                     (index,value)=>{
-                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
+                        var div = $(storify.template.createListItemBrandView(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
                             storify.brand.detail.viewDetail(value.id);

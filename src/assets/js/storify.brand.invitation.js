@@ -96,7 +96,7 @@ storify.brand.invitation = {
 				[
 					{
 						label:"Invite",
-						attr:{type:"button", class:"btn btn-primary invitation_dialog_button"}
+						attr:{href:"#", class:"btn btn-primary small invitation_dialog_button"}
 					}
 				]
 			));
@@ -156,7 +156,7 @@ storify.brand.invitation = {
 	displaySingleInvite:function(data){
 		var a = "#single_invitation_dialog",
 			b = $(a+" .modal-body .status"),
-			c = $(a+" .modal-footer button");
+			c = $(a+" .modal-footer .btn");
 		$(a+" .profile-image").css({"background-image":"url("+data.profile_image+")"});
 		$(a+" .profile-image").removeClass("item-rejected item-accepted item-expired item-pending");
 		b.removeClass("item-rejected item-accepted item-expired item-pending");

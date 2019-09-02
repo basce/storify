@@ -135,7 +135,7 @@ include("page/component/header.php"); ?>
                     "#closeloadmore",
                     "No closed projects yet.",
                     (index, value)=>{
-                        var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
+                        var div = $(storify.template.createListItemBrandView(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
                             storify.brand.detail_closed.viewDetail(value.id);

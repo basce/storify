@@ -41,6 +41,14 @@ if($current_user->ID){
 }else{
     $current_user_meta = NULL;
 }
+
+if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
+    //get default business account page
+    $default_group_id = \storify\business_group::getDefaultGroup($current_user->ID);
+}else{
+    $default_group_id = NULL;
+}
+
 $sortBy = isset($_GET["order"])?$_GET["order"]:"";
 switch($sortBy){
     case "latest":
@@ -65,6 +73,9 @@ if(sizeof($pathquery) == 0){
         $pageSettings = $pageManager->getSettings("home");
 
         include_once("page/main/index.php");
+        exit();
+    }else if($pathquery[0] == "stripe_authorize"){
+        include_once("page/payment/stripe_authorize.php");
         exit();
     }else if($pathquery[0] == "listing"){
         $pageSettings = $pageManager->getSettings("listing");
@@ -121,7 +132,7 @@ if(sizeof($pathquery) == 0){
                     header("Location: ".$login_redirect);
                     exit();
                 }else{
-                    header("Location: /user@".$user_ID."/collections");
+                    header("Location: /user@".$user_ID."/projects/ongoing");
                     exit();
                 }
             }else{
@@ -263,6 +274,22 @@ if(sizeof($pathquery) == 0){
                     header("Location: /user@".$current_user->ID."/profile");
                     exit();
                 break;
+                case "business_profile":
+                    header("Location: /user@".$current_user->ID."/business_profile");
+                    exit();
+                break;
+                case "business_add":
+                    header("Location: /user@".$current_user->ID."/business_add");
+                    exit();
+                break;
+                case "business_welcome":
+                    header("Location: /user@".$current_user->ID."/business_welcome");
+                    exit();
+                break;
+                case "business_member":
+                    header("Location: /user@".$current_user->ID."/business_member");
+                    exit();
+                break;
                 case "password":
                     header("Location: /user@".$current_user->ID."/password");
                     exit();
@@ -319,22 +346,37 @@ if(sizeof($pathquery) == 0){
             header("Location: /user@".$userID."/collections");
             exit();
         }else{
+            if($pathquery[1] == "payment"){
+                if($_SESSION["role_view"] == "brand"){
+                    if(isset($_POST)){
+                        include_once("page/payment/payment_post.php");
+                        include_once("page/payment/payment.php");
+                        exit();
+                    }else{
+                        include_once("page/payment/payment.php");
+                        exit();
+                    }
+                }else{
+                    include_once("page/payment/payment_creator.php");
+                    exit();
+                }
+            }
             if($pathquery[1] == "viewascreator"){
                 $main->changeDefaultRole("creator",$userID);
 
-                header("Location: /user@".$userID."/collections");
+                header("Location: /user@".$userID."/projects/ongoing");
                 exit();
             }
             if($pathquery[1] == "viewasbrand"){
                 $main->changeDefaultRole("brand",$userID);
 
-                header("Location: /user@".$userID."/collections");
+                header("Location: /user@".$userID."/projects/ongoing");
                 exit();
             }
             if($pathquery[1] == "welcomebrand"){
                 $main->changeDefaultRole("brand",$userID);                
 
-                header("Location: /user@".$userID."/collections");
+                header("Location: /user@".$userID."/projects/ongoing");
                 exit();
             }
             if($pathquery[1] == "performance"){
@@ -380,6 +422,11 @@ if(sizeof($pathquery) == 0){
                     //check if verified.
                     if(!$main->isBrandVerified($current_user->ID)){
                         include_once("page/user/projects_brand_not_approve.php");
+                        exit();
+                    }
+                    if(!$default_group_id){
+                        //no group id, go to brand welcome page
+                        header("Location: /user@".$userID."/business_welcome");
                         exit();
                     }
                     //brand, ongoing, closed
@@ -629,13 +676,18 @@ if(sizeof($pathquery) == 0){
                     include_once("page/user/func-update.php");
 
                     if($update_success){
-                        //check if social connected, if yes, stay at current page, else go to social page
-                        if($main->getUserIGAccounts($current_user->ID)){
+                        if($_SESSION["role_view"] == "brand"){
                             header("Refresh:0");
                             exit();
                         }else{
-                            header("Location: /user@".$user_ID."/showcase/");
-                            exit();
+                            //check if social connected, if yes, stay at current page, else go to social page
+                            if($main->getUserIGAccounts($current_user->ID)){
+                                header("Refresh:0");
+                                exit();
+                            }else{
+                                header("Location: /user@".$user_ID."/showcase/");
+                                exit();
+                            }
                         }
                     }else{
                         include_once("page/error/index.php");
@@ -643,6 +695,133 @@ if(sizeof($pathquery) == 0){
                     }
                 }else{
                     include_once("page/user/myprofile.php");
+                    exit();
+                }
+            }
+            if($pathquery[1] == "business_welcome"){
+                $pageSettings = $pageManager->getSettings("business_welcome");
+                include_once("page/business/welcome.php");
+                exit();
+            }
+            if($pathquery[1] == "business_member"){
+                if($default_group_id){
+                    $pageSettings = $pageManager->getSettings("business_member");
+                    if(isset($_POST) && sizeof($_POST)){
+                        //business profile
+                        include_once("page/business/member_ajax.php");
+                        exit();
+                    }else{
+                        include_once("page/business/member.php");
+                        exit();
+                    }
+                }else{
+                    header("Location: /user@".$user_ID."/business_welcome");
+                    exit();
+                }
+            }
+            if($pathquery[1] == "business_payment"){
+                if($default_group_id){
+                    $pageSettings = $pageManager->getSettings("business_payment");
+                    if(isset($_POST) && sizeof($_POST)){
+                        //business profile
+                        if(isset($_POST["method"])){
+                            include_once("page/business/payment_ajax.php");
+                            exit();
+                        }else{
+                            include_once("page/business/payment.php");
+                            if($update_success){
+                                header("Refresh:0");
+                                exit();
+                            }else{
+                                include_once("page/error/index.php");
+                                exit();
+                            }
+                        }
+                    }else{
+                        include_once("page/business/payment.php");
+                        exit();
+                    }
+                }else{
+                    header("Location: /user@".$user_ID."/business_welcome");
+                    exit();
+                }
+            }
+            if($pathquery[1] == "business_add"){
+                if($main->isBrandVerified($current_user->ID)){
+                    $pageSettings = $pageManager->getSettings("business_add");
+                    if(isset($_POST) && sizeof($_POST)){
+                        //business profile
+                        if(isset($_POST["method"])){
+                            header("Location: /user@".$user_ID."/business_member");
+                            exit();
+                        }else{
+                            include_once("page/business/profile_post.php");
+                            if($update_success){
+                                header("Refresh:0");
+                                exit();
+                            }else{
+                                include_once("page/error/index.php");
+                                exit();
+                            }
+                        }
+                    }else{
+                        include_once("page/business/add.php");
+                        exit();
+                    }
+                }else{
+                    header("Location: /user@".$user_ID."/business_welcome");
+                    exit();
+                }
+            }
+            if($pathquery[1] == "business_profile"){
+                if($default_group_id){
+                    $pageSettings = $pageManager->getSettings("business_profile");
+                    if(isset($_POST) && sizeof($_POST)){
+                        //business profile
+                        if(isset($_POST["method"])){
+                            include_once("page/business/ajax.php");
+                            exit();
+                        }else{
+                            include_once("page/business/profile_post.php");
+                            if($update_success){
+                                header("Refresh:0");
+                                exit();
+                            }else{
+                                include_once("page/error/index.php");
+                                exit();
+                            }
+                        }
+                    }else{
+                        include_once("page/business/profile.php");
+                        exit();
+                    }
+                }else{
+                    header("Location: /user@".$user_ID."/business_welcome");
+                    exit();
+                }
+            }
+            if($pathquery[1] == "business_create"){
+                if(!$default_group_id){
+                    header("Location: /user@".$user_ID."/business_welcome");
+                    exit();
+                }
+                $pageSettings = $pageManager->getSettings("business_create");
+                if(isset($_POST) && sizeof($_POST)){
+                    if(isset($_POST["method"])){
+                        include_once("page/business/ajax.php");
+                        exit();
+                    }else{
+                        include_once("page/business/profile_post.php");
+                        if($update_success){
+                            header("Refresh:0");
+                            exit();
+                        }else{
+                            include_once("page/error/index.php");
+                            exit();
+                        }
+                    }
+                }else{
+                    include_once("page/business/add.php");
                     exit();
                 }
             }

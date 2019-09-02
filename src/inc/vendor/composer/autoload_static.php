@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit9923cfabdf6d69515547c543927f59aa
+class ComposerStaticInit408b5dcaff29dff79f194d26cfbcf769
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
@@ -20,6 +20,10 @@ class ComposerStaticInit9923cfabdf6d69515547c543927f59aa
         array (
             'phpssdb\\' => 8,
             'phpFastCache\\' => 13,
+        ),
+        'S' => 
+        array (
+            'Stripe\\' => 7,
         ),
         'P' => 
         array (
@@ -55,6 +59,10 @@ class ComposerStaticInit9923cfabdf6d69515547c543927f59aa
         'phpFastCache\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpfastcache/phpfastcache/src/phpFastCache',
+        ),
+        'Stripe\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -107,9 +115,9 @@ class ComposerStaticInit9923cfabdf6d69515547c543927f59aa
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit9923cfabdf6d69515547c543927f59aa::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit9923cfabdf6d69515547c543927f59aa::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit9923cfabdf6d69515547c543927f59aa::$prefixesPsr0;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit408b5dcaff29dff79f194d26cfbcf769::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit408b5dcaff29dff79f194d26cfbcf769::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit408b5dcaff29dff79f194d26cfbcf769::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }

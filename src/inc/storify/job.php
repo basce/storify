@@ -128,11 +128,11 @@ class job{
 		}
 	}
 
-	public static function addFlag($flag){
+	public static function addFlag($flag, $project_id = 0, $user_id = 0){
 		global $wpdb;
 
-		$query = "INSERT INTO `".$wpdb->prefix."flag` ( flag ) VALUES ( %s )";
-		$wpdb->query($wpdb->prepare($query, $flag));
+		$query = "INSERT INTO `".$wpdb->prefix."flag` ( flag, project_id, user_id ) VALUES ( %s, %d, %d )";
+		$wpdb->query($wpdb->prepare($query, $flag, $project_id, $user_id));
 	}
 
 	public static function checkFlagExist($flag){

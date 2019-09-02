@@ -41,13 +41,17 @@ storify.brand.projectList = {
         });
 
         var bountytext = "";
+        var bountyicon = "";
         if(summary.bounty.length == 2){
-            bountytext = "$" + summary.bounty[0].value + " & " + summary.bounty[1].value;
+            bountytext = "$" + storify.project.formatMoney(summary.bounty[0].value) + " & " + summary.bounty[1].value;
+            bountyicon = '<i class="fa fa-money" aria-hidden="true"></i> & <i class="fa fa-gift" aria-hidden="true"></i>';
         }else{
             if(summary.bounty[0].type == "cash"){
-                bountytext = "$" + summary.bounty[0].value;
+                bountytext = "$" + storify.project.formatMoney(summary.bounty[0].value);
+                bountyicon = '<i class="fa fa-money" aria-hidden="true"></i>';
             }else{
                 bountytext = summary.bounty[0].value;
+                bountyicon = '<i class="fa fa-gift" aria-hidden="true"></i>';
             }
         }
 
@@ -82,14 +86,14 @@ storify.brand.projectList = {
             }
         });
 
-        div_description.append(" / creator");
+        div_description.append(document.createTextNode(" / creator"));
         div_description.append($("<br>"));
         div_description.append(document.createTextNode(summary.description));
 
         div.append($("<div>").addClass("wrapper")
             .append(div_image
                 .append(brand_tags)
-                .append($("<div>").attr({title:bountytext}).addClass("price").text(bountytext))
+                .append($("<div>").attr({title:bountytext}).addClass("price").html(bountyicon))
             )
             .append($("<div>").addClass("content")
                 .append(title)

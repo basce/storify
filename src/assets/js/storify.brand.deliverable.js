@@ -7,7 +7,7 @@ storify.brand.deliverable = {
 		if( !$("#reject_submission").length ){
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:`Reject Submission`,
+                    titlehtml:`Updates Needed`,
                     bodyhtml:`
                     <h3>Let us know why the Creator's submission is rejected so that he or she can update the submission accordingly. (Optional)</h3>
                     <textarea class="form-control" rows="4"></textarea>
@@ -17,11 +17,11 @@ storify.brand.deliverable = {
                 [   
                     {
                         label:"Cancel",
-                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                        attr:{href:"#", class:"btn btn-primary small", "data-dismiss":"modal"}
                     },
                     {
                         label:"Reject",
-                        attr:{type:"button", class:"btn btn-primary small confirmreject"}
+                        attr:{href:"#", class:"btn btn-primary small confirmreject"}
                     }
                 ]
             ));
@@ -33,7 +33,7 @@ storify.brand.deliverable = {
         if( !$("#reject_reason").length ){
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:`Reject Submission`,
+                    titlehtml:`Updates Needed`,
                     bodyhtml:`
                     <p class="reason"></p>
                     `
@@ -42,11 +42,7 @@ storify.brand.deliverable = {
                 [   
                     {
                         label:"Edit",
-                        attr:{type:"button", class:"btn btn-primary small edit"}
-                    },
-                    {
-                        label:"Close",
-                        attr:{type:"button", class:"btn btn-primary small", "data-dismiss":"modal"}
+                        attr:{href:"#", class:"btn btn-primary small edit"}
                     }
                 ]
             ));
@@ -68,8 +64,8 @@ storify.brand.deliverable = {
                 "downloadLinkModal",
                 [   
                     {
-                        label:"download",
-                        attr:{type:"button", class:"btn btn-primary small download", href:"", download:""}
+                        label:"Download",
+                        attr:{class:"btn btn-primary small download", href:"#", download:""}
                     }
                 ]
             ));
@@ -205,6 +201,9 @@ storify.brand.deliverable = {
         if(data.remark){
             temp_remark = $("<div>").addClass("single_block urldescription")
                                 .append($("<p>").text(data.remark));
+        }else{
+            temp_remark = $("<div>").addClass("single_block urldescription")
+                                .append($("<p>").append($("<i>").text("No caption entered.")));
         }
         if(data.status == "accepted" || data.status == "rejected"){
             if(data.status == "accepted"){
@@ -212,13 +211,17 @@ storify.brand.deliverable = {
                                 .append($("<span>").attr({title:data.admin_remark}).addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1)));
                 d.addClass("item-accepted");
             }else{
-                console.log(data);
                 temp_status = $("<div>").addClass("status_block")
                                 .append($("<a>").attr({href:"#", title:data.admin_remark}).addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1))
                                     .click(function(e){
                                         e.preventDefault();
                                         var remark = $(this).attr("title");
-                                        $("#reject_reason .reason").text(remark ? remark : "no reason given.");
+                                        if(remark){
+                                            $("#reject_reason .reason").text(remark);
+                                        }else{
+                                            $("#reject_reason .reason").empty().append($("<i>").text("No caption entered."));
+                                        }
+                                        
 
                                         $("#reject_submission textarea").val(remark ? remark : "");
                                         $("#reject_submission button.confirmreject").attr({"data-id":data.id});

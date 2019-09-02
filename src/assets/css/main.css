@@ -31,8 +31,7 @@
 .file-container {
   background-color: #e9ecef;
   padding: 1.1rem 1.6rem;
-  font-size: 1.4rem;
-  margin-top: 5px; }
+  font-size: 1.4rem; }
   .file-container .file-download-link {
     background-color: white;
     display: inline-block;
@@ -237,6 +236,8 @@
       padding: 1.6rem;
       font-size: 1.4rem;
       margin-top: 5px; }
+      .deliverable-group .deliverable-creator-group .deliverable-creator-item .single_block.urldescription p {
+        white-space: pre-wrap; }
     .deliverable-group .deliverable-creator-group .deliverable-creator-item .status_block {
       float: right;
       padding: .7rem 0 0; }
@@ -671,7 +672,10 @@
               display: inline-block;
               text-align: center; }
             .submissioncontent .submissionsection .list .submission .urlrow .urlaction span, .submissioncontent .submissionlist .list .submission .urlrow .urlaction span {
-              color: green; }
+              color: green;
+              color: green;
+              border: solid 1px green;
+              background-color: transparent; }
             .submissioncontent .submissionsection .list .submission .urlrow .urlaction a.bin, .submissioncontent .submissionlist .list .submission .urlrow .urlaction a.bin {
               color: #ff0000;
               border: solid 1px #ff0000;
@@ -696,6 +700,12 @@
           padding: 1.6rem;
           font-size: 1.4rem;
           margin-top: 5px; }
+          .submissioncontent .submissionsection .list .submission .urldescription p, .submissioncontent .submissionlist .list .submission .urldescription p {
+            white-space: pre-wrap; }
+        .submissioncontent .submissionsection .list .submission .asset_id, .submissioncontent .submissionlist .list .submission .asset_id {
+          width: calc(100% - 100px);
+          text-align: right;
+          opacity: 0.65; }
     .submissioncontent .submissionsection::after, .submissioncontent .submissionlist::after {
       content: " ";
       clear: both;

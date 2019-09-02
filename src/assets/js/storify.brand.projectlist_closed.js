@@ -84,7 +84,7 @@ storify.brand.projectList_closed = {
             }
         });
 
-        div_description.append(" / creator");
+        div_description.append(document.createTextNode(" / creator"));
         div_description.append($("<br>"));
         div_description.append(document.createTextNode(summary.description));
 

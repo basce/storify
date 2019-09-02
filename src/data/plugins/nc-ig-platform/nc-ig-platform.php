@@ -75,6 +75,27 @@ function brand_verified_profile_update_action($user_id) {
 }
 
 /**
+ * add payment invoice type meta ( brand will issue invoice rather than charge by credit card )
+ */
+add_action('show_user_profile', 'brand_invoice_profile_edit_action');
+add_action('edit_user_profile', 'brand_invoice_profile_edit_action');
+function brand_invoice_profile_edit_action($user) {
+  $checked = (isset($user->brand_invoice) && $user->brand_invoice) ? ' checked="checked"' : '';
+?>
+  <h3>Payment ( Invoice )</h3>
+  <label for="brand_invoice">
+    <input name="brand_invoice" type="checkbox" id="brand_invoice" value="1"<?php echo $checked; ?>>
+    Use Invoice
+  </label>
+<?php 
+}
+add_action('personal_options_update', 'brand_invoice_profile_update_action');
+add_action('edit_user_profile_update', 'brand_invoice_profile_update_action');
+function brand_invoice_profile_update_action($user_id) {
+  update_user_meta($user_id, 'brand_invoice', isset($_POST['brand_invoice']));
+}
+
+/**
  * Disable admin bar on the frontend of your website
  * for subscribers.
  */
@@ -207,9 +228,21 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
   $countries = $pods->field("instagrammer_country");
   $languages = $pods->field("instagrammer_language");
 
-  $tag_ar = array_merge_recursive($tag_ar, $tags);
-  $country_ar = array_merge_recursive($country_ar, $countries);
-  $language_ar = array_merge_recursive($language_ar, $languages);
+  if(is_array($tags)){
+    $tag_ar = array_merge_recursive($tag_ar, $tags);
+  }else{
+    $tag_ar = array();
+  }
+  if(is_array($countries)){
+    $country_ar = array_merge_recursive($country_ar, $countries);
+  }else{
+    $country_ar = array();
+  }
+  if(is_array($languages)){
+    $language_ar = array_merge_recursive($language_ar, $languages);
+  }else{
+    $language_ar = array();
+  }
 
   //get all post
   $query_params = array(
@@ -234,7 +267,7 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
   foreach($tag_ar as $key=>$value){
       $query_params = array(
                 "where"=>"instagram_post_tag.term_id = '".$value["term_id"]."'",
-                "limit"=> -1
+                "limit"=> 1 // dont need to pull all
             );
       $temp_pods = pods('instagram_post_fast', $query_params);
       
@@ -243,7 +276,7 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
         
         $query_params_2 = array(
             "where"=>"instagrammer_tag.term_id = '".$value["term_id"]."'",
-            "limit"=> -1
+            "limit"=> 2 // no need to pull all, either only have 1 or more
         );
 
         $temp_pods = pods('instagrammer_fast', $query_params_2);
@@ -259,7 +292,7 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
   foreach($country_ar as $key=>$value){
       $query_params = array(
                 "where"=>"instagram_post_country.term_id = '".$value["term_id"]."'",
-                "limit"=> -1
+                "limit"=> 1 // dont need to pull all
             );
       $temp_pods = pods('instagram_post_fast', $query_params);
       
@@ -268,7 +301,7 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
         
         $query_params_2 = array(
             "where"=>"instagrammer_country.term_id = '".$value["term_id"]."'",
-            "limit"=> -1
+            "limit"=> 2 // no need to pull all, either only have 1 or more
         );
 
         $temp_pods = pods('instagrammer_fast', $query_params_2);
@@ -284,7 +317,7 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
   foreach($language_ar as $key=>$value){
       $query_params = array(
                 "where"=>"instagram_post_language.term_id = '".$value["term_id"]."'",
-                "limit"=> -1
+                "limit"=> 1 // dont need to pull all
             );
       $temp_pods = pods('instagram_post_fast', $query_params);
       
@@ -293,7 +326,7 @@ function NgICPlatform_i18n_Instagrammer_delete( $params, $pod = NULL ){
         
         $query_params_2 = array(
             "where"=>"instagrammer_language.term_id = '".$value["term_id"]."'",
-            "limit"=> -1
+            "limit"=> 2 // no need to pull all, either only have 1 or more
         );
 
         $temp_pods = pods('instagrammer_fast', $query_params_2);
@@ -416,7 +449,7 @@ function NgICPlatform_i18n_dashboard_widget_function( $post, $callback_args ) {
   //get user that request for moderate
   echo "<p>User(s) request to access the app as \"Brand\".</p>";
   $query = "SELECT user_id, display_name FROM `".$wpdb->prefix."brand_verify_request` a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID";
-  $verify_requests = $wpdb->get_results($wpdb->prepare($query), ARRAY_A);
+  $verify_requests = $wpdb->get_results($query, ARRAY_A);
 
   if(sizeof($verify_requests)){
     foreach($verify_requests as $key=>$value){

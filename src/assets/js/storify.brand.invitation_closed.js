@@ -98,7 +98,7 @@ storify.brand.invitation_closed = {
 				[
 					{
 						label:"Invite",
-						attr:{type:"button", class:"btn btn-primary invitation_dialog_button"}
+						attr:{class:"btn btn-primary small invitation_dialog_button"}
 					}
 				]
 			));

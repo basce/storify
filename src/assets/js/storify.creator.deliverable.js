@@ -67,7 +67,7 @@ storify.creator.deliverable = {
                 [   
                     {
                         label:"Update",
-                        attr:{type:"button", class:"btn btn-primary small confirmsubmission"}
+                        attr:{href:"#", class:"btn btn-primary small confirmsubmission"}
                     }
                 ]
             ));

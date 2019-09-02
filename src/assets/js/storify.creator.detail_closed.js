@@ -169,14 +169,14 @@ storify.creator.detail_closed = {
 
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:``,
+                    titlehtml:`Required Updates`,
                     bodyhtml:``
                 },
                 "rejectModal",
                 [   
                     {
                         label:"ok",
-                        attr:{type:"button", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+                        attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
                     }
                 ]
             ));
@@ -210,7 +210,7 @@ storify.creator.detail_closed = {
 
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:``,
+                    titlehtml:`Reject Reason`,
                     bodyhtml:`
                     <a class="filename" download></a>
                     <div class="filesize"></div>
@@ -220,8 +220,8 @@ storify.creator.detail_closed = {
                 "downloadLinkModal",
                 [   
                     {
-                        label:"download",
-                        attr:{type:"button", class:"btn btn-primary small download", href:"", download:""}
+                        label:"Download",
+                        attr:{href:"#", class:"btn btn-primary small download", download:""}
                     }
                 ]
             ));
@@ -691,11 +691,11 @@ storify.creator.detail_closed = {
                         })
                     )*/
                     .append($("<a>").addClass("reject").attr({href:"#"})
-                        .append($("<i>").addClass("fa fa-thumbs-down").attr({"aria-hidden":true}))
+                        .append($("<i>").addClass("fa fa-exclamation").attr({"aria-hidden":true}))
                         .click(function(e){
                             e.preventDefault();
                             $("#rejectModal .modal-body").empty()
-                                .append($("<p>").text(data.admin_remark?data.admin_remark:"no reason given"));
+                                .append( data.admin_remark ? $("<p>").text(data.admin_remark) : $("<p>").append($("<i>").text("No caption entered.")));
                             $("#rejectModal").modal("show");
                         })
                     );
@@ -730,7 +730,10 @@ storify.creator.detail_closed = {
                     .append(actiondiv)
                 )
                 .append($("<div>").addClass("urldescription")
-                    .append($("<p>").text(data.remark ? data.remark : "no caption given."))
+                    .append(data.remark ? $("<p>").text(data.remark) : $("<p>").append($("<i>").text("No caption entered.")))
+                )
+                .append($("<div>").addClass("asset_id")
+                    .append($("<small>").text("ASSET-"+storify.core.leadingZero(data.id, 9)))
                 );
         }else{
             div = $("<div>").addClass("submission "+mainClass).attr({o:data.id})
@@ -742,7 +745,10 @@ storify.creator.detail_closed = {
                         .append(actiondiv)
                     )
                     .append($("<div>").addClass("urldescription")
-                        .append($("<p>").text(data.remark ? data.remark : "no caption given."))
+                        .append(data.remark ? $("<p>").text(data.remark) : $("<p>").append($("<i>").text("No caption entered.")))
+                    )
+                    .append($("<div>").addClass("asset_id")
+                        .append($("<small>").text("ASSET-"+storify.core.leadingZero(data.id, 9)))
                     );
         }
         return div;

@@ -19,7 +19,6 @@
   background-color: #e9ecef;
   padding: 1.1rem 1.6rem;
   font-size: 1.4rem;
-  margin-top: 5px;
   .file-download-link{
     background-color: white;
     display: inline-block;
@@ -321,6 +320,9 @@
         padding: 1.6rem;
         font-size: 1.4rem;
         margin-top: 5px;
+        p{
+          white-space: pre-wrap;
+        }
       }
       .status_block{
         float:right;
@@ -892,6 +894,9 @@
             }
             span{
               color:green;
+              color:green;
+              border: solid 1px green;
+              background-color: transparent;
             }
             a{
               
@@ -927,6 +932,14 @@
           padding:1.6rem;
           font-size:1.4rem;
           margin-top:5px;
+          p{
+            white-space: pre-wrap;
+          }
+        }
+        .asset_id{
+          width:calc(100% - 100px);
+          text-align:right;
+          opacity:0.65;
         }
       }
     }
