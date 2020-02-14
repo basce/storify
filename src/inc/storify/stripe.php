@@ -29,25 +29,78 @@ class stripe{
 	}
 
 	public static function createCustomer(){
-		global $current_user;
+		global $current_user, $default_group_id;
 
-		if($current_user && $current_user->ID){
+		if($default_group_id){
 			$response = \Stripe\Customer::create(array(
-				"email"=>$current_user->user_email,
-				"name"=>$current_user->display_name
+				"description"=>"for business account :".$default_group_id
 			));
 			if($response && $response->id){
-				return $response->id;
+				return array(
+					"type"=>"pay",
+					"id"=>$response->id
+				);
+			}
+		}else if($current_user && $current_user->ID){
+			$response = \Stripe\Customer::create(array(
+				"email"=>$current_user->user_email,
+			));
+			if($response && $response->id){
+				return array(
+					"type"=>"personal",
+					"id"=>$response->id
+				);
 			}
 		}
 
 		return null;
 	}
 
-	public static function getAllCards($user_id){ //only the first 20 cards.
+	public static function setSource($ba_id, $source){
 		global $wpdb;
 
-		$stripe_id = self::getStripe_id($user_id, "pay");
+		$stripe_id = self::getStripe_id($ba_id, "pay");
+		if($stripe_id){
+			return \Stripe\Customer::update(
+				$stripe_id,
+				[
+					"default_source"=>$source
+				]
+			);
+		}else{
+			return null;
+		}
+	}
+
+	public static function removeCard($ba_id, $card_id){
+
+		$stripe_id = self::getStripe_id($ba_id, "pay");
+		if($stripe_id){
+			return \Stripe\Customer::deleteSource(
+				$stripe_id,
+				$card_id
+			);
+		}else{
+			return null;
+		}
+		
+	}
+
+	public static function getStripeCustomer($ba_id){
+		global $wpdb;
+
+		$stripe_id = self::getStripe_id($ba_id, "pay");
+		if($stripe_id){
+			return \Stripe\Customer::retrieve($stripe_id);
+		}else{
+			return null;
+		}
+	}
+
+	public static function getAllCards($ba_id){ //only the first 20 cards.
+		global $wpdb;
+
+		$stripe_id = self::getStripe_id($ba_id, "pay");
 		if($stripe_id){
 			return \Stripe\Customer::allSources(
 			  $stripe_id,
@@ -57,7 +110,7 @@ class stripe{
 			  ]
 			);
 		}else{
-			return array();
+			return null;
 		}
 	}
 
@@ -81,11 +134,11 @@ class stripe{
 		);
 	}
 
-	public static function insertPayment($stripe_payment_id, $amount, $description, $balance_transaction, $uid, $project_id, $payment_unique_code, $receipt_url, $credit_card_fingerprint, $raw){
+	public static function insertPayment($stripe_payment_id, $amount, $description, $balance_transaction, $uid, $project_id, $receipt_url, $credit_card_fingerprint, $raw){
 		global $wpdb;
 
-		$query = "INSERT INTO `".$wpdb->prefix."payment` ( stripe_payment_id, amount, description, balance_transaction, uid, project_id, payment_unique_code, receipt_url, credit_card_fingerprint, raw ) VALUES ( %s, %d, %s, %s, %d, %d, %s, %s, %s, %s )";
-		$wpdb->query($wpdb->prepare($query, $stripe_payment_id, $amount, $description, $balance_transaction, $uid, $project_id, $payment_unique_code, $receipt_url, $credit_card_fingerprint, $raw));
+		$query = "INSERT INTO `".$wpdb->prefix."payment` ( stripe_payment_id, amount, description, balance_transaction, uid, project_id, receipt_url, credit_card_fingerprint, raw ) VALUES ( %s, %d, %s, %s, %d, %d, %s, %s, %s )";
+		$wpdb->query($wpdb->prepare($query, $stripe_payment_id, $amount, $description, $balance_transaction, $uid, $project_id, $receipt_url, $credit_card_fingerprint, $raw));
 	}
 
 	public static function checkPayment($project_id){

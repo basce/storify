@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -37,6 +37,7 @@
     <script src="/assets/js/scrollreveal.js"></script>
     <script src="/assets/js/custom.js"></script>
     <script src="/assets/js/nc_custom.js"></script>
+    <script src="/assets/js/storify.template.js"></script>
 <?=get_option("custom_settings_header_js")?>
     <style type="text/css">
         .selectize-control.customselect{
@@ -71,16 +72,23 @@
             top: 1.5rem;
             right: 3rem;
         }
+        .box .body:after{
+            content:"";
+            display:block;
+            clear:both;
+        }
         .member{
             width: 45%;
             margin-right:5%;
             float: left;
             position: relative;
+            margin-bottom: 1rem;
+            padding:10px;
         }
         .member .profile{
             position:absolute;
-            top:0;
-            left:0;
+            top:10px;
+            left:10px;
         }
         .member .profile img{
             width: 50px;
@@ -100,9 +108,12 @@
         }
         .member .close{
             position:absolute;
-            top:0;
-            right:0;
+            top:5px;
+            right:5px;
             display:none;
+        }
+        .member:hover{
+            background:lightgray;
         }
         .member:hover .close{
             display:block;
@@ -139,58 +150,22 @@ include("page/component/header.php"); ?>
                         <div class="col-md-9">
                                 
                             <h2>Members</h2>
-                            <div class="box">
+                            <div class="box owner">
                                 <div class="header">
                                     <div class="title">Owners</div>
                                     <a href="#" class="btn btn-primary small" id="addOwner">Add</a>
                                 </div>
                                 <div class="body">
-                                    <div class="member">
-                                        <a href="#" target="_blank" class="profile">
-                                            <img class="" src="https://cdn.storify.me/data/uploads/2019/08/winnie-loves.jpg" />
-                                        </a>
-                                        <div class="right_cnt">
-                                            <span class="text">winnie.loves</span>
-                                        </div>
-                                        <button class="close" type="button" aria-label="Remove"><span aria-hidden="true">×</span></button>
-                                    </div>
-                                    <div class="member">
-                                        <a href="#" target="_blank" class="profile">
-                                            <img class="" src="https://via.placeholder.com/50" />
-                                        </a>
-                                        <div class="right_cnt">
-                                            <span class="text">sampletext@email.com (pending)</span>
-                                        </div>
-                                        <button class="close" type="button" aria-label="Remove"><span aria-hidden="true">×</span></button>
-                                    </div>
-                                    <div class="clearfix"></div>
+                                    
                                 </div>
                             </div>
-                            <div class="box">
+                            <div class="box manager">
                                 <div class="header">
                                     <div class="title">Managers</div>
                                     <a href="#" class="btn btn-primary small" id="addManager">Add</a>
                                 </div>
                                 <div class="body">
-                                    <div class="member">
-                                        <a href="#" target="_blank" class="profile">
-                                            <img class="" src="https://cdn.storify.me/data/uploads/2019/08/winnie-loves.jpg" />
-                                        </a>
-                                        <div class="right_cnt">
-                                            <span class="text">winnie.loves</span>
-                                        </div>
-                                        <button class="close" type="button" aria-label="Remove"><span aria-hidden="true">×</span></button>
-                                    </div>
-                                    <div class="member">
-                                        <a href="#" target="_blank" class="profile">
-                                            <img class="" src="https://via.placeholder.com/50" />
-                                        </a>
-                                        <div class="right_cnt">
-                                            <span class="text">sampletext@email.com (pending)</span>
-                                        </div>
-                                        <button class="close" type="button" aria-label="Remove"><span aria-hidden="true">×</span></button>
-                                    </div>
-                                    <div class="clearfix"></div>
+                                   
                                 </div>
                             </div>
                         </div>
@@ -204,6 +179,68 @@ include("page/component/header.php"); ?>
     </div>
     <!--end page-->
     <script type="text/javascript">
+
+        function createMemberBlock(member){
+            var target_url = member.igusername ? "<?=get_home_url()?>/"+member.igusername:"#",
+                image = member.image_url ? member.image_url : "https://via.placeholder.com/50",
+                label = member.status == "waiting" ? member.display_name + " (pending)" : member.display_name;
+
+            var a = `<div class="member">
+                        <a href="${target_url}" target="_blank" class="profile">
+                            <img class="" src="${image}" />
+                        </a>
+                        <div class="right_cnt">
+                            <span class="text">${label}</span>
+                        </div>
+                        <button class="close" type="button" aria-label="Remove" o="${member.user_email}"><span aria-hidden="true">×</span></button>
+                    </div>`;
+
+            return a;
+        }
+
+        function getMember(){
+            $.ajax({
+                type:"POST",
+                dataType:"json",
+                data:{
+                    method:"getMember"
+                },
+                error:function(er){
+                    console.log(er);
+                },
+                success:function(res){
+                    if(res.error){
+                        console.log(res);
+                    }else{
+                        $(".box.owner .body").empty();
+                        $(".box.manager .body").empty();
+
+                        $.each(res.members, function(index, value){
+                            var a = $(createMemberBlock(value));
+                            if(!value.igusername){
+                                a.find(".profile").click(function(e){
+                                    e.preventDefault();
+                                });
+                            }
+                            a.find("button.close").click(function(e){
+                                removeMember($(this).attr("o"), function(result){
+                                    if(result.error){
+                                        console.log(result.msg);
+                                    }else{
+                                        getMember();
+                                    }
+                                });
+                            });
+                            if(value.role == "admin"){
+                                $(".box.owner .body").append(a);
+                            }else{
+                                $(".box.manager .body").append(a);
+                            }
+                        });
+                    }
+                }
+            })
+        }
 
         function sendInvite(email, type, callback){
             $.ajax({
@@ -238,7 +275,7 @@ include("page/component/header.php"); ?>
                     /*
                     [{name:xxx,value:xxxx},{name:xxx,value:xxxx}]
                      */
-                    callback(res.data);
+                    callback(res);
                 }
             });
         }
@@ -247,11 +284,77 @@ include("page/component/header.php"); ?>
 
             $("#addOwner").click(function(e){
                 e.preventDefault();
+                $("#owner_email").modal("show");
             });
 
             $("#addManager").click(function(e){
                 e.preventDefault();
+                $("#manager_email").modal("show");
             });
+
+            getMember();
+
+            var div_owner = $(storify.template.simpleModal(
+                    {
+                        titlehtml:'Add Owner',
+                        bodyhtml:`<h3>Add email</h3>
+                        <input name="email" type="email" class="form-control" id="add_owner_email" placeholder="Email" value="">
+                        `
+                    },
+                    "owner_email",
+                    [
+                        {
+                            label:"Add",
+                            attr:{href:"#", class:'btn btn-primary small add'}
+                        }
+                    ]
+                ));
+
+            div_owner.find(".actions .add").click(function(e){
+                e.preventDefault();
+                sendInvite(
+                    $("#add_owner_email").val(),
+                    'admin',
+                    function(){
+                        getMember();
+                        $("#owner_email").modal("hide");
+                        $("#add_owner_email").val("");
+                    }
+                );
+            });
+
+            $("body").append(div_owner);
+
+            var div_manager = $(storify.template.simpleModal(
+                    {
+                        titlehtml:'Add Manager',
+                        bodyhtml:`<h3>Add email</h3>
+                        <input name="email" type="email" class="form-control" id="add_manager_email" placeholder="Email" value="">
+                        `
+                    },
+                    "manager_email",
+                    [
+                        {
+                            label:"Add",
+                            attr:{href:"#", class:'btn btn-primary small add'}
+                        }
+                    ]
+                ));
+
+            div_manager.find(".actions .add").click(function(e){
+                e.preventDefault();
+                sendInvite(
+                    $("#add_manager_email").val(),
+                    'manager',
+                    function(){
+                        getMember();
+                        $("#manager_email").modal("hide");
+                        $("#add_manager_email").val("");
+                    }
+                )
+            });
+
+            $("body").append(div_manager);
         });
     </script>
 </body>

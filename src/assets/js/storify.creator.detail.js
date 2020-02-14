@@ -112,6 +112,11 @@ storify.creator.detail = {
                                                             .append($("<a>").attr({ href: "#" }).addClass("form_submit_btn").text("Add").click(function(e) {
                                                                 e.preventDefault();
                                                                 if ($(this).hasClass("disabled")) {
+                                                                    if($(this).attr("type") == "empty"){
+                                                                        $("#slotNoModal").modal("show");
+                                                                    }else{
+                                                                        $("#slotFullModal").modal("show");
+                                                                    }
                                                                     return;
                                                                 }
                                                                 storify.creator.detail.submitSubmisionFile();
@@ -139,6 +144,11 @@ storify.creator.detail = {
                                                             .append($("<a>").attr({ href: "#" }).addClass("form_submit_btn").text("Add").click(function(e) {
                                                                 e.preventDefault();
                                                                 if ($(this).hasClass("disabled")) {
+                                                                    if($(this).attr("type") == "empty"){
+                                                                        $("#slotNoModal").modal("show");
+                                                                    }else{
+                                                                        $("#slotFullModal").modal("show");
+                                                                    }
                                                                     return;
                                                                 }
                                                                 storify.creator.detail.submitSubmision();
@@ -177,6 +187,13 @@ storify.creator.detail = {
                                                         .append($("<i>").addClass("fa fa-video-camera"))
                                                     )
                                                 )
+                                                .append($("<li>").addClass("nav-item")
+                                                    .append($("<a>").addClass("nav-link").attr({ id: "extra-tab", "data-toggle": "tab", href: "#extralist", role: "tab", "aria-controls": "extralist", "aria-expanded": true })
+                                                        .append($("<span>").text("100/∞"))
+                                                        .append(document.createTextNode(" "))
+                                                        .append($("<i>").addClass("fa fa-archive"))
+                                                    )
+                                                )
                                             )
                                             .append($("<div>").addClass("tab-content").attr({ id: "tab_content2" })
                                                 .append($("<div>").addClass("tab-pane fade show active").attr({ id: "photolist", role: "tabpanel", "aria-labelledby": "photolist-tab" })
@@ -184,6 +201,9 @@ storify.creator.detail = {
                                                 )
                                                 .append($("<div>").addClass("tab-pane fade").attr({ id: "videolist", role: "tabpanel", "aria-labelledby": "videolist-tab" })
                                                     .append($("<div>").addClass("list videolist"))
+                                                )
+                                                .append($("<div>").addClass("tab-pane fade").attr({ id: "extralist", role: "tabpanel", "aria-labelledby": "extralist-tab" })
+                                                    .append($("<div>").addClass("list extralist"))
                                                 )
                                             )
                                         )
@@ -215,8 +235,10 @@ storify.creator.detail = {
 
                 if (target == "#photolist") {
                     storify.creator.detail.viewlist("photo");
-                } else {
+                } else if (target == "#videolist") {
                     storify.creator.detail.viewlist("video");
+                } else{
+                    storify.creator.detail.viewlist("extra");
                 }
             });
         }
@@ -251,7 +273,7 @@ storify.creator.detail = {
                 "rejectModal",
                 [   
                     {
-                        label:"ok",
+                        label:"OK",
                         attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
                     }
                 ]
@@ -287,6 +309,13 @@ storify.creator.detail = {
                 {
                     titlehtml:``,
                     bodyhtml:`
+                    <video width="640" height="480" controls="" style="width: 100%;height: 320px;">
+                        <source src="" type="video/MP4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <img src="" style="width: 100%">
+                    <div class="caption" style="padding:10px; background:#F6F8F8; white-space: pre-wrap; word-break: break-word;">
+                    </div>
                     <a class="filename" download></a>
                     <div class="filesize"></div>
                     <div class="filemime"></div>
@@ -296,7 +325,86 @@ storify.creator.detail = {
                 [   
                     {
                         label:"Download",
-                        attr:{href:"#", class:"btn btn-primary small download", href:"", download:""}
+                        attr:{class:"btn btn-primary small download", href:"#", download:""}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
+        }
+
+        if (!$("#editCaptionModal").length) {
+
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Edit Caption <small>(To update file, delete submission and upload a new file)</small>`,
+                    bodyhtml:`
+                    <textarea class="form-control edit_description" rows="3" placeholder="Enter your caption here."></textarea>
+                    `
+                },
+                "editCaptionModal",
+                [   
+                    {
+                        label:"Delete Submission",
+                        attr:{class:"btn btn-link small delete", href:"#", style:"color:#666"}
+                    },
+                    {
+                        label:"Update",
+                        attr:{class:"btn btn-primary small update", href:"#"}
+                    }
+                ]
+            ));
+
+            $("body").append(div);   
+
+            div.find(".delete").click(function(e){
+                e.preventDefault();
+                storify.creator.detail.removeSubmission($(this).attr("o"), $(this).attr("type"));
+                $("#editCaptionModal").modal("hide");
+            });
+
+            div.find(".update").click(function(e){
+                e.preventDefault();
+                storify.creator.detail.editSubmission($(this).attr("o"), $(this).attr("type"));
+                $("#editCaptionModal").modal("hide");
+            });
+        }
+
+        if (!$("#slotFullModal").length){
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Uh-oh, submission slots are full.`,
+                    bodyhtml:`<p>
+                    <ol>
+                     <li>To replace an existing submission, click Edit button beside your entry, and remove the file before adding a new one.</li>
+                     <li>To update a caption, click the same Edit button and enter your caption.</li>
+                     <li>To upload additional files, click the <i class="fa fa-archive"></i> tab.</li>
+                    </ol>
+                    </p>`
+                },
+                "slotFullModal",
+                [
+                    {
+                        label:"OK",
+                        attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
+                    }
+                ]
+            ));
+
+            $("body").append(div);
+        }
+
+        if (!$("#slotNoModal").length){
+            div = $(storify.template.simpleModal(
+                {
+                    titlehtml:`Uh-oh, no slots allocated!`,
+                    bodyhtml:`<p>If you would like to upload additional files, click <i class="fa fa-archive"></i> tab.</p>`
+                },
+                "slotNoModal",
+                [
+                    {
+                        label:"OK",
+                        attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
                     }
                 ]
             ));
@@ -376,13 +484,14 @@ storify.creator.detail = {
                     storify.project._project_id = project_id;
                     storify.project.user.getAllUser(function() {
                         storify.creator.deliverable.getList(function() {
-                            storify.loading.hide();
                             storify.creator.detail.createDetail(rs.data);
                             storify.creator.detail.resetSubmission();
                             storify.creator.detail.getSubmission();
                             $("#newDetailModal .modal-body").scrollTop(0);
-                            if(onComplete)onComplete();
-                            $("#newDetailModal").modal();
+                            if(onComplete) onComplete(function(){
+                                storify.loading.hide();
+                                $("#newDetailModal").modal();
+                            });
                         });
                     });
                 }
@@ -474,8 +583,8 @@ storify.creator.detail = {
                 )
             )
             .append(deliverable_block)
-            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief));
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.description_brief)))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.deliverable_brief)));
         cont.append(owlImages);
 
         if (owlImages) {
@@ -527,8 +636,10 @@ storify.creator.detail = {
 
         if ($("#photolist").is(":visible")) {
             selectType = "photo";
-        } else {
+        } else if ($("#videolist").is(":visible")) {
             selectType = "video";
+        } else {
+            selectType = "extra";
         }
 
         if (!$("#submission-file .submission-file").val()) {
@@ -539,7 +650,7 @@ storify.creator.detail = {
         //get file data
         var file = $("#submission-file .submission-file")[0].files[0];
 
-        if ($("#submission-file .submission_description").val() && $("#submission-file .submission_description").val().length >= 800) {
+        if ($("#submission-file .submission_description").val() && $("#submission-file .submission_description").val().length >= 2200) {
             error_alert.text("You have exceeded the character limit. Please shorten your caption.").removeClass("hide");
             return;
         }
@@ -570,7 +681,7 @@ storify.creator.detail = {
                 } else {
                     if(rs.success){
                         //upload file
-                        storify.creator.detail._S3Upload(file, rs.url, function(){
+                        storify.creator.detail._S3Upload(file, rs.url, null, function(){
                             storify.creator.detail._updateFileStatus(rs.id, caption, selectType, function(){
                                 storify.creator.detail.resetSubmission();
                                 storify.creator.detail.getSubmission(selectType);
@@ -617,7 +728,7 @@ storify.creator.detail = {
         }
     },
     _S3Uploading:false,
-    _S3Upload:function(file, url, onComplete){
+    _S3Upload:function(file, url, contentType, onComplete){
         if (storify.creator.detail._S3Uploading) { 
             return; 
         }
@@ -635,13 +746,12 @@ storify.creator.detail = {
                return xhr;
             },
             beforeSend: function(request) {
-                request.setRequestHeader('Content-Disposition', 'attachment');
+                /*request.setRequestHeader('Content-Disposition', 'attachment');*/
             },
             url:url,
             type:"PUT",
             data:file,
             processData:false,
-            contentType:false,
             success:function(evt){
                 storify.creator.detail._progress(0);
                 storify.creator.detail._S3Uploading = false;
@@ -666,8 +776,10 @@ storify.creator.detail = {
 
         if ($("#photolist").is(":visible")) {
             selectType = "photo";
-        } else {
+        } else if ($("#videolist").is(":visible")) {
             selectType = "video";
+        } else {
+            selectType = "extra";
         }
 
         if (!$("#submission-text .submission_url").val()) {
@@ -675,7 +787,7 @@ storify.creator.detail = {
             return;
         }
 
-        if ($("#submission-text .submission_description").val() && $("#submission-text .submission_description").val().length >= 800) {
+        if ($("#submission-text .submission_description").val() && $("#submission-text .submission_description").val().length >= 2200) {
             error_alert.text("You have exceeded the character limit. Please shorten your caption.").removeClass("hide");
             return;
         }
@@ -724,9 +836,12 @@ storify.creator.detail = {
         if (data.type == "photo") {
             iconClass = "fa-camera";
             mainClass = "photo";
-        } else {
+        } else if (data.type == "video") {
             iconClass = "fa-video-camera";
             mainClass = "video";
+        } else {
+            iconClass = "fa-archive";
+            mainClass = "extra";
         }
 
         switch (data.status) {
@@ -738,10 +853,13 @@ storify.creator.detail = {
             case "rejected":
                 //pending
                 actiondiv.append($("<a>").addClass("bin").attr({ href: "#" })
-                        .append($("<i>").addClass("fa fa-trash-o").attr({ "aria-hidden": true }))
+                        .append($("<i>").addClass("fa fa-pencil").attr({ "aria-hidden": true }))
                         .click(function(e) {
                             e.preventDefault();
-                            storify.creator.detail.removeSubmission(data.id, data.type);
+                            $("#editCaptionModal").find(".edit_description").val(data.remark ? data.remark : "");
+                            $("#editCaptionModal").find(".delete").attr({o:data.id, type:data.type});
+                            $("#editCaptionModal").find(".update").attr({o:data.id, type:data.type});
+                            $("#editCaptionModal").modal("show");
                         })
                     )
                     .append($("<a>").addClass("reject").attr({ href: "#" })
@@ -757,12 +875,15 @@ storify.creator.detail = {
             default:
                 //pending
                 actiondiv.append($("<a>").addClass("bin").attr({ href: "#" })
-                    .append($("<i>").addClass("fa fa-trash-o").attr({ "aria-hidden": true }))
-                    .click(function(e) {
-                        e.preventDefault();
-                        storify.creator.detail.removeSubmission(data.id, data.type);
-                    })
-                );
+                        .append($("<i>").addClass("fa fa-pencil").attr({ "aria-hidden": true }))
+                        .click(function(e) {
+                            e.preventDefault();
+                            $("#editCaptionModal").find(".edit_description").val(data.remark ? data.remark : "");
+                            $("#editCaptionModal").find(".delete").attr({o:data.id, type:data.type});
+                            $("#editCaptionModal").find(".update").attr({o:data.id, type:data.type});
+                            $("#editCaptionModal").modal("show");
+                        })
+                    );
                 break;
         }
 
@@ -776,7 +897,7 @@ storify.creator.detail = {
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
                                             .click(function(e){
                                                 e.preventDefault();
-                                                storify.creator.detail._showDownloadDialog(data.file_id);
+                                                storify.creator.detail._showDownloadDialog(data.file_id, data.remark ? data.remark : "No caption entered.");
                                             })
                                 )
                         )
@@ -807,8 +928,12 @@ storify.creator.detail = {
         }
         return div;
     },
-    _showDownloadDialog:function(id){
+    _showDownloadDialog:function(id, caption){
         storify.loading.show();
+        $("#downloadLinkModal").find("video")[0].pause();
+        $("#downloadLinkModal").find("video source").remove();
+        $("#downloadLinkModal").find("video").css({display:"none"});
+        $("#downloadLinkModal").find("img").attr({src:""}).css({display:"none"});
         $.ajax({
             method: "POST",
             dataType: "json",
@@ -821,6 +946,24 @@ storify.creator.detail = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
+                    var re = /(?:\.([^.]+))?$/;
+                    var ext = re.exec(rs.filename);
+                    if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["mp4", "m4a", "m4v", "f4v", "f4a", "m4b", "m4r", "f4b", "mov"]) != -1)){
+                        $("#downloadLinkModal").find("video").prepend($("<source>").attr({src:rs.filelink}));
+                        $("#downloadLinkModal").find("video").css({display:"block"});
+                        $("#downloadLinkModal").find("video")[0].load();
+                    }else if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["jpg","png","jpeg"]) != -1)){
+                        $("#downloadLinkModal").find("img").attr({src:rs.filelink}).css({display:"block"});
+                    }else{
+                        
+                    }
+
+                    if(caption){
+                        $("#downloadLinkModal").find(".caption").text(caption);
+                    }else{
+                        $("#downloadLinkModal").find(".caption").text("");
+                    }
+                    
                     $("#downloadLinkModal").find(".filename")
                                                 .attr({href:rs.filelink, target:"_blank", download:rs.filename})
                                                 .text(storify.creator.detail.shortenFileName(rs.filename)+" ("+rs.filemime+")")
@@ -848,6 +991,30 @@ storify.creator.detail = {
             },
             success: function(rs) {
                 storify.creator.detail._removingSubmission = false;
+                storify.loading.hide();
+                if (rs.error) {
+                    alert(rs.msg);
+                } else {
+                    storify.creator.detail.getSubmission(type);
+                }
+            }
+        });
+    },
+    _updatingSubmission: false,
+    editSubmission(id, type){
+        if (storify.creator.detail._updatingSubmission) return;
+        storify.creator.detail._updatingSubmission = true;
+        storify.loading.show();
+        $.ajax({
+            method: "POST",
+            dataType: "json",
+            data: {
+                method: "updateSubmission",
+                id: id,
+                caption: $("#editCaptionModal .edit_description").val()
+            },
+            success: function(rs) {
+                storify.creator.detail._updatingSubmission = false;
                 storify.loading.hide();
                 if (rs.error) {
                     alert(rs.msg);
@@ -894,8 +1061,9 @@ storify.creator.detail = {
         var max_photo = $("#tab_control2").attr("m_photo") ? +$("#tab_control2").attr("m_photo") : 0,
             max_video = $("#tab_control2").attr("m_video") ? +$("#tab_control2").attr("m_video") : 0,
             n_photo = $("#tab_control2").attr("n_photo") ? +$("#tab_control2").attr("n_photo") : 0,
-            n_video = $("#tab_control2").attr("n_video") ? +$("#tab_control2").attr("n_video") : 0;
-
+            n_video = $("#tab_control2").attr("n_video") ? +$("#tab_control2").attr("n_video") : 0,
+            n_extra = $("#tab_control2").attr("n_extra") ? +$("#tab_control2").attr("n_extra") : 0;
+        /*
         console.log({
             type: type,
             max_photo: max_photo,
@@ -903,31 +1071,48 @@ storify.creator.detail = {
             n_photo: n_photo,
             n_video: n_video
         });
+        */
         if (type == "photo") {
-            if (n_photo < max_photo) {
+            if ( max_photo == 0){
+                $(".form_submit_btn").addClass("disabled");
+                $(".form_submit_btn").attr({type:"empty"});
+            }else if (n_photo < max_photo) {
                 //still available
                 $(".form_submit_btn").removeClass("disabled");
+                $(".form_submit_btn").attr({type:""});
             } else {
                 $(".form_submit_btn").addClass("disabled");
+                $(".form_submit_btn").attr({type:"full"});
             }
-        } else {
-            if (n_video < max_video) {
+        } else if (type == "video"){
+            if ( max_video == 0){
+                $(".form_submit_btn").addClass("disabled");
+                $(".form_submit_btn").attr({type:"empty"});
+            }else if (n_video < max_video) {
                 $(".form_submit_btn").removeClass("disabled");
+                $(".form_submit_btn").attr({type:""});
             } else {
                 $(".form_submit_btn").addClass("disabled");
+                $(".form_submit_btn").attr({type:"full"});
             }
+        } else{
+            $(".form_submit_btn").removeClass("disabled");
+            $(".form_submit_btn").attr({type:""});
         }
 
         //update text
         $("#photo-tab span").text(n_photo + "/" + max_photo);
         $("#video-tab span").text(n_video + "/" + max_video);
+        $("#extra-tab span").text(n_extra + "/∞");
     },
     listSubmissions: function(no_p, no_v, data, viewtype) {
         $("#submission-content .photolist").empty();
         $("#submission-content .videolist").empty();
+        $("#submission-content .extralist").empty();
 
         var number_photo = 0,
             number_video = 0,
+            number_extra = 0,
             total_assets = no_p + no_v,
             number_submitted = 0,
             number_finalised = 0,
@@ -939,6 +1124,9 @@ storify.creator.detail = {
             } else if (value.type == "video") {
                 number_video++;
                 $("#submission-content .videolist").append(storify.creator.detail.createSubmissionBlock(value));
+            } else{
+                number_extra++;
+                $("#submission-content .extralist").append(storify.creator.detail.createSubmissionBlock(value));
             }
             if (value.status == "accepted") {
                 number_finalised++;
@@ -954,11 +1142,16 @@ storify.creator.detail = {
             $("#submission-content .videolist").append($("<p>").text("No submissions have been made, yet."));
         }
 
+        if (number_extra == 0) {
+            $("#submission-content .extralist").append($("<p>").text("No submissions have been made, yet."));
+        }
+
         $("#tab_control2").attr({
             "m_photo": no_p,
             "m_video": no_v,
             "n_photo": number_photo,
-            "n_video": number_video
+            "n_video": number_video,
+            "n_extra": number_extra
         });
 
         //submission_title
@@ -973,8 +1166,10 @@ storify.creator.detail = {
 
         if (viewtype == "photo") {
             $('#tab_control2 a[href="#photolist"]').tab("show");
-        } else {
+        } else if (viewtype == "video") {
             $('#tab_control2 a[href="#videolist"]').tab("show");
+        } else{
+            $('#tab_control2 a[href="#extralist"]').tab("show");
         }
         storify.creator.detail.viewlist(viewtype);
     },
@@ -1000,12 +1195,15 @@ storify.creator.detail = {
                         //if viewtype is not set
                         if (rs.data.length) {
                             var number_photo = 0,
-                                number_video = 0;
+                                number_video = 0,
+                                number_extra = 0;
                             $.each(rs.data, function(index, value) {
                                 if (value.type == "photo") {
                                     number_photo++;
-                                } else {
+                                } else if(value.type == "video"){
                                     number_video++;
+                                } else {
+                                    number_extra++;
                                 }
                             });
 

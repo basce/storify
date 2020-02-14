@@ -2,9 +2,69 @@
     if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
 
         //get ongoing and close number
-        $project_stats = $main->getProjectManager()->getProjectStats($current_user->ID);
+        $project_stats = $main->getProjectManager()->getProjectStats($current_user->ID, $default_group_id);
         $total_ongoing = $project_stats["open"];
         $total_closed = $project_stats["closed"];
+
+        if($default_group_id){
+            $business_link = array(
+                "label"=>"Businesss Account",
+                "link"=>"",
+                "icon"=>"fa-users",
+                "group"=>array(
+                    array(
+                        "label"=>$default_group["name"],
+                        "link"=>"/user@".$current_user->ID."/business_profile",
+                        "icon"=>"fa-users",
+                        "query_item"=>"business_profile",
+                        "query_index"=>2
+                    ),
+                    array(
+                        "label"=>"Members",
+                        "link"=>"/user@".$current_user->ID."/business_member",
+                        "icon"=>"fa-users",
+                        "query_item"=>"business_member",
+                        "query_index"=>2
+                    ),
+                    array(
+                        "label"=>"Change Group",
+                        "link"=>"/user@".$current_user->ID."/business_group",
+                        "icon"=>"fa-arrows-h",
+                        "query_item"=>"business_group",
+                        "query_index"=>2
+                    ),
+                    array(
+                        "label"=>"Invitations",
+                        "link"=>"/user@".$current_user->ID."/business_invite",
+                        "icon"=>"fa-envelope-square",
+                        "query_item"=>"business_invite",
+                        "query_index"=>2
+                    ),
+                    array(
+                        "label"=>"Payment Method",
+                        "link"=>"/user@".$current_user->ID."/business_payment",
+                        "icon"=>"fa-credit-card",
+                        "query_item"=>"business_payment",
+                        "query_index"=>2
+                    )
+                )
+            );
+        }else{
+            $business_link = array(
+                "label"=>"Businesss Account",
+                "link"=>"",
+                "icon"=>"fa-users",
+                "group"=>array(
+                    array(
+                        "label"=>"Setup",
+                        "link"=>"/user@".$current_user->ID."/business_welcome",
+                        "icon"=>"fa-flag-checkered",
+                        "query_item"=>"business_welcome",
+                        "query_index"=>2
+                    )
+                )
+            );
+        }
 
         $left_nav_items = array(
             array(
@@ -39,6 +99,7 @@
                     )
                 )
             ),
+            $business_link,
             /*
             array(
                 "label"=>"Projects",

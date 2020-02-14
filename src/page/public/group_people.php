@@ -49,7 +49,7 @@ $pageSettings["breadcrumb"] = array(
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -103,6 +103,9 @@ if(isset($_REQUEST["order"])){
         case "latest":
             $sortBy = "latest";
         break;
+        case "popular":
+            $sortBy = "popular";
+        break;
         default:
             $sortBy = "default";
         break;
@@ -144,6 +147,7 @@ if(isset($_REQUEST["order"])){
                                     <div class="col-6">
                                             <select name="order" id="order" class="small width-200px" data-placeholder="Default Sorting" >
                                                 <option value="default" <?php if($sortBy == "default"){ echo "selected";}?>>Default</option>
+                                                <option value="popular" <?php if($sortBy == "popular"){ echo "selected";}?>>Popular</option>
                                                 <option value="latest" <?php if($sortBy == "latest"){ echo "selected";}?>>Newest</option>
                                                 <option value="oldest" <?php if($sortBy == "oldest"){ echo "selected";}?>>Oldest</option>
                                             </select>

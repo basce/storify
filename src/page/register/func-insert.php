@@ -16,6 +16,8 @@ if($result["error"]){
 	//success
 	$insert_success = true;
 
+	\storify\wallet::createAccount($result["id"],"personal");
+
 	job::add($result["id"], "new_register", array(
 		"userid"=>$result["id"],
 		"name"=>$name,

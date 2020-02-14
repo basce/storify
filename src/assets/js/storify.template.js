@@ -340,3 +340,115 @@ storify.template.simpleModal = (data, modal_id, actions) => `
         </div>
     </modal>
 `;
+
+storify.template.createProjectListItem = (data, project_id, actions) =>`
+    <div class="project-item" id="${project_id}">
+        <div class="ribbon-featured">
+            <div class="ribbon-start"></div>
+            <div class="ribbon-content">New</div>
+            <div class="ribbon-end">
+                <figure class="ribbon-shadow"></figure>
+            </div>
+        </div>
+        <div class="wrapper">
+            <div class="content">
+                <h3>${data.title}</h3>
+                <p>
+                ${
+                    (locations=>{
+                        if(locations.length){
+                            var templocations = locations.map(location=>{
+                                return `<span data-term_id="${location.term_id}">${location.name}</span>`;
+                            }).join(", ");
+                            return templocations;
+                        }else{
+                            return ``;
+                        }
+                    })(data.summary.location)
+                }
+                </p>
+                <p>
+                ${
+                    (brands=>{
+                        if(brands.length){
+                            var tempbrands = brands.map(brand=>{
+                                return `<span data-term_id="${brand.term_id}">${brand.name}</span>`;
+                            }).join(", ");
+                            return tempbrands;
+                        }else{
+                            return ``;
+                        }
+                    })(data.summary.brand)
+                }
+                </p>
+                <p>
+                ${
+                    (tags=>{
+                        if(tags.length){
+                            var temptags = tags.map(tag=>{
+                                return `<span data-term_id="${tag.term_id}">${tag.name}</span>`;
+                            }).join(", ");
+                            return temptags;
+                        }else{
+                            return ``;
+                        }
+                    })(data.summary.tag)
+                }
+                </p>
+                <p>
+                    ${data.summary.description}
+                </p>
+                <p># of creators: ${data.summary.offer.data.length}</p>
+                <div class="creators">
+                    ${
+                        (creators=>{
+                            var creator_div = creators.map(creator=>{
+                                return `<span class="creator ${creator.status}" title="${creator.igusername}" style="background-image:url(${creator.profile_image})"></span>`;
+                            }).join(" ");
+                            return creator_div;
+                        })(data.summary.offer.data)
+                    }
+                </div>
+                <div>
+                    ${
+                        (tasks=>{
+                            return tasks.length == 1 ? `1 task` : tasks.length + " tasks";
+                        })(data.summary.task)
+                    } / Creator
+                </div>
+                <div>
+                    ${
+                        (submissions=>{
+                            return submissions.stats.pending == 1 ? `1 Submission` : submissions.stats.pending + " Submissions";
+                        })(data.summary.submission)
+                    } waiting for review
+                    <br>
+                    ${
+                        (post_reports=>{
+                            return post_reports.stats.pending == 1 ? `1 Performance Report` : post_reports.stats.pending + " Performance Reports";
+                        })(data.summary.post_report)
+                    } waiting for review
+                </div>
+                <div class="actions">
+                    ${
+                        (actions=>{
+                            console.log(actions);
+                            if(actions.length){
+                                return actions.map(action=>{
+                                    if(action.attr){
+                                        var button = `<a `+ Object.entries(action.attr).map(attr=>{return attr[0]+ `="` + attr[1] + `"`}).join(" ") + ` >`+action.label+`</a>`;
+                                        return button;
+                                    }else{
+                                        return ``;
+                                    }
+                                }).join(" ");
+                            }else{
+                                return ``;
+                            }
+                        })(actions)
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+`;

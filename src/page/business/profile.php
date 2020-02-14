@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -53,6 +53,9 @@
             background-color: transparent;
             padding: 4rem 0 0;
             font-size: inherit;
+        }
+        #business_profile_form .profile-image .image {
+            background-image:url(/assets/img/partner.png);
         }
     </style>
 </head>
@@ -146,8 +149,8 @@ include("page/component/header.php"); ?>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="profile-image">
-                                            <div class="image background-image" id="business_image_preview" style="background-image:url(https://cdn.storify.me/<?=$business_account["profile_image"]?>)">
-                                                <img src="https://cdn.storify.me/<?=$business_account["profile_image"]?>">
+                                            <div class="image background-image" id="business_image_preview" style="background-image:url(<?=$main->getCDNURL(get_home_url()."/".$business_account["profile_image"])?>)">
+                                                <img src="<?=$main->getCDNURL(get_home_url()."/".$business_account["profile_image"])?>">
                                             </div>
                                             <div class="single-file-input">
                                                 <input type="file" id="business_image" name="business_image" accept="image/*">

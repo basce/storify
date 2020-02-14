@@ -73,7 +73,7 @@ switch($_REQUEST["method"]){
 		$obj["last_update"] = date("j M y H:i" , $last_update_datetime);
 	break;
 	case "getlisting":
-		 $igers = $main->getIger(isset($_REQUEST["category"])?json_decode($_REQUEST["category"], true):null,isset($_REQUEST["country"])?json_decode($_REQUEST["country"], true):null,isset($_REQUEST["langauge"])?json_decode($_REQUEST["langauge"], true):null,12,$_REQUEST["page"],$_REQUEST["sort"],false);
+		 $igers = $main->getIgerElasticSearch(isset($_REQUEST["category"])?json_decode($_REQUEST["category"], true):null,isset($_REQUEST["country"])?json_decode($_REQUEST["country"], true):null,isset($_REQUEST["langauge"])?json_decode($_REQUEST["langauge"], true):null,12,$_REQUEST["page"],$_REQUEST["sort"],false);
 		 $obj["error"] = 0;
 		 $obj["msg"] = "";
 		 $obj["result"] = $igers;

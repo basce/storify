@@ -446,6 +446,7 @@ function worker_job_project_invite_reject_creator($data){
 
 function worker_job_project_invite_accept_brand($data){
 	global $wpdb, $main;
+	//storify_invite_accept_brand
 
 	//get user id 
 	$user = get_user_by('id', $data["creator_id"]);
@@ -527,7 +528,7 @@ function worker_job_project_invite_accept_brand($data){
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
 			"number_of_items"=>$number_of_items,
-			"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])), //actually is submission close date
+			"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
 			"detail_link"=>$project_link
 		)
 	);
@@ -938,7 +939,7 @@ function worker_job_project_close($data){
 				$photos_accepted_requested++;
 				$total_accepted_items++;
 			}
-		}else{
+		}else if($value["type"] == "video"){
 			$creators_submission[$value["creator_id"]]["total_videos"]++;
 			if($value["status"] == "accepted"){
 				$videos_accepted_requested++;
@@ -959,13 +960,15 @@ function worker_job_project_close($data){
 			foreach($value["data"] as $key2=>$value2){
 				if( $value2["type"] == "photo" && $project["data"]["detail"]->cost_per_photo && $value2["status"] == "accepted" ){
 					$creators_submission[$value["creator_id"]]["data_sentence"][] = getAssetsCode($value2["id"])." by @".$igusername.": S$".$project["data"]["detail"]->cost_per_photo;
-					$creators_submission[$value["creator_id"]]["creator_data_sentence"][] = getAssetsCode($value2["id"]).": S$".$project["data"]["detail"]->cost_per_video;
+					$creators_submission[$value["creator_id"]]["creator_data_sentence"][] = getAssetsCode($value2["id"]).": S$".$project["data"]["detail"]->cost_per_photo;
 					$creators_submission[$value["creator_id"]]["total_amount"] += $project["data"]["detail"]->cost_per_photo;
+					$creators_submission[$value["creator_id"]]["igusername"] = $igusername;
 				}
 				if( $value2["type"] == "video" && $project["data"]["detail"]->cost_per_video && $value2["status"] == "accepted" ){
 					$creators_submission[$value["creator_id"]]["data_sentence"][] = getAssetsCode($value2["id"])." by @".$igusername.": S$".$project["data"]["detail"]->cost_per_video;
 					$creators_submission[$value["creator_id"]]["creator_data_sentence"][] = getAssetsCode($value2["id"]).": S$".$project["data"]["detail"]->cost_per_video;
 					$creators_submission[$value["creator_id"]]["total_amount"] += $project["data"]["detail"]->cost_per_video;
+					$creators_submission[$value["creator_id"]]["igusername"] = $igusername;
 				}
 			}
 		}
@@ -986,14 +989,14 @@ function worker_job_project_close($data){
 				$submissions_payment_detail_list_plain .= "\n".$count.") ".$value2;
 				$count++;
 			}
-			$submissions_payment_detail_list .= "</ol></p><hr><p>Final Due for @".$igusername.": S$".$value["total_amount"]."</p>";
-			$submissions_payment_detail_list_plain .= "\n-----------------------------------------------\nFinal Due for @".$igusername.": S$".$value["total_amount"]."\n";
+			$submissions_payment_detail_list .= "</ol></p><hr><p>Final for @".$value["igusername"].": S$".$value["total_amount"]."</p><hr>";
+			$submissions_payment_detail_list_plain .= "\n-----------------------------------------------\nFinal for @".$value["igusername"].": S$".$value["total_amount"]."\n\n-----------------------------------------------";
 			$payment_total += $value["total_amount"];
 		}
 	}
 
-	$submissions_payment_detail_list .= "<hr><p>Platform fee for ".( sizeof($creators_submission) == 1 ? "1 activated creator" : sizeof($creators_submission)." activated creators" ).": S$".( sizeof($creators_submission) * 99 )." (S$99 / creator)</p>";
-	$submissions_payment_detail_list_plain .= "\n-----------------------------------------------\nPlatform fee for ".( sizeof($creators_submission) == 1 ? "1 activated creator" : sizeof($creators_submission)." activated creators" ).": S$".( sizeof($creators_submission) * 99 )." (S$99 / creator)\n";
+	$submissions_payment_detail_list .= "<p>Platform fee for ".( sizeof($creators_submission) == 1 ? "1 activated creator" : sizeof($creators_submission)." activated creators" ).": S$".( sizeof($creators_submission) * 99 )." (S$99 / creator)</p>";
+	$submissions_payment_detail_list_plain .= "\nPlatform fee for ".( sizeof($creators_submission) == 1 ? "1 activated creator" : sizeof($creators_submission)." activated creators" ).": S$".( sizeof($creators_submission) * 99 )." (S$99 / creator)\n";
 
 	$payment_total += sizeof($creators_submission) * 99;
 
@@ -1069,7 +1072,7 @@ function worker_job_project_close($data){
 					$submission_payment_detail_list_plain .= "\n".$count.") ".$value2;
 					$count++;
 				}
-				$submission_payment_detail_list = "</ol></p>";
+				$submission_payment_detail_list .= "</ol></p>";
 
 				$item_data = array(
 					"to"=>array(
@@ -1129,7 +1132,7 @@ function worker_job_project_close($data){
 					$submission_payment_detail_list_plain .= "\n".$count.") ".$value2;
 					$count++;
 				}
-				$submission_payment_detail_list = "</ol></p>";
+				$submission_payment_detail_list .= "</ol></p>";
 
 				$item_data = array(
 					"to"=>array(
@@ -1238,7 +1241,16 @@ function worker_job_project_payment_confirm($data){
 
 	$items = array();
 	foreach( $submissions as $key=>$value ){
-		$items[] = getAssetsCode($value["id"]).": S$".( $value["type"] == "photo" ? $project["data"]["detail"]->cost_per_photo : $project["data"]["detail"]->cost_per_video );
+		switch($value["type"]){
+			case "photo":
+				$items[] = getAssetsCode($value["id"]).": S$".$project["data"]["detail"]->cost_per_photo;
+			break;
+			case "video":
+				$items[] = getAssetsCode($value["id"]).": S$".$project["data"]["detail"]->cost_per_video;
+			break;
+			case "extra":
+			break;
+		}
 	}
 
 	$submission_paid_list = "";
@@ -1350,13 +1362,15 @@ function worker_job_project_status_change($data){
 	$pass_data = array();
 
 	//get summary 
-	$query = "SELECT creator_id, id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d AND creator_id = %d AND status != %s ORDER BY id ASC";
-	$submissions = $wpdb->get_results($wpdb->prepare($query, $data["project_id"], $data["creator_id"], ""), ARRAY_A);
+	$query = "SELECT creator_id, id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d AND creator_id = %d ORDER BY id ASC";
+	$submissions = $wpdb->get_results($wpdb->prepare($query, $data["project_id"], $data["creator_id"]), ARRAY_A);
 
 	$photos_update_requested = 0;
 	$videos_update_requested = 0;
 	$photos_accepted_requested = 0;
 	$videos_accepted_requested = 0;
+	$photos_pending = 0;
+	$videos_pending = 0;
 
 	$creators_submission = array();
 	foreach($submissions as $key=>$value){
@@ -1377,47 +1391,58 @@ function worker_job_project_status_change($data){
 				$photos_update_requested++;
 			}else if($value["status"] == "accepted"){
 				$photos_accepted_requested++;
+			}else{ //pending
+				$photos_pending++;
 			}
-		}else{
+			$creators_submission[$value["creator_id"]]["total_items"]++;
+			$creators_submission[$value["creator_id"]]["data"][] = $value;
+		}else if($value["type"] == "video"){
 			$creators_submission[$value["creator_id"]]["total_videos"]++;
 			if($value["status"] == "rejected"){
 				$videos_update_requested++;
 			}else if($value["status"] == "accepted"){
 				$videos_accepted_requested++;
+			}else{
+				$videos_pending++;
 			}
+			$creators_submission[$value["creator_id"]]["total_items"]++;
+			$creators_submission[$value["creator_id"]]["data"][] = $value;
 		}
-		$creators_submission[$value["creator_id"]]["total_items"]++;
-		$creators_submission[$value["creator_id"]]["data"][] = $value;
 	}
 
 	foreach($creators_submission as $key=>$value){
 		if(sizeof($value["data"])){
 			foreach($value["data"] as $key2=>$value2){
-				$creators_submission[$value["creator_id"]]["data_sentence"][] = getAssetsCode($value2["id"])." - ".( $value2["status"] == "accepted" ? "Accepted" : "Updates Requested" );
+				$tempcase = "Pending Acceptance";
+				switch($value2["status"]){
+					case "accepted":
+						$tempcase = "Accepted";
+					break;
+					case "rejected":
+						$tempcase = "Updates Requested";
+					break;
+					default:
+						$tempcase = "Pending Acceptance";
+					break;
+				}
+				$creators_submission[$value["creator_id"]]["data_sentence"][] = getAssetsCode($value2["id"])." - ".$tempcase;
 			}
 		}
 	}
 
-	$update_number_of_items = "";
-	if($photos_update_requested == 0 && $videos_update_requested == 0){
-		$update_number_of_items = "0";
-	}else if($photos_update_requested == 0){
-		$update_number_of_items = ( $videos_update_requested == 1 ) ? "1 video" : $videos_update_requested." videos";
-	}else if($videos_update_requested == 0){
-		$update_number_of_items = ( $photos_update_requested == 1 ) ? "1 photo" : $photos_update_requested." photos";
-	}else{
-		$update_number_of_items = ( ( $photos_update_requested == 1 ) ? "1 photo" : $photos_update_requested." photos" )." and ".( ( $videos_update_requested == 1 ) ? "1 video" : $videos_update_requested." videos" );
-	}
-
 	if($project["data"]["detail"]->no_of_photo == 0){
-		$summary_line_1 = $videos_accepted_requested." / ".$project["data"]["detail"]->no_of_video." videos";
+		$summary_line_1 = $videos_accepted_requested." / ".$project["data"]["detail"]->no_of_video." video(s)";
+		$summary_line_2 = $videos_update_requested == 1 ? "1 video" : $videos_update_requested." videos";
+		$summary_line_3 = $videos_pending == 1 ? "1 video" : $videos_pending." videos";
 	}else if($project["data"]["detail"]->no_of_video == 0){
-		$summary_line_1 = $photos_accepted_requested." / ".$project["data"]["detail"]->no_of_photo." photos";
+		$summary_line_1 = $photos_accepted_requested." / ".$project["data"]["detail"]->no_of_photo." photo(s)";
+		$summary_line_2 = $photos_update_requested == 1 ? "1 photo" : $photos_update_requested." photos";
+		$summary_line_3 = $photos_pending == 1 ? "1 photo" : $photos_pending." photos";
 	}else{
-		$summary_line_1 = $photos_accepted_requested." / ".$project["data"]["detail"]->no_of_photo." photos and ".$videos_accepted_requested." / ".$project["data"]["detail"]->no_of_video." videos";
+		$summary_line_1 = $photos_accepted_requested." / ".$project["data"]["detail"]->no_of_photo." photo(s) and ".$videos_accepted_requested." / ".$project["data"]["detail"]->no_of_video." video(s)";
+		$summary_line_2 = ( $photos_update_requested == 1 ? "1 photo" : $photos_update_requested." photos" ) . " and " . ( $videos_update_requested == 1 ? "1 video" : $videos_update_requested." videos" );
+		$summary_line_3 = ( $photos_pending == 1 ? "1 photo" : $photos_pending." photos" )  . " and " . ( $videos_pending == 1 ? "1 video" : $videos_pending." videos" );
 	}
-
-	$summary_line_2 = $update_number_of_items;
 
 	$item_detail_list = "";
 	$item_detail_list_plain = "";
@@ -1454,10 +1479,10 @@ function worker_job_project_status_change($data){
 			"igusername"=>$igusername,
 			"accepted_item"=>$summary_line_1,
 			"update_item"=>$summary_line_2,
+			"pending_item"=>$summary_line_3,
 			"item_detail_list"=>$item_detail_list,
 			"item_detail_list_plain"=>$item_detail_list_plain,
 			"submit_link"=>$project_link."/submit",
-			"project_close_date_before_7"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 604800 ),
 			"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 )
 		)
 	);
@@ -1557,13 +1582,15 @@ function worker_job_project_summary($data){
 	$total_video_submission = $total_creator * $project["data"]["detail"]->no_of_video;
 
 	//get summary 
-	$query = "SELECT id, creator_id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d AND status != %s ORDER BY id ASC";
-	$submissions = $wpdb->get_results($wpdb->prepare($query, $data["project_id"], "rejected"), ARRAY_A);
+	$query = "SELECT id, creator_id, `type`, status FROM `".$wpdb->prefix."project_new_submission` WHERE project_id = %d ORDER BY id ASC";
+	$submissions = $wpdb->get_results($wpdb->prepare($query, $data["project_id"]), ARRAY_A);
 
 	$photos_update_requested = 0;
 	$videos_update_requested = 0;
 	$photos_accepted_requested = 0;
 	$videos_accepted_requested = 0;
+	$photos_pending = 0;
+	$videos_pending = 0;
 
 	$creators_submission = array();
 	if(sizeof($submissions)){
@@ -1581,21 +1608,27 @@ function worker_job_project_summary($data){
 
 			if($value["type"] == "photo"){
 				$creators_submission[$value["creator_id"]]["total_photos"]++;
-				if($value["status"] == ""){
+				if($value["status"] == "rejected"){
 					$photos_update_requested++;
 				}else if($value["status"] == "accepted"){
 					$photos_accepted_requested++;
+				}else{
+					$photos_pending++;
 				}
-			}else{
+				$creators_submission[$value["creator_id"]]["total_items"]++;
+				$creators_submission[$value["creator_id"]]["data"][] = $value;
+			}else if($value["type"] == "video"){
 				$creators_submission[$value["creator_id"]]["total_videos"]++;
-				if($value["status"] == ""){
+				if($value["status"] == "rejected"){
 					$videos_update_requested++;
 				}else if($value["status"] == "accepted"){
 					$videos_accepted_requested++;
+				}else{
+					$videos_pending++;
 				}
+				$creators_submission[$value["creator_id"]]["total_items"]++;
+				$creators_submission[$value["creator_id"]]["data"][] = $value;
 			}
-			$creators_submission[$value["creator_id"]]["total_items"]++;
-			$creators_submission[$value["creator_id"]]["data"][] = $value;
 		}
 	}
 
@@ -1607,28 +1640,39 @@ function worker_job_project_summary($data){
 
 			if(sizeof($value["data"])){
 				foreach($value["data"] as $key2=>$value2){
-					$creators_submission[$value["creator_id"]]["data_sentence"][] = getAssetsCode($value2["id"])." by @".$igusername." - ".( $value2["status"] == "accepted" ? "Accepted" : "Updates Requested" );
+					$tempcase = "Pending Acceptance";
+					switch($value2["status"]){
+						case "accepted":
+							$tempcase = "Accepted";
+						break;
+						case "rejected":
+							$tempcase = "Updates Requested";
+						break;
+						default:
+							$tempcase = "Pending Acceptance";
+						break;
+					}
+					$creators_submission[$value["creator_id"]]["data_sentence"][] = getAssetsCode($value2["id"])." by @".$igusername." - ".$tempcase;
 				}
 			}
 		}
 	}
 
-	if( $total_photo_submission == 0 ){
-		$summary_line_1 = "Accepted: ".$videos_accepted_requested." / ".$total_video_submission." videos";
-	}else if( $total_video_submission == 0 ){
-		$summary_line_1 = "Accepted: ".$photos_accepted_requested." / ".$total_photo_submission." photos";
-	}else{
-		$summary_line_1 = "Accepted: ".$photos_accepted_requested." / ".$total_photo_submission." photos and ".$videos_accepted_requested." / ".$total_video_submission." videos";
-	}
+	$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project_user` WHERE project_id = %d AND role = %s";
+	$no_creator = $wpdb->get_var($wpdb->prepare($query, $data["project_id"], "creator"));
 
-	if( $photos_update_requested == 0 && $videos_update_requested == 0 ){
-		$summary_line_2 = "";
-	}else if( $photos_update_requested == 0 ){
-		$summary_line_2 = "Updates requested: ".( $videos_update_requested == 1 ? "1 video" : $videos_update_requested." videos" );
-	}else if( $videos_update_requested == 0 ){
-		$summary_line_2 = "Updates requested: ".( $photos_update_requested == 1 ? "1 photo" : $photos_update_requested." photos" );
+	if($project["data"]["detail"]->no_of_photo == 0){
+		$summary_line_1 = "Accepted : ".$videos_accepted_requested." / ".( $project["data"]["detail"]->no_of_video * $no_creator )." video(s)";
+		$summary_line_2 = "Updates needed : ". ( $videos_update_requested == 1 ? "1 video" : $videos_update_requested." videos" );
+		$summary_line_3 = "Pending acceptance : ". ( $videos_pending == 1 ? "1 video" : $videos_pending." videos" );
+	}else if($project["data"]["detail"]->no_of_video == 0){
+		$summary_line_1 = "Accepted : ".$photos_accepted_requested." / ".( $project["data"]["detail"]->no_of_photo * $no_creator )." photo(s)";
+		$summary_line_2 = "Updates needed : ". ( $photos_update_requested == 1 ? "1 photo" : $photos_update_requested." photos" );
+		$summary_line_3 = "Pending acceptance : ". ( $photos_pending == 1 ? "1 photo" : $photos_pending." photos" );
 	}else{
-		$summary_line_2 = "Updates requested: ".( $photos_update_requested == 1 ? "1 photo" : $photos_update_requested." photos" ) . " and " . ( $videos_update_requested == 1 ? "1 video" : $videos_update_requested." videos" );
+		$summary_line_1 = "Accepted : ".$photos_accepted_requested." / ".( $project["data"]["detail"]->no_of_photo * $no_creator )." photo(s) and ".$videos_accepted_requested." / ".( $project["data"]["detail"]->no_of_video * $no_creator )." video(s)";
+		$summary_line_2 = "Updates needed : ". ( $photos_update_requested == 1 ? "1 photo" : $photos_update_requested." photos" ) . " and " . ( $videos_update_requested == 1 ? "1 video" : $videos_update_requested." videos" );
+		$summary_line_3 = "Pending acceptance : ". ( $photos_pending == 1 ? "1 photo" : $photos_pending." photos" )  . " and " . ( $videos_pending == 1 ? "1 video" : $videos_pending." videos" );
 	}
 
 	$submission_complete_list = "";
@@ -1668,9 +1712,8 @@ function worker_job_project_summary($data){
 						"data"=>array(
 							"project_name"=>$project_name,
 							"first_name"=>$first_name,
-							"submission_complete_list"=>"<p>".$summary_line_1."<br />".$summary_line_2."</p>".$submission_complete_list,
-							"submission_complete_list_plain"=>$summary_line_1."\n".$summary_line_2.$submission_complete_list_plain,
-							"project_close_date_before_7"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])+604800),
+							"submission_complete_list"=>"<p>".$summary_line_1."<br />".$summary_line_2."<br />".$summary_line_3."</p>".$submission_complete_list,
+							"submission_complete_list_plain"=>$summary_line_1."\n".$summary_line_2."\n".$summary_line_3.$submission_complete_list_plain,
 							"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]) + 1209600 ),
 							"submit_link"=>$project_link."/submit"
 						)
@@ -1777,30 +1820,33 @@ function worker_job_submission_complete($data){
 
 		if($value["type"] == "photo"){
 			$creators_submission[$value["creator_id"]]["total_photos"] = (int) $value["cnt"];
-		}else{
+			$creators_submission[$value["creator_id"]]["total_items"] += (int) $value["cnt"];
+		}else if($value["type"] == "video"){
 			$creators_submission[$value["creator_id"]]["total_videos"] = (int) $value["cnt"];
+			$creators_submission[$value["creator_id"]]["total_items"] += (int) $value["cnt"];
 		}
-		$creators_submission[$value["creator_id"]]["total_items"] += (int) $value["cnt"];
 	}
 
 	$current_creator_photo_count = 0;
 	$current_creator_video_count = 0;
 	$current_creator_submitted_item = "";
+	$current_creator_submitted_item_count = 0;
 
 	$creators_submission_sentence = array();
 	//create listing
 	foreach($creators_submission as $key=>$value){
-		$photo_submitted = $value["total_photos"]." / ".$project["data"]["detail"]->no_of_photo." photos";
-		$video_submitted = $value["total_videos"]." / ".$project["data"]["detail"]->no_of_video." videos";
+		$photo_submitted = $value["total_photos"]." / ".$project["data"]["detail"]->no_of_photo." photo(s)";
+		$video_submitted = $value["total_videos"]." / ".$project["data"]["detail"]->no_of_video." video(s)";
 
 		if($value["creator_id"] == $data["creator_id"]){
 			if($value["total_photos"] == 0){
-				$current_creator_submitted_item = $value["total_videos"]." / ".$project["data"]["detail"]->no_of_video." videos";
+				$current_creator_submitted_item = $value["total_videos"]." / ".$project["data"]["detail"]->no_of_video." video(s)";
 			}else if($value["total_videos"] == 0){
-				$current_creator_submitted_item = $value["total_photos"]." / ".$project["data"]["detail"]->no_of_photo." photos";
+				$current_creator_submitted_item = $value["total_photos"]." / ".$project["data"]["detail"]->no_of_photo." photo(s)";
 			}else{
-				$current_creator_submitted_item = $value["total_photos"]." / ".$project["data"]["detail"]->no_of_photo." photos and ".$value["total_videos"]." / ".$project["data"]["detail"]->no_of_video." videos";
+				$current_creator_submitted_item = $value["total_photos"]." / ".$project["data"]["detail"]->no_of_photo." photo(s) and ".$value["total_videos"]." / ".$project["data"]["detail"]->no_of_video." video(s)";
 			}
+			$current_creator_submitted_item_count = $value["total_photos"] + $value["total_videos"];
 		}
 
 		$query = "SELECT igusername FROM `".$wpdb->prefix."igaccounts` WHERE userid = %d";
@@ -1824,6 +1870,15 @@ function worker_job_submission_complete($data){
 		$creators_submission_sentence_plain .= ($key + 1)." ".$value."\n";
 	}
 
+	//check if submission still complete, if not escape
+	if( ( $project["data"]["detail"]->no_of_photo + $project["data"]["detail"]->no_of_video ) != ( $current_creator_submitted_item_count ) ){
+		return array(
+			"complete"=>1,
+			"type"=>"emails",
+			"emaildatas"=>array()
+		);
+	}
+
 	//get all user ( to get admin, but not creator that already accept the job )
 	$users = $main->getProjectManager()->getUsers($data["project_id"]);
 
@@ -1843,7 +1898,7 @@ function worker_job_submission_complete($data){
 				"data"=>array(
 					"project_name"=>$project_name,
 					"first_name"=>$first_name,
-					"creator_complete_list"=>"<p></ol><li>".implode("</li><li>",$creators_submission_sentence)."</p></ol></li>",
+					"creator_complete_list"=>"<p></ol><li>".implode("</li><li>",$creators_submission_sentence)."</li></ol></p>",
 					"creator_complete_list_plain"=>$creators_submission_sentence_plain,
 					"submit_link"=>$project_link."/submit",
 					"brand"=>$brand,
@@ -1886,7 +1941,6 @@ function worker_job_submission_complete($data){
 			"brand"=>$brand,
 			"submitted_items"=>$current_creator_submitted_item,
 			"submit_link"=>$project_link."/submit",
-			"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
 			"cash_or_sponsorship"=>$cash_or_sponsorship,
 			"bounty"=>$bounty,
 			"number_of_items"=>$number_of_items			
@@ -1978,10 +2032,11 @@ function worker_job_submission_close($data){
 	$total_number_of_video_count = 0;
 	if(sizeof($submissions)){
 		foreach($submissions as $key=>$value){
-			$total_submission += $value["cnt"];
 			if($value["type"] == "photo"){
+				$total_submission += $value["cnt"];
 				$total_number_of_photo_count = $value["cnt"];
-			}else{
+			}else if($value["type"] == "video"){
+				$total_submission += $value["cnt"];
 				$total_number_of_video_count = $value["cnt"];
 			}
 		}
@@ -2018,6 +2073,7 @@ function worker_job_submission_close($data){
 					"data"=>array(
 						"project_name"=>$project_name,
 						"brand"=>$brand,
+						"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
 						"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])+1209600), //2 weeks after submission close date
 						"first_name"=>$first_name,
 						"total_number_of_items"=>$total_number_of_items,
@@ -2044,6 +2100,7 @@ function worker_job_submission_close($data){
 						"project_name"=>$project_name,
 						"brand"=>$brand,
 						"submit_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
+						"project_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])+1209600), //2 weeks after submission close date
 						"first_name"=>$first_name,
 						"number_of_items"=>$number_of_items,
 						"submit_link"=>$project_link."/submit",
@@ -2086,10 +2143,11 @@ function worker_job_submission_close($data){
 			$individual_number_of_video_count = 0;
 			if(sizeof($individual_submissions)){
 				foreach($individual_submissions as $key2=>$value2){
-					$individual_submission_count += $value2["cnt"];
 					if($value2["type"] == "photo"){
+						$individual_submission_count += $value2["cnt"];
 						$individual_number_of_photo_count = $value2["cnt"];
-					}else{
+					}else if($value2["type"] == "video"){
+						$individual_submission_count += $value2["cnt"];
 						$individual_number_of_video_count = $value2["cnt"];
 					}
 				}
@@ -2467,6 +2525,8 @@ function worker_job_project_brief_update($data){
 
 	$pass_data = array();
 
+	$dynamic_submission_closing_date = date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]));
+
 	//get all user 
 	$users = $main->getProjectManager()->getUsers($data["project_id"]);
 
@@ -2511,7 +2571,7 @@ function worker_job_project_brief_update($data){
 					"cash_or_sponsorship"=>$cash_or_sponsorship,
 					"bounty"=>$bounty,
 					"number_of_items"=>$number_of_items,
-					"submission_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
+					"submission_close_date"=>$dynamic_submission_closing_date,
 					"detail_link"=>$project_link
 				)
 			);
@@ -2646,8 +2706,10 @@ function worker_job_project_invite_expired($data){
 		}
 	}
 
-	$number_of_people_with_is = ( $number_of_creator == 1 ) ? "1 people is": $number_of_creator." people are";
+	$number_of_people_with_is = ( $number_of_creator == 1 ) ? "1 creator is": $number_of_creator." creators are";
 	$number_of_creator_with_is = ( $number_of_creator == 1 ) ? "1 creator is": $number_of_creator." creators are";
+
+	$dynamic_submission_closing_date = date('d/m/y', strtotime($project["data"]["summary"]["closing_date"]));
 
 	foreach($users as $key=>$value){
 		if($value["role"] == "admin"){
@@ -2673,7 +2735,7 @@ function worker_job_project_invite_expired($data){
 					"cash_or_sponsorship"=>$cash_or_sponsorship,
 					"bounty"=>$bounty,
 					"number_of_items"=>$number_of_items,
-					"submission_close_date"=>date('d/m/y', strtotime($project["data"]["summary"]["closing_date"])),
+					"submission_close_date"=>$dynamic_submission_closing_date,
 					"submit_link"=>$project_link."/submit"
 				)
 			);
@@ -2691,8 +2753,8 @@ function worker_job_project_invite_expired($data){
 	//get all creator that is being invited, but in pending
 	$invited_creators = $main->getProjectManager()->getInvitationList($data["project_id"]);
 	foreach($invited_creators as $key=>$value){
-		//only interest on invitation pending
-		if($value["invitation_status"] == "pending"){
+		//only interest on invitation that is not accepted ( expired )
+		if($value["invitation_status"] == "expired"){
 
 			$user = get_user_by('id', $value["user_id"]);
 

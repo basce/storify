@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -73,6 +73,35 @@
         .StripeElement--webkit-autofill {
           background-color: #fefde5 !important;
         }
+
+        .ccard_container{
+            margin-bottom:10px;
+        }
+        .ccard{
+            background-color: white;
+            display: inline-block;
+            padding: 5px 15px;
+            color: gray;
+            font-size:1.1em;
+        }
+
+        .ccard.default{
+            border: solid 1px blue;
+        }
+
+        .ccard i{
+            padding-right:10px;
+            color:black;
+        }
+
+        .ccard .date{
+            padding-left:260px;
+            padding-right:20px;
+        }
+
+        .ccard_container .setDefaultForm{
+            display:inline-block;
+        }
     </style>
 </head>
 <body>
@@ -104,7 +133,7 @@ include("page/component/header.php"); ?>
                         </div>
                         <div class="col-md-9">
                             <div class="clearfix">
-                                <p>Connect with stripe</p>
+                                <p>Credit Cards</p>
                                 <?php if(isset($_GET["error"])){
                                     ?>
                                     <div class="alert alert-danger">
@@ -131,19 +160,24 @@ include("page/component/header.php"); ?>
                                 <a href="https://connect.stripe.com/oauth/authorize?<?=http_build_query($params)?>" class="btn btn-primary">Connect</a>
                                 <?php */ 
 
-                                $stripe_id = \storify\stripe::getStripe_id($current_user->ID, "pay");
+                                //updat to use business id
 
+                                $stripe_id = \storify\stripe::getStripe_id($default_group_id, "pay");
                                 if(!$stripe_id){
                                     //stripe_id customer not exist, create stripe customer
-                                    $stripe_id = \storify\stripe::createCustomer();
+                                    $create_result = \storify\stripe::createCustomer();
 
-                                    if($stripe_id){
-                                        \storify\stripe::updateStripe_id($current_user->ID, "pay", $stripe_id);
+                                    if(isset($create_result["id"]) && $create_result["id"]){
 
-                                        print_r("new customer :".$stripe_id);
+                                        $stripe_id = $create_result["id"];
+
+                                        \storify\stripe::updateStripe_id($default_group_id, $create_result["type"], $stripe_id);
+
+                                        //print_r("new customer :".$stripe_id);
                                     }
                                 }
 
+                                $stripe_customer = \storify\stripe::getStripeCustomer($default_group_id);
                                 if($stripe_id){
 
                                     if(isset($_POST["stripeToken"])){
@@ -155,6 +189,26 @@ include("page/component/header.php"); ?>
                                     if($cards && sizeof($cards->data)){
                                         //with cards
 
+                                        //print_r($cards->data);
+                                        foreach($cards->data as $key=>$value){
+                                            if($value["id"] == $stripe_customer->default_source){
+                                                ?>
+                                                <div class="ccard_container">
+                                            <div class="ccard default"><i class="fa fa-credit-card"></i> xxxx xxxx xxxx <?=$value["last4"]?> <span class="date"><?=$value["exp_month"]?> / <?=substr($value["exp_year"],-2)?></span> <span class="corg"><?=$value["brand"]?></span></div>
+                                            <form action="" method="post" id="delete_card" style="display:inline-block">
+                                                <input type="hidden" name="delete_card_id" value="<?=$value["id"]?>">
+                                                <button type="submit" name="submit">Remove</button>
+                                            </form>
+                                            </div>
+                                            
+                                            <?php
+                                            }else{
+                                                ?>
+                                                <div class="ccard_container">
+                                            <div class="ccard"><i class="fa fa-credit-card"></i> xxxx xxxx xxxx <?=$value["last4"]?> <span class="date"><?=$value["exp_month"]?> / <?=substr($value["exp_year"],-2)?></span> <span class="corg"><?=$value["brand"]?></span> </div><form action="" method="post" class="setDefaultForm"><input type="hidden" value="<?=$value["id"]?>" name="default_source" > <button>Set as Default</button></form> </div>
+                                            <?php
+                                            }
+                                        }
                                         //list out all cards so can manage
                                         /*
                                         if(!\storify\stripe::checkPayment($project_id)){
@@ -180,14 +234,15 @@ include("page/component/header.php"); ?>
                                         */
                                         
                                     }else{
-                                        
-                                        
+                                        if(!$default_group["invoice"]){
+                                            ?><h2>No payment method is set, please enter credit card or request for invoice support: <small style="inline-block">use these card for testing 4000007020000003 4000004580000002 4000005540000008 4000001560000002</small></h2><?php
+                                        }
+                                    }
                                     ?>
-                                    <h2>Add card</h2>
                                     <form action="" method="post" id="payment-form">
                                       <div style="width:70%">
                                         <label for="card-element">
-                                          Credit or debit card
+                                          Add Card
                                         </label>
                                         <div id="card-element">
                                           <!-- A Stripe Element will be inserted here. -->
@@ -201,6 +256,21 @@ include("page/component/header.php"); ?>
                                     </form>
                                     <?php
 
+                                    if($cards && sizeof($cards->data)){
+
+                                    }else{
+                                        if(!$default_group["invoice"]){
+                                            ?>
+                                            <hr>
+                                            <p>Request for invoice payment method, by sending email / filling form</p>
+                                            <?php
+                                        }else{
+                                            ?>
+                                            <hr>
+                                            <h3>Invoice support is enabled</h3>
+                                            <p>Enter credit card to change the payment source.</p>
+                                            <?php
+                                        }
                                     }
                                 }else{
                                     print_r("cannot create Stripe Customer Account");

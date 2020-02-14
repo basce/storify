@@ -56,6 +56,13 @@ storify.brand.deliverable = {
                 {
                     titlehtml:``,
                     bodyhtml:`
+                    <video width="640" height="480" controls="" style="width: 100%;height: 320px;">
+                        <source src="" type="video/MP4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <img src="" style="width: 100%">
+                    <div class="caption" style="padding:10px; background:#F6F8F8; white-space: pre-wrap; word-break: break-word;">
+                    </div>
                     <a class="filename" download></a>
                     <div class="filesize"></div>
                     <div class="filemime"></div>
@@ -97,7 +104,13 @@ storify.brand.deliverable = {
                 if(res.error){
                     alert(res.msg);
                 }else{
+
                     storify.brand.completion.getCompletion(storify.project._project_id);
+                    //update single
+
+                    $("#reject_submission").modal("hide");
+                    storify.brand.deliverable.updateDeliverableItem(res.data);
+                    /*
                     storify.brand.deliverable.getList(function(){
                         $("#reject_submission").modal("hide");
                         $(".item-rejected[data-id='"+$submission_id+"'] a.item-status").click();
@@ -105,6 +118,7 @@ storify.brand.deliverable = {
 							callback();
 						}
                     });
+                    */
                 }
             }
         });
@@ -189,6 +203,160 @@ storify.brand.deliverable = {
             }
         });
     },
+    updateDeliverableItem:function(data){
+        var d = $(".deliverable-creator-item[data-id='"+data.id+"']"),
+            temp_creator = storify.project.user.getUserDetail(data.creator_id),
+            temp_remark = null,
+            temp_status = null,
+            temp_action = null,
+            temp_history = null;
+
+        d.empty().removeClass("item-accepted item-pending item-rejected");
+
+        if(data.remark){
+            temp_remark = $("<div>").addClass("single_block urldescription")
+                                .append($("<p>").text(data.remark));
+        }else{
+            temp_remark = $("<div>").addClass("single_block urldescription")
+                                .append($("<p>").append($("<i>").text("No caption entered.")));
+        }
+        if(data.status == "accepted" || data.status == "rejected"){
+            if(data.status == "accepted"){
+                temp_status = $("<div>").addClass("status_block")
+                                .append($("<span>").attr({title:data.admin_remark}).addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1)));
+                d.addClass("item-accepted");
+            }else{
+                temp_status = $("<div>").addClass("status_block")
+                                .append($("<a>").attr({href:"#", title:data.admin_remark}).addClass("item-status").text(data.status.charAt(0).toUpperCase() + data.status.slice(1))
+                                    .click(function(e){
+                                        e.preventDefault();
+                                        var remark = $(this).attr("title");
+                                        if(remark){
+                                            $("#reject_reason .reason").text(remark);
+                                        }else{
+                                            $("#reject_reason .reason").empty().append($("<i>").text("No caption entered."));
+                                        }
+                                        
+
+                                        $("#reject_submission textarea").val(remark ? remark : "");
+                                        $("#reject_submission a.confirmreject").attr({"data-id":data.id});
+
+                                        $("#reject_reason").modal("show");
+                                    })
+                                );
+                d.addClass("item-rejected");
+                $("#reject_reason a.edit").attr({"data-id":data.id});
+            }
+        }else{
+            d.addClass("item-pending");
+            temp_action = $("<div>").addClass("bottom_panel")
+                .append(
+                    $("<a>").addClass("btn btn-success small")
+                        .attr({href:"#"})
+                        .text("Accept")
+                        .click(function(e){
+                            //accept submission
+                            storify.brand.deliverable.response(data.id, "accepted","");
+                        })
+                )
+                .append(
+                    $("<a>").addClass("btn btn-danger small")
+                        .attr({href:"#"})
+                        .text("Reject")
+                        .click(function(e){
+                            //reject submission
+                            $("#reject_submission textarea").val("");
+                            $("#reject_submission a.confirmreject").attr({"data-id":data.id});
+                            $("#reject_submission").modal("show");
+                        })
+                );
+        }
+        if(data.history_id){
+            /*no longer in used*/
+            temp_history = $("<a>").attr({href:"#"}).text("history")
+                                .click(function(e){
+                                    e.preventDefault();
+                                    var _this = $(this);
+                                    storify.brand.deliverable.getHistory(data.deliverable_id, data.user_id, function(data2){
+                                         $.each(data2.data, function(index,value){
+                                            _this.parent().append(storify.brand.deliverable.createHistoryBlock(value));
+                                        });
+                                        _this.remove();
+                                    });
+                                });
+        }
+
+        if(+data.file_id){
+
+            var typeicon = "camera";
+            switch(data.type){
+                case "photo":
+                    typeicon = "fa-camera";
+                break;
+                case "video":
+                    typeicon = "fa-video-camera";
+                break;
+                case "extra":
+                    typeicon = "fa-archive";
+                    d.addClass("extra");
+                break;
+            }
+
+            d.append($("<div>").addClass("top_panel")
+                    .append($("<small>").text(data.submit_tt))
+                    .append($("<div>").addClass("single_block")
+                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-"+storify.core.leadingZero(data.id, 9))).prepend($("<i>").addClass("fa "+typeicon)).css({"margin-right":"5px"}))
+                        .append($("<div>").addClass("file-container")
+                            .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable.shortenFileName(data.filename)+" ("+data.mime+")")
+                                            .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
+                                            .click(function(e){
+                                                e.preventDefault();
+                                                storify.brand.deliverable._showDownloadDialog(data.file_id, data.remark ? data.remark : "No caption entered.");
+                                            })
+                                )
+                        )
+                    )
+                    .append(temp_remark)
+                    .append(temp_status)
+                    .append(temp_history)
+            )
+            .append(temp_action);
+
+        } else {
+
+            var typeicon = "camera";
+            switch(data.type){
+                case "photo":
+                    typeicon = "fa-camera";
+                break;
+                case "video":
+                    typeicon = "fa-video-camera";
+                break;
+                case "extra":
+                    typeicon = "fa-archive";
+                    d.addClass("extra");
+                break;
+            }
+            
+            d.append($("<div>").addClass("top_panel")
+                    .append($("<small>").text(data.submit_tt))
+                    .append($("<div>").addClass("single_block")
+                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa "+typeicon)).css({"margin-right":"5px"}))
+                        .append($("<input>").attr({type:"text",readonly:true})
+                            .val(data.URL)
+                            .click(function(e){
+                                e.preventDefault();
+                                this.setSelectionRange(0, this.value.length);
+                            })
+                        )
+                    )
+                    .append(temp_remark)
+                    .append(temp_status)
+                    .append(temp_history)
+            )
+            .append(temp_action);
+        }
+    },
     createDeliverableItem:function(data){
     	storify.brand.deliverable.addElementIfNotExist();
     	var d = $("<div>").addClass("deliverable-creator-item").attr({"data-id":data.id}),
@@ -224,32 +392,34 @@ storify.brand.deliverable = {
                                         
 
                                         $("#reject_submission textarea").val(remark ? remark : "");
-                                        $("#reject_submission button.confirmreject").attr({"data-id":data.id});
+                                        $("#reject_submission a.confirmreject").attr({"data-id":data.id});
 
                                         $("#reject_reason").modal("show");
                                     })
                                 );
                 d.addClass("item-rejected");
-                $("#reject_reason button.edit").attr({"data-id":data.id});
+                $("#reject_reason a.edit").attr({"data-id":data.id});
             }
         }else{
             d.addClass("item-pending");
             temp_action = $("<div>").addClass("bottom_panel")
                 .append(
-                    $("<button>").addClass("btn btn-success small")
+                    $("<a>").addClass("btn btn-success small")
+                        .attr({href:"#"})
                         .text("Accept")
                         .click(function(e){
                             //accept submission
                             storify.brand.deliverable.response(data.id, "accepted","");
                         })
-                    )
+                )
                 .append(
-                    $("<button>").addClass("btn btn-danger small")
+                    $("<a>").addClass("btn btn-danger small")
+                        .attr({href:"#"})
                         .text("Reject")
                         .click(function(e){
                             //reject submission
                             $("#reject_submission textarea").val("");
-                            $("#reject_submission button.confirmreject").attr({"data-id":data.id});
+                            $("#reject_submission a.confirmreject").attr({"data-id":data.id});
                             $("#reject_submission").modal("show");
                         })
                 );
@@ -270,16 +440,31 @@ storify.brand.deliverable = {
         }
 
         if(+data.file_id){
+
+            var typeicon = "camera";
+            switch(data.type){
+                case "photo":
+                    typeicon = "fa-camera";
+                break;
+                case "video":
+                    typeicon = "fa-video-camera";
+                break;
+                case "extra":
+                    typeicon = "fa-archive";
+                    d.addClass("extra");
+                break;
+            }
+
             d.append($("<div>").addClass("top_panel")
                     .append($("<small>").text(data.submit_tt))
                     .append($("<div>").addClass("single_block")
-                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-"+storify.core.leadingZero(data.id, 9))).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-"+storify.core.leadingZero(data.id, 9))).prepend($("<i>").addClass("fa "+typeicon)).css({"margin-right":"5px"}))
                         .append($("<div>").addClass("file-container")
                             .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable.shortenFileName(data.filename)+" ("+data.mime+")")
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
                                             .click(function(e){
                                                 e.preventDefault();
-                                                storify.brand.deliverable._showDownloadDialog(data.file_id);
+                                                storify.brand.deliverable._showDownloadDialog(data.file_id, data.remark ? data.remark : "No caption entered.");
                                             })
                                 )
                         )
@@ -291,10 +476,25 @@ storify.brand.deliverable = {
             .append(temp_action);
 
         } else {
+
+            var typeicon = "camera";
+            switch(data.type){
+                case "photo":
+                    typeicon = "fa-camera";
+                break;
+                case "video":
+                    typeicon = "fa-video-camera";
+                break;
+                case "extra":
+                    typeicon = "fa-archive";
+                    d.addClass("extra");
+                break;
+            }
+            
             d.append($("<div>").addClass("top_panel")
                     .append($("<small>").text(data.submit_tt))
                     .append($("<div>").addClass("single_block")
-                        .append($("<label>").append($("<span>").css({opacity:0.65}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa "+typeicon)).css({"margin-right":"5px"}))
                         .append($("<input>").attr({type:"text",readonly:true})
                             .val(data.URL)
                             .click(function(e){
@@ -311,7 +511,11 @@ storify.brand.deliverable = {
         }
 	    return d;
     },
-    _showDownloadDialog:function(id){
+    _showDownloadDialog:function(id, caption){
+        $("#downloadLinkModal").find("video")[0].pause();
+        $("#downloadLinkModal").find("video source").remove();
+        $("#downloadLinkModal").find("video").css({display:"none"});
+        $("#downloadLinkModal").find("img").attr({src:""}).css({display:"none"});
         storify.loading.show();
         $.ajax({
             method: "POST",
@@ -325,6 +529,25 @@ storify.brand.deliverable = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
+                    var re = /(?:\.([^.]+))?$/;
+                    var ext = re.exec(rs.filename);
+                    if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["mp4", "m4a", "m4v", "f4v", "f4a", "m4b", "m4r", "f4b", "mov"]) != -1)){
+                        $("#downloadLinkModal").find("video").prepend($("<source>").attr({src:rs.filelink}));
+                        $("#downloadLinkModal").find("video").css({display:"block"});
+                        $("#downloadLinkModal").find("video")[0].load();
+                    }else if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["jpg","png","jpeg"]) != -1)){
+                        
+                        $("#downloadLinkModal").find("img").attr({src:rs.filelink}).css({display:"block"});
+                    }else{
+                        
+                    }
+
+                    if(caption){
+                        $("#downloadLinkModal").find(".caption").text(caption);
+                    }else{
+                        $("#downloadLinkModal").find(".caption").text("");
+                    }
+
                     $("#downloadLinkModal").find(".filename")
                                                 .attr({href:rs.filelink, download:rs.filename, target:"_blank"})
                                                 .text(storify.brand.deliverable.shortenFileName(rs.filename)+" ("+rs.filemime+")")
@@ -377,7 +600,7 @@ storify.brand.deliverable = {
                             photo_submitted++;
                         break;
                     }
-                }else{
+                }else if(value2.type == "video"){
                     switch(value2.status){
                         case "accepted":
                             video_approved++;
@@ -500,8 +723,8 @@ storify.brand.deliverable = {
     reject_click:function(e){
     	e.preventDefault();
     	var a = "#reject_submission";
-        if($(a+" button.confirmreject").attr("data-id")){
-            storify.brand.deliverable.response($(a+" button.confirmreject").attr("data-id"), "rejected", $(a+" textarea").val());
+        if($(a+" a.confirmreject").attr("data-id")){
+            storify.brand.deliverable.response($(a+" a.confirmreject").attr("data-id"), "rejected", $(a+" textarea").val());
         }
     },
     edit_reason:function(e){

@@ -263,6 +263,38 @@ class NcIgPlatform_OptionsManager {
         echo "</pre>";
     }
 
+    public function checkCode($igname, $code){
+        global $wpdb;
+
+        $instagram = new \InstagramScraper\Instagram();
+
+        try{
+            $media = $instagram->getMedias($igname, 5, '');
+
+        }catch(Exception $e){
+
+
+            $return_obj["error"] = 1;
+            $return_obj["igusername"] = $igname;
+            $return_obj["msg"] = "Instagram Error, pulling posts fail, refresh and try again";
+            return $return_obj;
+        }
+
+        $verified = false;
+        foreach($media as $key=>$value){
+
+            if(strpos($value["caption"], $code) !== false){
+                $verified = true;
+            }
+        }
+
+        $return_obj["error"] = 0;
+        $return_obj["igusername"] = $igname;
+        $return_obj["msg"] = "verified complete";
+        $return_obj["verified"] = $verified;
+        return $return_obj;
+    }
+
     public function autoPoll($igname, $userid, $number_post){
         global $wpdb;
 
@@ -466,10 +498,11 @@ class NcIgPlatform_OptionsManager {
                 }
             }             
 
-            $templink = 'https://storify.me/ao/wp-admin/admin.php?page=pods-manage-instagram_post_fast&action=edit&id='.$instagram_post_id;
+            $templink = get_home_url().'/ao/wp-admin/admin.php?page=pods-manage-instagram_post_fast&action=edit&id='.$instagram_post_id;
             $return_obj["results"][] = array(
                 "link"=>$templink
             );
+
 
             if(sizeof($attachment_IDs)){
                 foreach($attachment_IDs as $key=>$value){
@@ -484,6 +517,39 @@ class NcIgPlatform_OptionsManager {
                     //dont need to check account display image, since it will be replaced by the last step in this function
                 }
             }
+            //get post data
+            $post_pod = pods("instagram_post_fast", $instagram_post_id);
+
+            $post_tags = array();
+            if($post_pod->field("instagram_post_tag") && sizeof($post_pod->field("instagram_post_tag"))){
+                foreach($post_pod->field("instagram_post_tag") as $key2=>$value2){
+                    $post_tags[] = array(
+                        "name"=>$value2["name"],
+                        "term_id"=>$value2["term_id"]
+                    );
+                }
+            }
+
+            $post_country = array();
+            if($post_pod->field("instagram_post_country") && sizeof($post_pod->field("instagram_post_country"))){
+                foreach($post_pod->field("instagram_post_country") as $key2=>$value2){
+                    $post_country[] = array(
+                        "name"=>$value2["name"],
+                        "term_id"=>$value2["term_id"]
+                    );
+                }
+            }
+
+            $post_language = array();
+            if($post_pod->field("instagram_post_language") && sizeof($post_pod->field("instagram_post_language"))){
+                foreach($post_pod->field("instagram_post_language") as $key2=>$value2){
+                    $post_language[] = array(
+                        "name"=>$value2["name"],
+                        "term_id"=>$value2["term_id"]
+                    );
+                }
+            }
+
         }
 
         if($newimageid != 0){
@@ -492,6 +558,14 @@ class NcIgPlatform_OptionsManager {
             $data = $pod->save('display_image', array(
                 "id"=>$newimageid,
                 "title"=>$newimagetitle
+            ));
+
+            //elastic cloud update display_image
+            $this->putSearchElastic('/instagrammer/_update/'.$pod->field('ig_id'), array(
+                "doc"=>array(
+                    "hr_image"=>$this->getCDNURL(pods_image_url($newimageid, 'large')),
+                    "display_image"=>$this->getCDNURL(pods_image_url($newimageid, NULL))
+                )
             ));
         }
 
@@ -544,7 +618,7 @@ class NcIgPlatform_OptionsManager {
                     if($result["error"]){
                         die($result["msg"]);
                     }else{
-                        foreach($result["result"] as $key=>$value){
+                        foreach($result["results"] as $key=>$value){
                             echo "<p><a href=\"".$value["link"]."\" target=\"_blank\">".$value["link"]."</a></p>";
                         }
                     }
@@ -628,7 +702,7 @@ class NcIgPlatform_OptionsManager {
                                 }
                             }
 
-                            $templink = 'https://storify.me/ao/wp-admin/admin.php?page=pods-manage-instagram_post_fast&action=edit&id='.$instagram_post_id;
+                            $templink = get_home_url().'/ao/wp-admin/admin.php?page=pods-manage-instagram_post_fast&action=edit&id='.$instagram_post_id;
                             echo "<p><a href=\"".$templink."\" target=\"_blank\">".$templink."</a></p>";
 
                             if($key == 0){
@@ -964,6 +1038,10 @@ class NcIgPlatform_OptionsManager {
             $query = "INSERT INTO `".$wpdb->prefix."stats_avg_comments` ( instagrammer_id, amount ) VALUES ( %d, %f )";
             $wpdb->query($wpdb->prepare($query, $id, $total_comments / $totalposts));
 
+            //update on elastic search
+            $query = "SELECT ig_id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE id = %d";
+            $ig_id = $wpdb->get_var($wpdb->prepare($query, $id));
+
         }else{
             // do nothing
         }
@@ -1084,7 +1162,23 @@ class NcIgPlatform_OptionsManager {
                             $wpdb->query($prepare);
                             */
                            
-                           //
+                            //update
+                            $this->putSearchElastic('/instagrammer/_update/'.$account["id"], array(
+                                "doc"=>array(
+                                    "id"=>(int)$instagrammer_id,
+                                    "name"=>$fullName,
+                                    "ig_id"=>(int)$account["id"],
+                                    "igusername"=>$account["username"],
+                                    "org_profile_pic"=>$this->getCDNURL(pods_image_url($result["media_id"], 'large')),
+                                    "biography"=>$account["biography"],
+                                    "media_count"=>(int)$account["mediaCount"],
+                                    "follows_by_count"=>(int)$account["followedByCount"],
+                                    "external_url"=>$account["externalUrl"],
+                                    "created"=>time(),
+                                    "modified"=>date('j M y H:i'),
+                                    "unformatted_modified"=>time()
+                                )
+                            ));
                             
                             echo "<p>Existing IGer found, Key index updated.</p>";
 
@@ -1116,6 +1210,23 @@ class NcIgPlatform_OptionsManager {
                             
                             $wpdb->query($prepare);
                             */
+
+                            //insert 
+                            $this->putSearchElastic('/instagrammer/_doc/'.$account["id"] , array(
+                                "name"=>$fullName,
+                                "id"=>(int)$instagrammer_id,
+                                "ig_id"=>(int)$account["ig_id"],
+                                "igusername"=>$account["username"],
+                                "ig_profile_pic"=>$this->getCDNURL(pods_image_url($result["media_id"], 'large')),
+                                "hr_image"=>$this->getCDNURL(pods_image_url($result["media_id"], 'large')),
+                                "org_profile_pic"=>$this->getCDNURL(pods_image_url($result["media_id"], 'large')),
+                                "biography"=>$account["biography"],
+                                "media_count"=>(int)$account["mediaCount"],
+                                "follows_by_count"=>(int)$account["followedByCount"],
+                                "external_url"=>$account["externalUrl"],
+                                "modified"=>date('j M y H:i'),
+                                "unformatted_modified"=>time()
+                            ));
                            
                             echo "<p>New user Inserted</p>";
                         }
@@ -1127,6 +1238,7 @@ class NcIgPlatform_OptionsManager {
                         $wpdb->query($wpdb->prepare($query, $instagrammer_id, $account["mediaCount"]));
 
                         echo "<p>Will be redirected to edit page in 3 seconds.</p>";
+
 
                         ?>
                         <script>
@@ -1445,6 +1557,93 @@ class NcIgPlatform_OptionsManager {
         $args[] = &$data;
         call_user_func_array('array_multisort', $args);
         return array_pop($args);
+    }
+
+    private function putSearchElastic($endpoint, $data){
+        try{
+
+            $ch = curl_init();
+
+            $url = AWS_ELASTICSEARCH;
+
+            $data_json = json_encode($data);
+
+            curl_setopt($ch, CURLOPT_URL, $url.$endpoint);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($data_json)));
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
+
+            $response = curl_exec($ch);
+
+            curl_close($ch);
+
+            return array(
+                "success"=>1,
+                "data"=>json_decode($response, true)
+            );
+
+        }catch(Exception $e){
+            return array(
+                "success"=>0,
+                "error"=>$e->getMessage()
+            );
+        }
+    }
+
+    private function postSearchElastic($endpoint, $data){
+
+        try{
+
+            $ch = curl_init();
+
+            $url = AWS_ELASTICSEARCH;
+
+            $data_json = json_encode($data);
+
+            curl_setopt($ch, CURLOPT_URL, $url.$endpoint);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($data_json)));
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
+
+            $response = curl_exec($ch);
+
+            curl_close($ch);
+
+            return array(
+                "success"=>1,
+                "data"=>json_decode($response, true)
+            );
+
+        }catch(Exception $e){
+
+            return array(
+                "success"=>0,
+                "error"=>$e->getMessage()
+            );
+        }
+    }
+
+    public function getCDNURL($url){
+        //update all to https://cdn2.storify.me
+        //from
+        // https://cdn.storify.me
+        // https://staging.storify.me
+        // https://storify.me
+
+        $replace = "https://cdn2.storify.me";
+        $search = array(
+            "https://cdn.storify.me",
+            "https://staging.storify.me",
+            "https://storify.me"
+        );
+
+        foreach($search as $key=>$value){
+            $url = str_replace($value, $replace, $url);
+        }
+
+        return $url;
     }
 
 }

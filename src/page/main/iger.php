@@ -9,8 +9,7 @@
     $pageSEttings["meta"]["description"] = $pageSettings["og"]["og:description"] = ($iger["follows_by_count"] == 1 ? "1 Follower":number_format($iger["follows_by_count"])." Followers" ).", ".( $iger["media_count"] == 1 ? "1 Post":number_format($iger["media_count"])." Posts")." - See photos and videos from ".$iger["name"]." (@".$iger["igusername"].")";
 
     $additional_og_image = array();
-    $additional_og_image[] = $iger["display_image"];
-
+    $additional_og_image[] = $iger["org_profile_pic"];
     //update breadcumb
     $pageSettings["breadcrumb"] = array(
         array(
@@ -26,7 +25,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
 <?php include("page/component/meta.php"); ?>
 
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -229,7 +228,7 @@ include("page/component/header.php"); ?>
                         <div class="author big">
                             <div class="author-image">
                                 <div class="background-image">
-                                    <img src="<?=$iger["ig_profile_pic"]?>" alt="">
+                                    <img src="<?=$iger["org_profile_pic"]?>" alt="">
                                 </div>
                             </div>
                             <!--end author-image-->

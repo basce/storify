@@ -19,6 +19,9 @@ if($igusername && $userid && !$main->checkUpdatingRecord($igusername)){
 	$main->getCache()->set("nc_igplatform_post_updating_".$igusername, 1, 1800); // 30 mins
 	$result = $temp_optionManager->autoPoll($igusername, $userid, 30);
 
+	//update elastic cloud
+	$main->updateSingleIgerOnElasticSearch($igusername);
+
 	$main->getCache()->set("nc_igplatform_post_updating_".$igusername, 1, 7); // 7 seconds
 	if($result["error"]){
 		$main->getCache()->set("nc_igplatform_post_updating_error", $result, 86400); //keep error for 1 day for debugging

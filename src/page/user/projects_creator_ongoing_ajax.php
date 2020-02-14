@@ -48,6 +48,16 @@ if($current_user->ID){
                 $obj["data"] = $result["data"];
             }
         break;
+        case "updateSubmission":
+            $result = $main->getProjectManager()->submission_update_caption($_POST["id"], $current_user->ID, $_POST["caption"]);
+            if($result["error"]){
+                $obj["error"] = 1;
+                $obj["msg"] = $result["msg"];
+            }else{
+                $obj["error"] = 0;
+                $obj["msg"] = "";
+            }
+        break;
         case "removeSubmission":
             $result = $main->getProjectManager()->submission_remove($_POST["id"], $current_user->ID);
             if($result["error"]){
@@ -84,7 +94,7 @@ if($current_user->ID){
                     $presigned = $main->getS3UploadPresignedLink($result["key"], $_POST["file_mime"]);
                     $obj["error"] = 0;
                     $obj["url"] = $presigned["url"];
-                    $obj["filename"] = $result["filename"];
+                    $obj["presigned"] = $presigned;
                     $obj["id"] = $result["id"];
                     $obj["msg"] = "presigned URL generated";
                     $obj["success"] = 1;

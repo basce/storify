@@ -1,4 +1,16 @@
 <?php
+$sortBy = isset($_GET["order"])?$_GET["order"]:"";
+switch($sortBy){
+    case "latest":
+    case "likes":
+    case "oldest":
+    break;
+    default:
+        $sortBy = "";
+    break;
+}
+?><?php
+
 $category_tags = $main->getAllTags();
 $country_tags = $main->getAllCountries();
         
@@ -14,8 +26,11 @@ $sortBy = isset($_GET["order"])?$_GET["order"]:"";
 
 $page = isset($_GET["page"]) ? $_GET["page"] : 1;
 $pagesize = 12;
-$igers = $main->getIger(isset($_GET["category"])?$_GET["category"]:null, isset($_GET["country"])?$_GET["country"]:null, isset($_GET["language"])?$_GET["language"]:null, $pagesize, $page, $sortBy, false);
-
+$igers = $main->getIgerElasticSearch(isset($_GET["category"])?$_GET["category"]:null, isset($_GET["country"])?$_GET["country"]:null, isset($_GET["language"])?$_GET["language"]:null, $pagesize, $page, $sortBy, false);
+if( ( isset($_GET["category"]) && sizeof($_GET["category"])) || ( isset($_GET["country"]) && sizeof($_GET["country"]) )){
+    $searchdata = \storify\track::trackSearch( isset( $_GET["category"] ) ? $_GET["category"] : array(), isset($_GET["country"]) ? $_GET["country"] : array(), $current_user->ID ? $current_user->ID:NULL );
+    $main->putSearchElastic("/searchhistory/_doc/", $searchdata);
+}
 $cause_text = $main->convertCauseToText($igers["cause"]);
 $category_text = "";
 $country_text = "";
@@ -62,7 +77,7 @@ if($igers && isset($igers["data"]) && sizeof($igers["data"])){
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
 <?php include("page/component/meta.php"); ?>
 
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">

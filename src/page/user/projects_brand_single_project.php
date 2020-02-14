@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -41,6 +41,23 @@
     <script src="/assets/js/storify.core.js"></script>
     <script src="/assets/js/custom.js"></script>
     <script src="/assets/js/nc_custom.js"></script>
+    <script src="/assets/js/owlcarousel/owl.carousel.js"></script>
+    <script src="/assets/js/owlcarousel/owl.animate.js"></script>
+    <script src="/assets/js/owlcarousel/owl.autoplay.js"></script>
+    <script src="/assets/js/storify.loading.js"></script>
+    <script src="/assets/js/storify.core.js"></script>
+    <script src="/assets/js/storify.template.js"></script>
+    <script src="/assets/js/storify.brand.detail.js"></script>
+    <script src="/assets/js/storify.brand.projectlist.js"></script>
+    <script src="/assets/js/storify.project.users.js"></script>
+    <script src="/assets/js/storify.brand.invitation.js"></script>
+    <script src="/assets/js/storify.brand.deliverable.js"></script>
+    <script src="/assets/js/storify.brand.completion.js"></script>
+    <script src="/assets/js/SendBird.min.js"></script>
+    <script src="/assets/js/linkify.min.js"></script>
+    <script src="/assets/js/linkify-jquery.min.js"></script>
+
+    <script src="/assets/js/dev/dev_template.js"></script>
 <?=get_option("custom_settings_header_js")?>
 </head>
 <body>
@@ -70,7 +87,97 @@ include("page/component/header.php"); ?>
                             <?php include("page/user/leftnav.php"); ?>
                         </div>
                         <div class="col-md-9">
-                            <?php print_r($project_detail) ?>
+                            <ul class="nav nav-tabs" role="tablist" id="tab_control">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="brief-tab" data-toggle="tab" href="#brief" role="tab" aria-controls="brief" aria-expanded="true">Brief</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="deliverable-tab" data-toggle="tab" href="#deliverable" role="tab" aria-controls="deliverable" aria-expanded="true">Deliverable</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="creator-tab" data-toggle="tab" href="#creator" role="tab" aria-controls="creator" aria-expanded="true">Creator</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="final-tab" data-toggle="tab" href="#final" role="tab" aria-controls="final" aria-expanded="true">Final</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="tab_content">
+                                <div class="tab-pane fade show active" id="brief" role="tabpanel" aria-labelledby="brief-tab">
+                                </div>
+                                <div class="tab-pane fade" id="deliverable" role="tabpanel" aria-labelledby="creator-tab">
+                                    <table id="deliverable" class="display" style="100%">
+                                        <thead>
+                                            <th rowspan="2">Task #1</th>
+                                            <th
+                                        </thead>
+                                    </table>
+
+                                    <div class="creatorcontent" id="deliverable-content">
+                                        <p>Task will be list out, will also show all creator's submissions if any</p>
+                                        <?php
+                                        $temp_task = $project_detail["summary"]["task"];
+
+                                        // get creator that accepted offer
+                                        $temp_creator = array();
+                                        if(sizeof($project_detail["summary"]["offer"]["data"])){
+                                            foreach( $project_detail["summary"]["offer"]["data"] as $key=>$value ){
+                                                if($value["status"] == "accepted"){
+                                                    $temp_creator[] = $value;
+                                                }
+                                            }
+                                        }
+
+                                        // re-arrange 
+
+                                        $temp_submissions = $project_detail["summary"]["submission"]["data"];
+
+                                        print_r($temp_submissions);
+
+                                        $temp_port_report = $project_detail["summary"]["post_report"]["data"];
+
+                                        print_r($temp_port_report);
+
+                                        foreach( $temp_task as $key=>$value ){
+                                            if(!isset($temp_task[$key]["creator"])){
+                                                $temp_task[$key]["creator"] = array();
+                                            }
+                                            foreach( $temp_creator as $key2=>$value2 ){
+                                                if(!isset($temp_task[$key]["creator"][$value2["user_id"]])){
+                                                    $temp_task[$key]["creator"][$value2["user_id"]] = array();
+                                                }
+
+                                                foreach($temp_submissions as $key3=>$value3){
+                                                    if($value3["user_id"] == $value2["user_id"] && $value3["task_id"] == $value["id"] ){
+                                                        $temp_task[$key]["creator"][$value2["user_id"]][] = $value3;
+                                                        unset($temp_submissions[$key3]);
+                                                    }
+                                                }
+
+                                                foreach($temp_port_report as $key3=>$value3){
+                                                    if($value3["user_id"] == $value2["user_id"] && $value3["task_id"] == $value["id"]){
+                                                        $temp_task[$key]["creator"][$value2["user_id"]][] = $value3;
+                                                        unset($temp_port_report[$key3]);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        print_r($temp_task);
+
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="creator" role="tabpanel" aria-labelledby="submission-tab">
+                                    <div class="creatorcontent" id="creator-content">
+                                        <p>this is the body for creator</p>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="final" role="tabpanel" aria-labelledby="final-tab">
+                                    <div class="finalcontent" id="final-content">
+                                        <p>this is the body for final</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,6 +192,11 @@ include("page/component/header.php"); ?>
         $(function(){
             "use strict";
 
+            var project_detail = <?=json_encode($project_detail)?>;
+            //update brief tab
+            $("#brief").empty();
+            $("#brief").append(storify.dev.template.project_brief(project_detail));
+                                    
         });
     </script>
 </body>

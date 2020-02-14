@@ -61,6 +61,7 @@
       margin-bottom:0;
     }
     white-space: pre-wrap;
+    word-break: break-word;
     a{
       text-decoration:underline;
     }
@@ -95,7 +96,7 @@
 #reject_reason{
   .reason{
     white-space: pre-wrap;
-    word-break: break-all;
+    word-break: break-word;
   }
 }
 
@@ -103,7 +104,7 @@
   .modal-body{
     p{
       white-space: pre-wrap;
-      word-break: break-all;
+      word-break: break-word;
     }
   }
 }
@@ -322,6 +323,7 @@
         margin-top: 5px;
         p{
           white-space: pre-wrap;
+          word-break: break-word;
         }
       }
       .status_block{
@@ -347,7 +349,7 @@
       }
       .bottom_panel{
         margin-top:.5rem;
-        button{
+        button, .btn{
           float:right;
           margin-left:5px;
           margin-right:0;
@@ -385,6 +387,9 @@
         color:#dc3545;
         text-decoration: underline;
       }
+    }
+    .deliverable-creator-item.extra{
+      margin-left:10%;
     }
 
     &::after{
@@ -934,6 +939,7 @@
           margin-top:5px;
           p{
             white-space: pre-wrap;
+            word-break: break-word;
           }
         }
         .asset_id{
@@ -1166,6 +1172,9 @@
             }
           }
           .urldescription{
+            width:calc(100% - 50px);
+          }
+          .asset_id{
             width:calc(100% - 50px);
           }
         }

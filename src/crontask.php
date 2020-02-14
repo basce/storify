@@ -16,9 +16,6 @@ include("inc/main.php");
 
 $main = new main();
 
-if($print_log){ 
-            
-        }
 
 $beginningTime = time();
 function printLog($log){
@@ -33,8 +30,9 @@ printLog("get 50 IG account");
 //get all id and igusername
 //
 $query = "SELECT id, igusername, ig_id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE hidden = %d ORDER BY last_automodified ASC LIMIT 50"; // 50 each time
-//$query = "SELECT id, igusername, ig_id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE igusername = 'leodoesalot' ORDER BY last_automodified ASC LIMIT 50"; 
 $items = $wpdb->get_results($wpdb->prepare($query, 0), ARRAY_A);
+//$query = "SELECT id, igusername, ig_id FROM `".$wpdb->prefix."pods_instagrammer_fast` WHERE igusername = %s ORDER BY last_automodified ASC LIMIT 50"; 
+//$items = $wpdb->get_results($wpdb->prepare($query, "basce"), ARRAY_A);
 
 $instagram = new Instagram();
 $pod = pods('instagrammer_fast');
@@ -178,6 +176,8 @@ foreach($items as $key=>$value){
 		$wpdb->query($wpdb->prepare($query, $instagrammer_id));
 
 		printLog("update metric number Done");
+
+		$main->updateSingleIgerOnElasticSearch($account["username"]);
 
 		//update msg
 		

@@ -32,10 +32,13 @@
 /**
  * Add default role meta
  */
+/**
+ * Add default role meta
+ */
 add_action('show_user_profile', 'default_role_profile_edit_action');
 add_action('edit_user_profile', 'default_role_profile_edit_action');
 function default_role_profile_edit_action($user) {
-  $default_role = ( isset($user->default_role) && $user->default_role ) ? 'creator':'brand';
+  $default_role = get_user_meta($user->ID, "default_role", true);
 ?>
   <label for="default_role">
     Default Role
@@ -59,7 +62,8 @@ function default_role_profile_update_action($user_id) {
 add_action('show_user_profile', 'brand_verified_profile_edit_action');
 add_action('edit_user_profile', 'brand_verified_profile_edit_action');
 function brand_verified_profile_edit_action($user) {
-  $checked = (isset($user->brand_verified) && $user->brand_verified) ? ' checked="checked"' : '';
+  $checked = get_user_meta($user->ID, "brand_verified", true) ? ' checked="checked"' : '';
+  //$checked = (isset($user->brand_verified) && $user->brand_verified) ? ' checked="checked"' : '';
 ?>
   <h3>Other</h3>
   <label for="brand_verified">
@@ -75,25 +79,66 @@ function brand_verified_profile_update_action($user_id) {
 }
 
 /**
- * add payment invoice type meta ( brand will issue invoice rather than charge by credit card )
+ * add Creator Rating
  */
-add_action('show_user_profile', 'brand_invoice_profile_edit_action');
-add_action('edit_user_profile', 'brand_invoice_profile_edit_action');
-function brand_invoice_profile_edit_action($user) {
-  $checked = (isset($user->brand_invoice) && $user->brand_invoice) ? ' checked="checked"' : '';
+add_action('show_user_profile', 'rating_creator_profile_edit_action');
+add_action('edit_user_profile', 'rating_creator_profile_edit_action');
+function rating_creator_profile_edit_action($user) {
+  $rating_creator = get_user_meta($user->ID, "rating_creator", true)
 ?>
-  <h3>Payment ( Invoice )</h3>
-  <label for="brand_invoice">
-    <input name="brand_invoice" type="checkbox" id="brand_invoice" value="1"<?php echo $checked; ?>>
-    Use Invoice
-  </label>
+  <table class="form-table">
+      <tbody>
+        <tr>
+          <th><label for="rating_creator">Rating for Creator</label></th>
+          <td>
+
+            <input name="rating_creator" value="<?=$rating_creator?>">
+            
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
 <?php 
 }
-add_action('personal_options_update', 'brand_invoice_profile_update_action');
-add_action('edit_user_profile_update', 'brand_invoice_profile_update_action');
-function brand_invoice_profile_update_action($user_id) {
-  update_user_meta($user_id, 'brand_invoice', isset($_POST['brand_invoice']));
+add_action('personal_options_update', 'rating_creator_profile_update_action');
+add_action('edit_user_profile_update', 'rating_creator_profile_update_action');
+function rating_creator_profile_update_action($user_id) {
+  update_user_meta($user_id, 'rating_creator', isset($_POST['rating_creator']));
 }
+
+/**
+ * add Brand Rating
+ */
+add_action('show_user_profile', 'rating_brand_profile_edit_action');
+add_action('edit_user_profile', 'rating_brand_profile_edit_action');
+function rating_brand_profile_edit_action($user) {
+  $rating_brand = get_user_meta($user->ID, "rating_brand", true)
+?>
+  <table class="form-table">
+      <tbody>
+        <tr>
+          <th><label for="rating_brand">Rating for Brand ( temporary, will need to move to business account later )</label></th>
+          <td>
+
+            <input name="rating_brand" value="<?=$rating_brand?>">
+            
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+<?php 
+
+}
+add_action('personal_options_update', 'rating_brand_profile_update_action');
+add_action('edit_user_profile_update', 'rating_brand_profile_update_action');
+function rating_brand_profile_update_action($user_id) {
+  update_user_meta($user_id, 'rating_brand', isset($_POST['rating_brand']));
+}
+
 
 /**
  * Disable admin bar on the frontend of your website

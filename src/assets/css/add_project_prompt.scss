@@ -288,7 +288,7 @@ $disable-color : #f5f5f5;
 		padding:0;
 		box-shadow: 0 0.2rem 1rem 0rem rgba(0,0,0, .1);
     	border: .1rem solid rgba(0,0,0, .15);
-    	min-height: 100px;
+    	height: 300px;
 		.ql-editor{
 			font-family: 'Poppins', sans-serif;
 			padding: 1.7rem;
@@ -382,3 +382,13 @@ $disable-color : #f5f5f5;
 		}
 	}
 }
+@media (max-width: 991px){
+	.bs-wizard{
+		& > .bs-wizard-step{
+			& > .bs-wizard-dot{
+				top: 25px;
+			}
+		}
+	}
+}
+

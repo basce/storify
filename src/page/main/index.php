@@ -1,8 +1,19 @@
-<!doctype html>
+<?php
+$sortBy = isset($_GET["order"])?$_GET["order"]:"";
+switch($sortBy){
+    case "latest":
+    case "likes":
+    case "oldest":
+    break;
+    default:
+        $sortBy = "";
+    break;
+}
+?><!doctype html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
 <?php include("page/component/meta.php"); ?>
 
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">

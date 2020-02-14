@@ -110,6 +110,13 @@ storify.creator.detail_closed = {
                                                                     .append($("<i>").addClass("fa fa-video-camera"))
                                                             )
                                                     )
+                                                    .append($("<li>").addClass("nav-item")
+                                                        .append($("<a>").addClass("nav-link").attr({ id: "extra-tab", "data-toggle": "tab", href: "#extralist", role: "tab", "aria-controls": "extralist", "aria-expanded": true })
+                                                            .append($("<span>").text("100/∞"))
+                                                            .append(document.createTextNode(" "))
+                                                            .append($("<i>").addClass("fa fa-archive"))
+                                                        )
+                                                    )
                                                 )
                                                 .append($("<div>").addClass("tab-content").attr({id:"tab_content2"})
                                                    .append($("<div>").addClass("tab-pane fade show active").attr({id:"photolist",role:"tabpanel","aria-labelledby":"photolist-tab"})
@@ -117,7 +124,10 @@ storify.creator.detail_closed = {
                                                     )
                                                     .append($("<div>").addClass("tab-pane fade").attr({id:"videolist",role:"tabpanel","aria-labelledby":"videolist-tab"})
                                                         .append($("<div>").addClass("list videolist"))
-                                                    ) 
+                                                    )
+                                                    .append($("<div>").addClass("tab-pane fade").attr({ id: "extralist", role: "tabpanel", "aria-labelledby": "extralist-tab" })
+                                                        .append($("<div>").addClass("list extralist"))
+                                                    )
                                                 )
                                             )
                                         )
@@ -139,8 +149,10 @@ storify.creator.detail_closed = {
 
                 if(target == "#photolist"){
                     storify.creator.detail_closed.viewlist("photo");
-                }else{
+                }else if(target == "#videolist"){
                     storify.creator.detail_closed.viewlist("video");
+                }else{
+                    storify.creator.detail_closed.viewlist("extra");
                 }
             });
         }   
@@ -175,7 +187,7 @@ storify.creator.detail_closed = {
                 "rejectModal",
                 [   
                     {
-                        label:"ok",
+                        label:"OK",
                         attr:{href:"#", "data-dismiss":"modal", "aria-label":"Close", class:"btn btn-primary small"}
                     }
                 ]
@@ -210,8 +222,15 @@ storify.creator.detail_closed = {
 
             div = $(storify.template.simpleModal(
                 {
-                    titlehtml:`Reject Reason`,
+                    titlehtml:``,
                     bodyhtml:`
+                    <video width="640" height="480" controls="" style="width: 100%;height: 320px;">
+                        <source src="" type="video/MP4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <img src="" style="width: 100%">
+                    <div class="caption" style="padding:10px; background:#F6F8F8; white-space: pre-wrap; word-break: break-word;">
+                    </div>
                     <a class="filename" download></a>
                     <div class="filesize"></div>
                     <div class="filemime"></div>
@@ -221,7 +240,7 @@ storify.creator.detail_closed = {
                 [   
                     {
                         label:"Download",
-                        attr:{href:"#", class:"btn btn-primary small download", download:""}
+                        attr:{class:"btn btn-primary small download", href:"#", download:""}
                     }
                 ]
             ));
@@ -408,9 +427,11 @@ storify.creator.detail_closed = {
             if(value.type == "photo"){
                 photo_type++;
                 tempname = "Photo #"+photo_type;
-            }else{
+            }else if(value.type =="video"){
                 video_type++;
                 tempname = "Video #"+video_type;
+            }else{
+                tempname = "Extra #"+video_type;
             }
             a.append($("<h3>").text(tempname));
             if(value.deliverable_remark){
@@ -626,7 +647,7 @@ storify.creator.detail_closed = {
         });
     },
     _gettingDetail:false,
-    viewDetail:function(project_id){
+    viewDetail:function(project_id, onComplete){
         if(storify.creator.detail_closed._gettingDetail) return;
         storify.creator.detail_closed._gettingDetail = true;
         storify.creator.detail_closed.addElementIfNotExist();
@@ -649,12 +670,14 @@ storify.creator.detail_closed = {
                     _project_id = project_id;
                     storify.project._project_id = project_id;
                     storify.project.user.getAllUser(function(){
-                        storify.loading.hide();
                         storify.creator.detail_closed.createDetail(rs.data);
                         storify.creator.detail_closed.getSubmission(null, function(xdata){
                             storify.creator.detail_closed.createSummary(rs.data.detail, xdata)
+                            if(onComplete)onComplete(function(){
+                                $("#newDetailModal").modal("show");
+                                storify.loading.hide();
+                            });
                         });
-                        $("#newDetailModal").modal();
                     });
                 }
             }
@@ -669,9 +692,12 @@ storify.creator.detail_closed = {
         if(data.type == "photo"){
             iconClass = "fa-camera";
             mainClass = "photo";
-        }else{
+        }else if(data.type == "video"){
             iconClass = "fa-video-camera";
             mainClass = "video";
+        }else{
+            iconClass = "fa-archive";
+            mainClass = "extra";
         }
 
         switch(data.status){
@@ -722,7 +748,7 @@ storify.creator.detail_closed = {
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
                                             .click(function(e){
                                                 e.preventDefault();
-                                                storify.creator.detail_closed._showDownloadDialog(data.file_id);
+                                                storify.creator.detail_closed._showDownloadDialog(data.file_id, data.remark ? data.remark : "No caption entered.");
                                             })
                                 )
                         )
@@ -753,7 +779,11 @@ storify.creator.detail_closed = {
         }
         return div;
     },
-    _showDownloadDialog:function(id){
+    _showDownloadDialog:function(id, caption){
+        $("#downloadLinkModal").find("video")[0].pause();
+        $("#downloadLinkModal").find("video source").remove();
+        $("#downloadLinkModal").find("video").css({display:"none"});
+        $("#downloadLinkModal").find("img").attr({src:""}).css({display:"none"});
         storify.loading.show();
         $.ajax({
             method: "POST",
@@ -767,6 +797,24 @@ storify.creator.detail_closed = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
+                    var re = /(?:\.([^.]+))?$/;
+                    var ext = re.exec(rs.filename);
+                    if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["mp4", "m4a", "m4v", "f4v", "f4a", "m4b", "m4r", "f4b", "mov"]) != -1)){
+                        $("#downloadLinkModal").find("video").prepend($("<source>").attr({src:rs.filelink}));
+                        $("#downloadLinkModal").find("video").css({display:"block"});
+                        $("#downloadLinkModal").find("video")[0].load();
+                    }else if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["jpg","png","jpeg"]) != -1)){
+                        $("#downloadLinkModal").find("img").attr({src:rs.filelink}).css({display:"block"});
+                    }else{
+                        
+                    }
+
+                    if(caption){
+                        $("#downloadLinkModal").find(".caption").text(caption);
+                    }else{
+                        $("#downloadLinkModal").find(".caption").text("");
+                    }
+
                     $("#downloadLinkModal").find(".filename")
                                                 .attr({href:rs.filelink, target:"_blank"})
                                                 .text(storify.creator.detail_closed.shortenFileName(rs.filename)+" ("+rs.filemime+")")
@@ -787,7 +835,8 @@ storify.creator.detail_closed = {
         var max_photo = $("#tab_control2").attr("m_photo") ? +$("#tab_control2").attr("m_photo") : 0,
             max_video = $("#tab_control2").attr("m_video") ? +$("#tab_control2").attr("m_video") : 0,
             n_photo = $("#tab_control2").attr("n_photo") ? +$("#tab_control2").attr("n_photo") : 0,
-            n_video = $("#tab_control2").attr("n_video") ? +$("#tab_control2").attr("n_video") : 0;
+            n_video = $("#tab_control2").attr("n_video") ? +$("#tab_control2").attr("n_video") : 0,
+            n_extra = $("#tab_control2").attr("n_extra") ? +$("#tab_control2").attr("n_extra") : 0;
 
         if(type == "photo"){
             if(n_photo < max_photo){
@@ -796,24 +845,29 @@ storify.creator.detail_closed = {
             }else{
                 $(".form_submit_btn").addClass("disabled");
             }
-        }else{
+        }else if(type == "video"){
             if(n_video < max_video){
                 $(".form_submit_btn").removeClass("disabled");
             }else{
                 $(".form_submit_btn").addClass("disabled");
             }
+        }else{
+
         }
 
         //update text
         $("#photo-tab span").text(n_photo+"/"+max_photo);
         $("#video-tab span").text(n_video+"/"+max_video);
+        $("#extra-tab span").text(n_extra + "/∞");
     },
     listSubmissions:function(no_p, no_v, data, viewtype){
         $("#submission-content .photolist").empty();
         $("#submission-content .videolist").empty();
+        $("#submission-content .extralist").empty();
 
         var number_photo = 0,
             number_video = 0,
+            number_extra = 0,
             total_assets = no_p + no_v,
             number_submitted = 0,
             number_finalised = 0,
@@ -825,6 +879,9 @@ storify.creator.detail_closed = {
             }else if(value.type == "video"){
                 number_video++;
                 $("#submission-content .videolist").append(storify.creator.detail_closed.createSubmissionBlock(value));
+            }else{
+                number_extra++;
+                $("#submission-content .extralist").append(storify.creator.detail_closed.createSubmissionBlock(value));
             }
             if(value.status == "accepted"){
                 number_finalised++;
@@ -840,11 +897,16 @@ storify.creator.detail_closed = {
             $("#submission-content .videolist").append($("<p>").text("The project has ended. No submissions have been made."));
         }
 
+        if (number_extra == 0) {
+            $("#submission-content .extralist").append($("<p>").text("No submissions have been made, yet."));
+        }
+
         $("#tab_control2").attr({
             "m_photo":no_p,
             "m_video":no_v,
             "n_photo":number_photo,
-            "n_video":number_video
+            "n_video":number_video,
+            "n_extra":number_extra
         });
 
         //submission_title
@@ -859,8 +921,10 @@ storify.creator.detail_closed = {
 
         if(viewtype == "photo"){
             $('#tab_control2 a[href="#photolist"]').tab("show");
-        }else{
+        }else if(viewtype == "video"){
             $('#tab_control2 a[href="#videolist"]').tab("show");
+        }else{
+            $('#tab_control2 a[href="#extralist"]').tab("show");
         }
         storify.creator.detail_closed.viewlist(viewtype);
     },
@@ -886,12 +950,15 @@ storify.creator.detail_closed = {
                         //if viewtype is not set
                         if(rs.data.length){
                             var number_photo = 0,
-                                number_video = 0;
+                                number_video = 0,
+                                number_extra = 0;
                             $.each(rs.data, function(index,value){
                                 if(value.type == "photo"){
                                     number_photo++;
-                                }else{
+                                }else if(value.type == "video"){
                                     number_video++;
+                                }else{
+                                    number_extra++;
                                 }
                             });
 
@@ -1000,8 +1067,8 @@ storify.creator.detail_closed = {
                     )
             )
             .append(deliverable_block)
-            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.description_brief)))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.deliverable_brief)))
             ;
         cont.append(owlImages);
 

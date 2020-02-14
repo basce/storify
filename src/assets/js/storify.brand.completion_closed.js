@@ -53,9 +53,11 @@ storify.brand.completion_closed = {
 			if(value.type == "photo"){
 				icon = $("<i>").addClass("fa fa-camera");
 				photo_count--;
-			}else{
+			}else if(value.type == "video"){
 				icon = $("<i>").addClass("fa fa-video-camera");
 				video_count--;
+			}else{
+				return true;
 			}
 			if(value.status == "accepted"){
 				items.append($("<div>").addClass("item complete "+value.type)

@@ -324,6 +324,8 @@ if(isset($_GET["error"])){
                 "ZM" => "Zambia",
                 "ZW" => "Zimbabwe"
             );
+
+            $current_user_meta = get_user_meta($current_user->ID);
     
             // get country name
             $country_label = "";
@@ -375,6 +377,8 @@ if(isset($_GET["error"])){
             //add country tag
             $pod2 = pods("instagrammer_fast", $instagrammer_id);
             $pod2->add_to("instagrammer_country", $temp_id);
+
+            $main->updateSingleIgerOnElasticSearch($account["username"]);
 
             //check if passive job exist, send email if yes.
             $result = job::getPassiveJob($current_user->ID, "waiting_for_ig");

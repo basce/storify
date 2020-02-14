@@ -8,7 +8,7 @@ if($current_user->ID){
         case "getProject":
             $obj["error"] = 0;
             $obj["msg"] = "";
-            $obj["result"] = $main->getProjectManager()->getBrandProjectList($current_user->ID, $_POST["sort"], $_POST["filter"], 24, $_POST["page"]);
+            $obj["result"] = $main->getProjectManager()->getBrandProjectList($current_user->ID, $default_group_id, $_POST["sort"], $_POST["filter"], 24, $_POST["page"]);
         break;
         case "getDetail":
             $result = $main->getProjectManager()->getProjectDetail($_POST["project_id"], $current_user->ID);

@@ -5,6 +5,10 @@ ini_set('display_startup_errors', 1);
 define("HOME_DIR", __dir__);
 error_reporting(E_ALL);
 
+if(!session_id()) {
+    session_start();
+}
+
 $debugTime = microtime(true);
 function getDebugTime(){
     global $debugTime;
@@ -45,20 +49,12 @@ if($current_user->ID){
 if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
     //get default business account page
     $default_group_id = \storify\business_group::getDefaultGroup($current_user->ID);
+    $default_group = \storify\business_group::getDefaultGroupObject($current_user->ID);
 }else{
     $default_group_id = NULL;
+    $default_group = NULL;
 }
 
-$sortBy = isset($_GET["order"])?$_GET["order"]:"";
-switch($sortBy){
-    case "latest":
-    case "likes":
-    case "oldest":
-    break;
-    default:
-        $sortBy = "";
-    break;
-}
 $pageSettings = $pageManager->getSettings("home");
 if(sizeof($pathquery) == 0){
     $category_tags = $main->getAllTagsInUsed();
@@ -282,12 +278,24 @@ if(sizeof($pathquery) == 0){
                     header("Location: /user@".$current_user->ID."/business_add");
                     exit();
                 break;
+                case "business_group":
+                    header("Location: /user@".$current_user->ID."/business_group");
+                    exit();
+                break;
+                case "business_invite":
+                    header("Location: /user@".$current_user->ID."/business_invite");
+                    exit();
+                break;
                 case "business_welcome":
                     header("Location: /user@".$current_user->ID."/business_welcome");
                     exit();
                 break;
                 case "business_member":
                     header("Location: /user@".$current_user->ID."/business_member");
+                    exit();
+                break;
+                case "business_payment":
+                    header("Location: /user@".$current_user->ID."/business_payment");
                     exit();
                 break;
                 case "password":
@@ -346,21 +354,6 @@ if(sizeof($pathquery) == 0){
             header("Location: /user@".$userID."/collections");
             exit();
         }else{
-            if($pathquery[1] == "payment"){
-                if($_SESSION["role_view"] == "brand"){
-                    if(isset($_POST)){
-                        include_once("page/payment/payment_post.php");
-                        include_once("page/payment/payment.php");
-                        exit();
-                    }else{
-                        include_once("page/payment/payment.php");
-                        exit();
-                    }
-                }else{
-                    include_once("page/payment/payment_creator.php");
-                    exit();
-                }
-            }
             if($pathquery[1] == "viewascreator"){
                 $main->changeDefaultRole("creator",$userID);
 
@@ -387,10 +380,21 @@ if(sizeof($pathquery) == 0){
             }
             if($pathquery[1] == "project"){
                 //check if user can access project
-                $role = $main->getProjectManager()->checkUserRoleInProject($current_user->ID, $pathquery[2]);
-                if($role == "creator"){
-                    //creator
-                    //get project detail
+                if($pathquery[2] == "new"){
+                    if(isset($_POST) && sizeof($_POST)){
+                        include_once("page/user/projects_brand_new_project_ajax.php");
+                        exit();
+                    }else{
+                        include_once("page/user/projects_brand_new_project.php");
+                        exit();
+                    }
+                }
+
+                //check if user have offer
+                $offer_status = \storify\project\offer::getInstance()->getUserLastOfferStatus($pathquery[2], $current_user->ID);
+                
+
+                if($offer_status){
                     if(isset($_POST) && sizeof($_POST)){
 
                     }else{
@@ -399,22 +403,27 @@ if(sizeof($pathquery) == 0){
                         include_once("page/user/projects_creator_single_project.php");
                         exit();
                     }
-                }else if($role == "admin"){
-                    //brand
-                    //get project detail
-                    if(isset($_POST) && sizeof($_POST)){
-
-                    }else{
-                        $project_detail = $main->getProjectManager()->getProjectDetail($pathquery[2], $current_user->ID);;
-
-                        include_once("page/user/projects_brand_single_project.php");
-                        exit();
-                    }
                 }else{
-                    //redirect user to project page
-                    header("Location: /user@".$userID."/projects");
-                    exit();
+                    // check if brand exist
+                    if($main->getProjectManager()->isHaveBusinessAccess($pathquery[2])){
+                        //with brand access
+
+                        if(isset($_POST) && sizeof($_POST)){
+
+                        }else{
+                            $project_detail = $main->getProjectManager()->getProjectDetail($pathquery[2], $current_user->ID);;
+
+                            include_once("page/user/projects_brand_single_project.php");
+                            exit();
+                        }    
+
+                    }
+
                 }
+
+                //redirect user to project page
+                header("Location: /user@".$userID."/projects");
+                exit();
             }
             if($pathquery[1] == "projects"){
                 $pageSettings = $pageManager->getSettings("projects");
@@ -429,6 +438,18 @@ if(sizeof($pathquery) == 0){
                         header("Location: /user@".$userID."/business_welcome");
                         exit();
                     }
+                    //if not yet set payment method or invoice
+                    if(!$default_group["invoice"]){
+                        $allcards = \storify\stripe::getAllCards($default_group_id);
+                        if($allcards && sizeof($allcards->data)){
+                            
+                        }else{
+                            //no card,
+                            header("Location: /user@".$userID."/business_payment");
+                            exit();
+                        }
+                    }
+
                     //brand, ongoing, closed
                     if(sizeof($pathquery) == 2){
                         header("Location: /user@".$userID."/projects/ongoing");
@@ -719,26 +740,48 @@ if(sizeof($pathquery) == 0){
                     exit();
                 }
             }
+            if($pathquery[1] == "business_group"){
+                if($default_group_id){
+                    $pageSettings = $pageManager->getSettings("business_group");
+                    if(isset($_POST) && sizeof($_POST)){
+                        include_once("page/business/default_group_post.php");
+                        include_once("page/business/default_group.php");
+                        exit();
+                    }else{
+                         $main->changeDefaultRole("brand",$current_user->ID);
+                        include_once("page/business/default_group.php");
+                        exit();
+                    }
+                }else{
+                    header("Location: /user@".$user_ID."/business_welcome");
+                    exit();
+                }
+            }
+            if($pathquery[1] == "business_invite"){
+                $pageSettings = $pageManager->getSettings("business_invite");
+                if(isset($_POST) && sizeof($_POST)){
+                    include_once("page/business/member_invite_post.php");
+                    include_once("page/business/member_invite.php");
+                    exit();
+                }else{
+                    $main->changeDefaultRole("brand",$current_user->ID);
+                    include_once("page/business/member_invite.php");
+                    exit();
+                }
+            }
             if($pathquery[1] == "business_payment"){
                 if($default_group_id){
-                    $pageSettings = $pageManager->getSettings("business_payment");
-                    if(isset($_POST) && sizeof($_POST)){
-                        //business profile
-                        if(isset($_POST["method"])){
-                            include_once("page/business/payment_ajax.php");
+                    if($_SESSION["role_view"] == "brand"){
+                        if(isset($_POST)){
+                            include_once("page/payment/payment_post.php");
+                            include_once("page/payment/payment.php");
                             exit();
                         }else{
-                            include_once("page/business/payment.php");
-                            if($update_success){
-                                header("Refresh:0");
-                                exit();
-                            }else{
-                                include_once("page/error/index.php");
-                                exit();
-                            }
+                            include_once("page/payment/payment.php");
+                            exit();
                         }
                     }else{
-                        include_once("page/business/payment.php");
+                        include_once("page/payment/payment_creator.php");
                         exit();
                     }
                 }else{
@@ -757,7 +800,7 @@ if(sizeof($pathquery) == 0){
                         }else{
                             include_once("page/business/profile_post.php");
                             if($update_success){
-                                header("Refresh:0");
+                                header("Location: /user@".$user_ID."/business_group");
                                 exit();
                             }else{
                                 include_once("page/error/index.php");

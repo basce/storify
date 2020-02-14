@@ -30,6 +30,9 @@ if(isset($_FILES) && isset($_FILES["business_image"]) && $_FILES["business_image
 
 			\storify\business_group::setMember($current_user->ID, $group_id, "admin");
 			\storify\business_group::setDefaultRole($current_user->ID, $group_id);
+
+			//create wallet
+			\storify\wallet::createAccount($group_id,"business");
 		}
 		$update_success = true;
 	}

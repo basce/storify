@@ -412,7 +412,7 @@ storify.brand.detail = {
                 }
             });
 
-            list_div_description.append(" / creator");
+            list_div_description.append(" / Creator");
             list_div_description.append($("<br>"));
             list_div_description.append(document.createTextNode(list_summary.description));
 
@@ -473,7 +473,7 @@ storify.brand.detail = {
                 .append($("<i>").addClass("fa fa-video-camera"));
         }
 
-        deliverable_block.append(" / creator");
+        deliverable_block.append(" / Creator");
         //sample block
         var owlImages = null;
 
@@ -520,8 +520,8 @@ storify.brand.detail = {
                     )
             )
             .append(deliverable_block)
-            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.description_brief)))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.deliverable_brief)))
             ;
         cont.append(owlImages);
 

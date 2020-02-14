@@ -115,3 +115,17 @@
 		}
 	}
 }
+
+.valueblock{
+  position: relative;
+  padding: 2rem 1rem 1rem;
+  label{
+    position: absolute;
+    top:0;
+    left:0;
+    opacity:0.5;
+  }
+  .content{
+
+  }
+}

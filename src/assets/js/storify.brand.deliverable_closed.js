@@ -115,10 +115,17 @@ storify.brand.deliverable_closed = {
             );
             */
 
-            div = $(storify.template.simpleModal(
+             div = $(storify.template.simpleModal(
                 {
                     titlehtml:``,
                     bodyhtml:`
+                    <video width="640" height="480" controls="" style="width: 100%;height: 320px;">
+                        <source src="" type="video/MP4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <img src="" style="width: 100%">
+                    <div class="caption" style="padding:10px; background:#F6F8F8; white-space: pre-wrap; word-break: break-word;">
+                    </div>
                     <a class="filename" download></a>
                     <div class="filesize"></div>
                     <div class="filemime"></div>
@@ -288,16 +295,31 @@ storify.brand.deliverable_closed = {
         }
 
         if(+data.file_id){
+
+            var typeicon = "camera";
+            switch(data.type){
+                case "photo":
+                    typeicon = "fa-camera";
+                break;
+                case "video":
+                    typeicon = "fa-video-camera";
+                break;
+                case "extra":
+                    typeicon = "fa-archive";
+                    d.addClass("extra");
+                break;
+            }
+
             d.append($("<div>").addClass("top_panel")
                     .append($("<small>").text(data.submit_tt))
                     .append($("<div>").addClass("single_block")
-                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-"+storify.core.leadingZero(data.id, 9))).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+                        .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-"+storify.core.leadingZero(data.id, 9))).prepend($("<i>").addClass("fa "+typeicon).css({"margin-right":"5px"})))
                         .append($("<div>").addClass("file-container")
                             .append($("<div>").addClass("file-download-link").text(storify.brand.deliverable_closed.shortenFileName(data.filename)+" ("+data.mime+")")
                                             .append($("<i>").addClass("fa fa-arrow-circle-down").css({"margin-left":".5rem"}))
                                             .click(function(e){
                                                 e.preventDefault();
-                                                storify.brand.deliverable_closed._showDownloadDialog(data.file_id);
+                                                storify.brand.deliverable_closed._showDownloadDialog(data.file_id, data.remark ? data.remark : "No caption entered.");
                                             })
                                 )
                         )
@@ -308,10 +330,25 @@ storify.brand.deliverable_closed = {
             )
             .append(temp_action);
         } else {
+
+            var typeicon = "camera";
+            switch(data.type){
+                case "photo":
+                    typeicon = "fa-camera";
+                break;
+                case "video":
+                    typeicon = "fa-video-camera";
+                break;
+                case "extra":
+                    typeicon = "fa-archive";
+                    d.addClass("extra");
+                break;
+            }
+            
             d.append($("<div>").addClass("top_panel")
     	                .append($("<small>").text(data.submit_tt))
     	                .append($("<div>").addClass("single_block")
-    	                    .append($("<label>").append($("<span>").css({opacity:0.65}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa fa-"+(data.type == "photo"?"camera":"video-camera")).css({"margin-right":"5px"})))
+    	                    .append($("<label>").append($("<span>").css({color:"#999","font-size":".9em"}).text("ASSET-000000000".slice(0, -1*(data.id+"").length) + data.id)).prepend($("<i>").addClass("fa "+typeicon).css({"margin-right":"5px"})))
     	                    .append($("<input>").attr({type:"text",readonly:true})
     	                        .val(data.URL)
     	                        .click(function(e){
@@ -328,8 +365,12 @@ storify.brand.deliverable_closed = {
         }
 	    return d;
     },
-    _showDownloadDialog:function(id){
+    _showDownloadDialog:function(id, caption){
         storify.loading.show();
+        $("#downloadLinkModal").find("video")[0].pause();
+        $("#downloadLinkModal").find("video source").remove();
+        $("#downloadLinkModal").find("video").css({display:"none"});
+        $("#downloadLinkModal").find("img").attr({src:""}).css({display:"none"});
         $.ajax({
             method: "POST",
             dataType: "json",
@@ -342,6 +383,24 @@ storify.brand.deliverable_closed = {
                 if(rs.error){
                     alert(rs.msg);
                 } else {
+                    var re = /(?:\.([^.]+))?$/;
+                    var ext = re.exec(rs.filename);
+                    if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["mp4", "m4a", "m4v", "f4v", "f4a", "m4b", "m4r", "f4b", "mov"]) != -1)){
+                        $("#downloadLinkModal").find("video").prepend($("<source>").attr({src:rs.filelink}));
+                        $("#downloadLinkModal").find("video").css({display:"block"});
+                        $("#downloadLinkModal").find("video")[0].load();
+                    }else if(ext[1] && ( $.inArray(ext[1].toLowerCase(), ["jpg","png","jpeg"]) != -1)){
+                        $("#downloadLinkModal").find("img").attr({src:rs.filelink}).css({display:"block"});
+                    }else{
+                        
+                    }
+
+                    if(caption){
+                        $("#downloadLinkModal").find(".caption").text(caption);
+                    }else{
+                        $("#downloadLinkModal").find(".caption").text("");
+                    }
+
                     $("#downloadLinkModal").find(".filename")
                                                 .attr({href:rs.filelink, download:rs.filename, target:"_blank"})
                                                 .text(storify.brand.deliverable_closed.shortenFileName(rs.filename)+" ("+rs.filemime+")")
@@ -394,7 +453,7 @@ storify.brand.deliverable_closed = {
                             photo_submitted++;
                         break;
                     }
-                }else{
+                }else if(value2.type == "video"){
                     switch(value2.status){
                         case "accepted":
                             video_approved++;

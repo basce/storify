@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/user.css">
     <link rel="stylesheet" href="/assets/css/main.css">
+    <!-- Theme included stylesheets -->
+    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script>
         window._startTime = new Date().getTime();
 
@@ -109,7 +111,28 @@ include("page/component/header.php"); ?>
     <script type="text/javascript">
         var APP_ID = '68CE9863-C07D-4505-A659-F384AB1DE478';
         var sb = new SendBird({appId: APP_ID});
-
+<?php
+            if(sizeof($pathquery) > 3){
+                if($pathquery[3] == "new" && isset($pathquery[4])){
+                    //add new project
+                    ?>
+            var _project_id = 0;
+            var _creator = <?=json_encode($main->getCreatorSingle($pathquery[4]))?>;
+                    <?php
+                }else{
+                    // project id exist
+                    ?>
+            var _project_id = <?=$pathquery[3]?>;
+            var _creator = <?=isset($pathquery[4])?"'".$pathquery[4]."'":"null"?>;
+                    <?php
+                }
+            }else{
+                ?>
+            var _project_id = 0;
+            var _creator = null;
+                <?php
+            }
+?>
         $(function(){
             "use strict";
 
@@ -127,7 +150,9 @@ include("page/component/header.php"); ?>
                         var div = $(storify.template.createListItem(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
-                            storify.creator.detail_closed.viewDetail(value.id);
+                            storify.creator.detail_closed.viewDetail(value.id, function(onComplete){
+                                if(onComplete) onComplete();
+                            });
                         })
 
                         return div;
@@ -136,9 +161,38 @@ include("page/component/header.php"); ?>
                         alert(rs.msg);
                     },
                     ()=>{
-                        if( _initial_prompt && <?=(sizeof($pathquery) == 4)?"1":"0"?>){
+                        if( _initial_prompt && _project_id){
                             _initial_prompt = false;
-                            storify.creator.detail_closed.viewDetail(<?=isset($pathquery[3])?$pathquery[3]:"0"?>);
+                            storify.creator.detail_closed.viewDetail(_project_id, function(onComplete){
+                                <?php
+                                    if(sizeof($pathquery) > 4){
+                                        switch($pathquery[4]){
+                                            case "submit":
+                                                $target_tab = "#submission-tab";
+                                            break;
+                                            case "final":
+                                                $target_tab = "#final-tab";
+                                            break;
+                                            case "creator":
+                                                $target_tab = "#creator-tab";
+                                            break;
+                                            case "bounty":
+                                                $target_tab = "#bounty-tab";
+                                            break;
+                                        }
+                                        ?>
+
+                                        $("<?=$target_tab?>").one('shown.bs.tab',function(){
+                                            if(onComplete)onComplete();
+                                        }).tab("show");
+                                        <?php
+                                    }else{
+                                ?>
+                                    if(onComplete)onComplete();
+                                <?php
+                                    }
+                                ?>
+                            });
                         }
                     }
                 )

@@ -116,3 +116,15 @@ storify.core.getProjectListing = ( grid_element_id, load_button_element_id, empt
 		}
 	});
 }
+
+storify.core.sendNotification = ( msg )=>{
+	if("Notification" in window){
+		if(Notification.permission === "granted"){
+			var notification = new Notification( msg );
+		}else{
+			console.log("user denied notifcation");
+		}
+	}else{
+		console.log("browser doesn't support notification");
+	}
+}

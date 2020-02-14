@@ -107,7 +107,7 @@ storify.creator.detail_invite = {
             .append(div);
     },
     _gettingDetail:false,
-    viewDetail:function(project_id){
+    viewDetail:function(project_id, onComplete){
         if(storify.creator.detail_invite._gettingDetail) return;
         storify.creator.detail_invite._gettingDetail = true;
         storify.creator.detail_invite.addElementIfNotExist();
@@ -129,8 +129,10 @@ storify.creator.detail_invite = {
                 }else{
                     storify.project._project_id = project_id;
                     storify.creator.detail_invite.createDetail(rs.data);
-                    storify.loading.hide();
-                    $("#newDetailModal").modal("show");
+                    if(onComplete){
+                        storify.loading.hide();
+                        $("#newDetailModal").modal("show");
+                    }
                 }
             }
         });
@@ -217,8 +219,8 @@ storify.creator.detail_invite = {
                     )
             )
             .append(deliverable_block)
-            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.description_brief)))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.deliverable_brief)))
             ;
         cont.append(owlImages);
 

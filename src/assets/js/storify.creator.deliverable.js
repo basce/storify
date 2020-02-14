@@ -330,7 +330,7 @@ storify.creator.deliverable = {
             if(value.type == "photo"){
                 photo_type++;
                 tempname = "Photo #"+photo_type;
-            }else{
+            }else if(value.type == "video"){
                 video_type++;
                 tempname = "Video #"+video_type;
             }

@@ -202,9 +202,11 @@ storify.brand.completion = {
 			if(value.type == "photo"){
 				icon = $("<i>").addClass("fa fa-camera");
 				photo_count--;
-			}else{
+			}else if(value.type == "video"){
 				icon = $("<i>").addClass("fa fa-video-camera");
 				video_count--;
+			}else{
+				return true;
 			}
 			if(value.status == "accepted"){
 				items.append($("<div>").addClass("item complete "+value.type)
@@ -297,6 +299,7 @@ storify.brand.completion = {
 		$("#final-content").empty();
 		var alldone = true,
 			widthData = false;
+		console.log(data);
 		$.each(data, function(index,value){
 			widthData = true;
 			$("#final-content").append(storify.brand.completion.createCompletionItem(value));
@@ -304,6 +307,8 @@ storify.brand.completion = {
 				alldone = false;
 			}
 		});
+
+		console.log(withData);
 
 		if(withData){
 			if(alldone){

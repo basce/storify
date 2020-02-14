@@ -64,6 +64,13 @@ class submission{
 		$wpdb->query($wpdb->prepare($query, $status, $admin_remark, $submission_id));
 	}
 
+	public function updateSubmissionCaption($submission_id, $caption){
+		global $wpdb;
+
+		$query = "UPDATE `".$this->tbl_submission."` SET remark = %s, status = %s WHERE id = %d";
+		$wpdb->query($wpdb->prepare($query, $caption, "", $submission_id));
+	}
+
 	public function removeSubmission($submission_id){
 		global $wpdb;
 

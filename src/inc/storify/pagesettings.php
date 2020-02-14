@@ -21,8 +21,8 @@ class pagesettings{
 				"og:description"=>"Storify.me is a self-serve marketplace connecting brands with everyday micro-influencers who create beautiful stories with the products they love.",
 				"og:url"=>"https://storify.me",
 				"og:site_name"=>"Storify.Me",
-				"og:image"=>"http://cdn.storify.me/data/uploads/2018/12/storify_homepage.jpg",
-				"og:image:secure_url"=>"https://cdn.storify.me/data/uploads/2018/12/storify_homepage.jpg",
+				"og:image"=>"http://cdn2.storify.me/data/uploads/2018/12/storify_homepage.jpg",
+				"og:image:secure_url"=>"https://cdn2.storify.me/data/uploads/2018/12/storify_homepage.jpg",
 				"og:image:type"=>"image/jpeg",
 				"og:image:width"=>1200,
 				"og:image:height"=>630
@@ -125,8 +125,8 @@ class pagesettings{
 				"og:description"=>'Sign in to Storify - the marketplace for everyday creators and the brands they love.',
 				"og:url"=>"https://storify.me/signin",
 				"og:site_name"=>"Storify.Me",
-				"og:image"=>"http://cdn.storify.me/data/uploads/2018/12/storify_homepage.jpg",
-				"og:image:secure_url"=>"https://cdn.storify.me/data/uploads/2018/12/storify_homepage.jpg",
+				"og:image"=>"http://cdn2.storify.me/data/uploads/2018/12/storify_homepage.jpg",
+				"og:image:secure_url"=>"https://cdn2.storify.me/data/uploads/2018/12/storify_homepage.jpg",
 				"og:image:type"=>"image/jpeg",
 				"og:image:width"=>1200,
 				"og:image:height"=>630
@@ -158,8 +158,8 @@ class pagesettings{
 				"og:description"=>'Create an account for Storify - the marketplace for everyday creators and the brands they love.',
 				"og:url"=>"https://storify.me/signup",
 				"og:site_name"=>"Storify.Me",
-				"og:image"=>"http://cdn.storify.me/data/uploads/2018/12/storify_homepage.jpg",
-				"og:image:secure_url"=>"https://cdn.storify.me/data/uploads/2018/12/storify_homepage.jpg",
+				"og:image"=>"http://cdn2.storify.me/data/uploads/2018/12/storify_homepage.jpg",
+				"og:image:secure_url"=>"https://cdn2.storify.me/data/uploads/2018/12/storify_homepage.jpg",
 				"og:image:type"=>"image/jpeg",
 				"og:image:width"=>1200,
 				"og:image:height"=>630

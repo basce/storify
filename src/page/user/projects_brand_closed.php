@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0,user-scalable=0">
     <meta name="robots" content="noindex, nofollow">
 <?php include("page/component/meta.php"); ?>
 
@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/user.css">
     <link rel="stylesheet" href="/assets/css/main.css">
+    <!-- Theme included stylesheets -->
+    <link href="//cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script>
         window._startTime = new Date().getTime();
 
@@ -138,7 +140,9 @@ include("page/component/header.php"); ?>
                         var div = $(storify.template.createListItemBrandView(value, value.id, [{classname:"detail", label:"Details"}]));
                         div.find(".actions .detail").click(function(e){
                             e.preventDefault();
-                            storify.brand.detail_closed.viewDetail(value.id);
+                            storify.brand.detail_closed.viewDetail(value.id, function(onComplete){
+                                if(onComplete)onComplete();
+                            });
                         });
                         return div;
                     },
@@ -147,23 +151,33 @@ include("page/component/header.php"); ?>
                     },
                     ()=>{
                         if( _initial_prompt && _project_id ){
-                            storify.brand.detail_closed.viewDetail(_project_id, function(){
+                            storify.brand.detail_closed.viewDetail(_project_id, function(onComplete){
                                 <?php
                                     if(sizeof($pathquery) > 4){
                                         switch($pathquery[4]){
                                             case "submit":
-                                            ?>$("#submission-tab").tab("show");<?php
+                                                $target_tab = "#submission-tab";
                                             break;
                                             case "final":
-                                            ?>$("#final-tab").tab("show");<?php
+                                                $target_tab = "#final-tab";
                                             break;
                                             case "creator":
-                                            ?>$("#creator-tab").tab("show");<?php
+                                                $target_tab = "#creator-tab";
                                             break;
                                             case "bounty":
-                                            ?>$("#bounty-tab").tab("show");<?php
+                                                $target_tab = "#bounty-tab";
                                             break;
                                         }
+                                        ?>
+
+                                        $("<?=$target_tab?>").one('shown.bs.tab',function(){
+                                            if(onComplete)onComplete();
+                                        }).tab("show");
+                                        <?php
+                                    }else{
+                                ?>
+                                    if(onComplete)onComplete();
+                                <?php
                                     }
                                 ?>
                             });

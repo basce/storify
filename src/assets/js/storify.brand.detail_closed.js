@@ -135,11 +135,12 @@ storify.brand.detail_closed = {
                     storify.project.user.getAllUser(function(){
                         storify.brand.deliverable_closed.getList(function(){
                             storify.brand.completion_closed.getCompletion(project_id, function(){
-                                storify.loading.hide();
                                 storify.brand.detail_closed.createDetail(rs.data);
                                 //$("#detailModal").modal();
-                                if(onComplete)onComplete();
-                                $("#newDetailModal").modal("show");
+                                if(onComplete)onComplete(function(){
+                                    $("#newDetailModal").modal("show");
+                                    storify.loading.hide();
+                                });
                                 //setup edit dialog
                             });
                         });
@@ -269,8 +270,8 @@ storify.brand.detail_closed = {
                     )
             )
             .append(deliverable_block)
-            .append($("<div>").addClass("linkify").html(data.detail.description_brief))
-            .append($("<div>").addClass("linkify").html(data.detail.deliverable_brief))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.description_brief)))
+            .append($("<div>").addClass("ql-snow").append($("<div>").addClass("linkify ql-editor").html(data.detail.deliverable_brief)))
             ;
         cont.append(owlImages);
 

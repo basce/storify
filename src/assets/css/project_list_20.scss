@@ -1,0 +1,59 @@
+.project20-items{
+	.project-item{
+		margin-top:2rem;
+		margin-bottom:2rem;
+		position:relative;
+		.ribbon-featured{
+			right:0;
+		}
+		.wrapper{
+			background-color:#FFF;
+			position:relative;
+			.content{
+				padding:10px;
+				.actions{
+					padding-top:2rem;
+					text-align:right;
+					a{
+						border: .1rem solid #ff0000;
+						padding: 1rem;
+						text-transform: none;
+						font-size: 1.4rem;
+						border-radius: .3rem;
+						z-index: 2;
+						color: #ff0000;
+						transition:.3s background-color ease;
+						margin-right:.5rem;
+						background-color:transparent;
+						display:inline-block;
+					}
+					a:hover{
+						background-color:#ff0000;
+						color:#fff;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media only screen and (max-width: 991px){
+	.project20-items{
+		.project-item{
+			.content{
+				position:relative;
+				padding:1rem;
+				h4{
+					width:auto;
+				}
+				.meta{
+					
+				}
+				.description{
+					padding-top:2rem;
+					height:8rem;
+				}
+			}
+		}
+	}
+}

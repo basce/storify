@@ -64,6 +64,27 @@ class project{
 		$this->status_manager = new status();
 	}  
 
+	public function getCDNURL($url){
+		//update all to https://cdn2.storify.me
+		//from
+		// https://cdn.storify.me
+		// https://staging.storify.me
+		// https://storify.me
+
+		$replace = "https://cdn2.storify.me";
+		$search = array(
+			"https://cdn.storify.me",
+			"https://staging.storify.me",
+			"https://storify.me"
+		);
+
+		foreach($search as $key=>$value){
+			$url = str_replace($value, $replace, $url);
+		}
+
+		return $url;
+	}
+
 	public function createNewProject($name, $userid, $groupid = 0){
 		global $wpdb;
 
@@ -420,7 +441,7 @@ class project{
 		SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `wp_project_invitation` a LEFT JOIN ( SELECT m1.* FROM `wp_project_invitation_response` m1 LEFT JOIN `wp_project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL) b ON a.id = b.invitation_id WHERE project_id = 1
 		 */
 		
-		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, user_email, action, remark, REPLACE(REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/'), 'https://staging.storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, b.user_email, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d ) g ON f.user_id = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s AND f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
+		$query = "SELECT f.invitation_id, f.invitation_status, f.user_id, f.sent_date, display_name, igusername, user_email, action, remark, h.guid as `profile_image` FROM ( SELECT d.*, e.id FROM ( SELECT a.*, b.display_name, b.user_email, c.igusername FROM ( SELECT a.id as `invitation_id`, a.status as `invitation_status`, a.sent_date, a.user_id, a.status, b.action, b.remark FROM `".$wpdb->prefix."project_invitation` a LEFT JOIN ( SELECT m1.* FROM `".$wpdb->prefix."project_invitation_response` m1 LEFT JOIN `".$wpdb->prefix."project_invitation_response` m2 ON (m1.invitation_id = m2.invitation_id AND m1.id < m2.id) WHERE m2.id IS NULL ) b ON a.id = b.invitation_id WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b on a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT item_id, related_item_id FROM `".$wpdb->prefix."podsrel` WHERE field_id = %d GROUP BY item_id ) g ON f.ID = g.item_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.related_item_id = h.ID WHERE f.invitation_status != %s AND f.invitation_status != %s ORDER BY f.sent_date DESC, display_name ASC";
 
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43, "removed", "closed"), ARRAY_A); // field_id 43 is the profile image for instagrammer_fast
 
@@ -429,6 +450,7 @@ class project{
 				$data[$key]["action"] = null;
 				$data[$key]["remark"] = null;
 			}
+			$data[$key]["profile_image"] = $this->getCDNURL($value["profile_image"]);
 		}
 
 		return $data;
@@ -488,8 +510,12 @@ class project{
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43), ARRAY_A);
 		*/
 	
-		$query = "SELECT f.*, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM  ( SELECT d.*, e.id FROM ( SELECT a.user_id, a.role, b.display_name, b.user_email, c.igusername FROM ( SELECT user_id, role FROM `".$this->user_manager->getTable()."` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT meta_value, user_id FROM `".$wpdb->prefix."usermeta` WHERE meta_key = %s ) g ON f.user_id = g.user_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.meta_value = h.ID";
+		$query = "SELECT f.*, h.guid as `profile_image` FROM  ( SELECT d.*, e.id FROM ( SELECT a.user_id, a.role, b.display_name, b.user_email, c.igusername FROM ( SELECT user_id, role FROM `".$this->user_manager->getTable()."` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT meta_value, user_id FROM `".$wpdb->prefix."usermeta` WHERE meta_key = %s ) g ON f.user_id = g.user_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.meta_value = h.ID";
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 'profile_pic'), ARRAY_A);
+
+		foreach($data as $key=>$value){
+			$data[$key]["profile_image"] = $this->getCDNURL($value["profile_image"]);
+		}
 		return $data;
 	}
 
@@ -502,19 +528,28 @@ class project{
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 43), ARRAY_A);
 		*/
 	
-		$query = "SELECT f.*, REPLACE(h.guid, 'https://storify.me/', 'https://cdn.storify.me/') as `profile_image` FROM ( SELECT d.* FROM ( SELECT a.user_id, a.role, b.ID, b.display_name, c.igusername FROM ( SELECT user_id, role FROM `".$wpdb->prefix."project_user` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT meta_value, user_id FROM `".$wpdb->prefix."usermeta` WHERE meta_key = %s ) g ON f.user_id = g.user_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.meta_value = h.ID";
+		$query = "SELECT f.*, h.guid as `profile_image` FROM ( SELECT d.* FROM ( SELECT a.user_id, a.role, b.ID, b.display_name, c.igusername FROM ( SELECT user_id, role FROM `".$wpdb->prefix."project_user` WHERE project_id = %d ) a LEFT JOIN `".$wpdb->prefix."users` b ON a.user_id = b.ID LEFT JOIN `".$wpdb->prefix."igaccounts` c ON a.user_id = c.userid ) d LEFT JOIN `".$wpdb->prefix."pods_instagrammer_fast` e ON d.igusername = e.igusername ) f LEFT JOIN ( SELECT meta_value, user_id FROM `".$wpdb->prefix."usermeta` WHERE meta_key = %s ) g ON f.user_id = g.user_id LEFT JOIN `".$wpdb->prefix."posts` h ON g.meta_value = h.ID";
 
 		$data = $wpdb->get_results($wpdb->prepare($query, $project_id, 'profile_pic'), ARRAY_A);
+		foreach($data as $key=>$value){
+			$data[$key]["profile_image"] = $this->getCDNURL($value["profile_image"]);
+		}
 		return $data;
 	}
 
-	public function getProjectStats($user_id){
+	public function getProjectStats($user_id, $group_id=0){
 		global $wpdb;
 
 		if(isset($_SESSION["role_view"]) && $_SESSION["role_view"] == "brand"){
-			$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE hide = 0 AND created_by = %d AND status = %s";
-	        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
-	        $total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
+			if($group_id){
+				$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE hide = 0 AND group_id = %d AND status = %s";
+				$total_ongoing = $wpdb->get_var($wpdb->prepare($query, $group_id, "open"));
+		        $total_closed = $wpdb->get_var($wpdb->prepare($query, $group_id, "close"));
+			}else{
+				$query = "SELECT COUNT(*) FROM `".$wpdb->prefix."project` WHERE hide = 0 AND created_by = %d AND status = %s";
+		        $total_ongoing = $wpdb->get_var($wpdb->prepare($query, $user_id, "open"));
+		        $total_closed = $wpdb->get_var($wpdb->prepare($query, $user_id, "close"));
+			}
 
 	        return array(
 	        	"open"=>$total_ongoing,
@@ -727,53 +762,100 @@ class project{
 		);
 	}
 
-	public function getBrandProjectList($user_id, $orderby = "", $filter="", $pagesize=24, $page=1){
+	public function getBrandProjectList($user_id, $group_id=0, $orderby = "", $filter="", $pagesize=24, $page=1){
 		global $wpdb;
 
 		$orderByCond = "";
-		switch($orderby){
-			case "id":
-				$orderByCond = " ORDER BY b.id DESC";
-			break;
-			case "bounty":
-				$orderByCond = " ORDER BY b.bounty DESC";
-			break;
-			case "brand_name":
-				$orderByCond = " ORDER BY b.brand_name ASC";
-			break;
-			case "number_creatives":
-				$orderByCond = " ORDER BY b.number_creatives ASC";
-			break;
-			case "closing_date":
-			case "close":
-			case "date":
-				$orderByCond = " ORDER BY b.closing_date ASC";
-			break;
-			case "rev_closing_date":
-				$orderByCond = " ORDER BY b.closing_date DESC";
-			break;
-			case "invitation_closing_date":
-			default:
-				$orderByCond = " ORDER BY b.invitation_closing_date ASC";
-			break;
+		if($group_id){
+			switch($orderby){
+				case "id":
+					$orderByCond = " ORDER BY a.id DESC";
+				break;
+				case "bounty":
+					$orderByCond = " ORDER BY a.bounty DESC";
+				break;
+				case "brand_name":
+					$orderByCond = " ORDER BY a.brand_name ASC";
+				break;
+				case "number_creatives":
+					$orderByCond = " ORDER BY a.number_creatives ASC";
+				break;
+				case "closing_date":
+				case "close":
+				case "date":
+					$orderByCond = " ORDER BY a.closing_date ASC";
+				break;
+				case "rev_closing_date":
+					$orderByCond = " ORDER BY a.closing_date DESC";
+				break;
+				case "invitation_closing_date":
+				default:
+					$orderByCond = " ORDER BY a.invitation_closing_date ASC";
+				break;
+			}
+		}else{
+			switch($orderby){
+				case "id":
+					$orderByCond = " ORDER BY b.id DESC";
+				break;
+				case "bounty":
+					$orderByCond = " ORDER BY b.bounty DESC";
+				break;
+				case "brand_name":
+					$orderByCond = " ORDER BY b.brand_name ASC";
+				break;
+				case "number_creatives":
+					$orderByCond = " ORDER BY b.number_creatives ASC";
+				break;
+				case "closing_date":
+				case "close":
+				case "date":
+					$orderByCond = " ORDER BY b.closing_date ASC";
+				break;
+				case "rev_closing_date":
+					$orderByCond = " ORDER BY b.closing_date DESC";
+				break;
+				case "invitation_closing_date":
+				default:
+					$orderByCond = " ORDER BY b.invitation_closing_date ASC";
+				break;
+			}
 		}
 
 		switch($filter){
 			case "ongoing":
-				$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND b.status = %s";
-				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "admin", "open"));
-				$totalpage = ceil($totalsize / $pagesize);
+				if($group_id){
+					$query = "SELECT COUNT(*) FROM `".$this->tbl_project."` WHERE hide = 0 AND group_id = %d AND status = %s";
+					$totalsize = $wpdb->get_var($wpdb->prepare($query, $group_id, "open"));
+					$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND b.status = %s".$orderByCond." LIMIT %d, %d";
-				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "admin", "open", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+					$query = "SELECT a.*, b.summary, 'admin' as `role` FROM `".$this->tbl_project."` a LEFT JOIN `".$this->summary_manager->getSummaryTable()."` b ON a.id = b.project_id WHERE a.hide = 0 AND a.group_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
+					$data = $wpdb->get_results($wpdb->prepare($query, $group_id, "open", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+				}else{
+					$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND b.status = %s";
+					$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "admin", "open"));
+					$totalpage = ceil($totalsize / $pagesize);
+
+					$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND b.status = %s".$orderByCond." LIMIT %d, %d";
+					$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "admin", "open", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+				}
 			break;
 			case "close":
-				$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )";
-				$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "admin", "complete", "close"));
-				$totalpage = ceil($totalsize / $pagesize);
+				if($group_id){
+					$query = "SELECT COUNT(*) FROM `".$this->tbl_project."` WHERE hide = 0 AND group_id = %d AND status = %s";
+					$totalsize = $wpdb->get_var($wpdb->prepare($query, $group_id, "close"));
+					$totalpage = ceil($totalsize / $pagesize);
 
-				$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )".$orderByCond." LIMIT %d, %d";
-				$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "admin", "complete", "close", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+					$query = "SELECT a.*, b.summary, 'admin' as `role` FROM `".$this->tbl_project."` a LEFT JOIN `".$this->summary_manager->getSummaryTable()."` b ON a.id = b.project_id WHERE a.hide = 0 AND a.group_id = %d AND a.status = %s".$orderByCond." LIMIT %d, %d";
+					$data = $wpdb->get_results($wpdb->prepare($query, $group_id, "close", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+				}else{
+					$query = "SELECT COUNT(*) FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )";
+					$totalsize = $wpdb->get_var($wpdb->prepare($query, $user_id, "admin", "complete", "close"));
+					$totalpage = ceil($totalsize / $pagesize);
+
+					$query = "SELECT a.role, b.*, c.summary FROM `".$this->user_manager->getTable()."` a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id LEFT JOIN `".$this->summary_manager->getSummaryTable()."` c ON a.project_id = c.project_id WHERE b.hide = 0 AND a.user_id = %d AND a.role = %s AND ( b.status = %s OR b.status = %s )".$orderByCond." LIMIT %d, %d";
+					$data = $wpdb->get_results($wpdb->prepare($query, $user_id, "admin", "complete", "close", ($page - 1)*$pagesize, $pagesize), ARRAY_A);
+				}
 			break;
 		}
 
@@ -1015,6 +1097,15 @@ class project{
 		}
 	}
 
+	public function getDeliverable($submission_id){
+		global $wpdb;
+
+		$query = "SELECT a.id, a.creator_id, a.type, a.URL, a.remark, a.status, a.file_id, a.admin_remark, a.admin_response_tt, a.tt, b.filename, b.size, b.mime FROM `".$this->submission_manager->getSubmissionTable()."` a LEFT JOIN `".$this->submission_manager->getSubmissionFileTable()."` b ON a.file_id = b.id WHERE a.id = %d";
+		$submission = $wpdb->get_row($wpdb->prepare($query, $submission_id), ARRAY_A);
+		return $submission;
+
+	}
+
 	public function getDeliverables($project_id, $user_id){
 		global $wpdb;
 		$user_role = $this->user_manager->getUserRoleInProject($project_id, $user_id);
@@ -1057,6 +1148,28 @@ class project{
 					return -1;
 				}else{
 					return 1;
+				}
+			});
+
+			usort($submissions, function($a, $b){
+				if($a["type"] == "extra"){
+					$a_sort_weight = 1;
+				}else{
+					$a_sort_weight = 0;
+				}
+
+				if($b["type"] == "extra"){
+					$b_sort_weight = 1;
+				}else{
+					$b_sort_weight = 0;
+				}
+
+				if($a_sort_weight == $b_sort_weight){
+					return 0;
+				}else if($a_sort_weight > $b_sort_weight){
+					return 1;
+				}else{
+					return -1;
 				}
 			});
 
@@ -1188,6 +1301,34 @@ class project{
 		return $this->user_manager->getUserRoleInProject($project_id, $user_id);
 	}
 
+	public function submission_update_caption($submission_id, $user_id, $caption){
+		global $wpdb;
+
+		$query = "SELECT COUNT(*) FROM `".$this->submission_manager->getSubmissionTable()."` WHERE id = %d AND creator_id = %d";
+		if($wpdb->get_var($wpdb->prepare($query, $submission_id, $user_id))){
+			$this->submission_manager->updateSubmissionCaption($submission_id, $caption);
+
+			$submission_result = $this->submission_manager->getSubmissionDetail($submission_id);
+			if($this->isSubmissionComplete($submission_result["creator_id"], $submission_result["project_id"])){
+				// send notification when all items is done.
+		        job::addUpdate("submission_complete_".$submission_result["project_id"]."_".$submission_result["creator_id"], "submission_complete", array(
+		            "project_id"=>$submission_result["project_id"],
+		            "creator_id"=>$submission_result["creator_id"]
+		        ), 300); //5 mins
+			}
+
+			return array(
+				"error"=>0,
+				"msg"=>""
+			);
+		}else{
+			return array(
+				"error"=>1,
+				"msg"=>"You are not the owner of this submission"
+			);
+		}
+	}
+
 	public function submission_remove($submission_id, $user_id){
 		global $wpdb;
 
@@ -1255,10 +1396,6 @@ class project{
 		//insert into submission
 		$result = $this->submission_manager->changeKeyStatus($key_id, "uploaded");
 
-		if($type != "photo"){
-			$type = "video";
-		}
-
 		$query = "SELECT no_of_photo, no_of_video FROM `".$this->detail_manager->getProjectDetailTable()."` WHERE project_id = %d";
 		$data = $wpdb->get_row($wpdb->prepare($query, $result["project_id"]), ARRAY_A);
 
@@ -1269,8 +1406,10 @@ class project{
 
 		if($type == "photo"){
 			$cap_submitted_type = $data["no_of_photo"];
-		}else{
+		}else if($type == "video"){
 			$cap_submitted_type	= $data["no_of_video"];
+		}else{
+			$cap_submitted_type	= 1000000;
 		}
 
 		if($num_submitted_type < $cap_submitted_type){
@@ -1295,10 +1434,6 @@ class project{
 	public function submission_file_submit($project_id, $type, $user_id, $filename, $filesize, $filemime){
 		global $wpdb;
 
-		if($type != "photo"){
-			$type = "video";
-		}
-
 		$query = "SELECT no_of_photo, no_of_video FROM `".$this->detail_manager->getProjectDetailTable()."` WHERE project_id = %d";
 		$data = $wpdb->get_row($wpdb->prepare($query, $project_id), ARRAY_A);
 
@@ -1309,8 +1444,10 @@ class project{
 
 		if($type == "photo"){
 			$cap_submitted_type = $data["no_of_photo"];
-		}else{
+		}else if($type == "video"){
 			$cap_submitted_type	= $data["no_of_video"];
+		}else{
+			$cap_submitted_type	= 1000000;
 		}
 
 		if($num_submitted_type < $cap_submitted_type){
@@ -1330,10 +1467,6 @@ class project{
 	public function submission_submit($project_id, $type, $user_id, $url, $remark){
 		global $wpdb;
 
-		if($type != "photo"){
-			$type = "video";
-		}
-
 		$query = "SELECT no_of_photo, no_of_video FROM `".$this->detail_manager->getProjectDetailTable()."` WHERE project_id = %d";
 		$data = $wpdb->get_row($wpdb->prepare($query, $project_id), ARRAY_A);
 
@@ -1344,8 +1477,10 @@ class project{
 
 		if($type == "photo"){
 			$cap_submitted_type = $data["no_of_photo"];
-		}else{
+		}else if($type == "video"){
 			$cap_submitted_type	= $data["no_of_video"];
+		}else{
+			$cap_submitted_type	= 1000000;
 		}
 
 		if($num_submitted_type < $cap_submitted_type){
@@ -1455,14 +1590,18 @@ class project{
 		if(sizeof($deliverables)){
 			foreach($deliverables as $key=>$value){
 				if($value["status"] == "accepted"){
-					$complete_count++;
 					if($value["type"] == "photo"){
+						$complete_count++;
 						$cash += $cost_per_photo;
 						$at_least_one = true;
 					}
 					if($value["type"] == "video"){
+						$complete_count++;
 						$cash += $cost_per_video;
 						$at_least_one = true;
+					}
+					if($value["type"] == "extra"){
+						//extra not in consider
 					}
 				}
 			}
@@ -1566,7 +1705,8 @@ class project{
 						    ), 1);
 
 						    job::add(0, "project_payment_confirm", array(
-						    	"project_id"=>$project_id
+						    	"project_id"=>$project_id,
+						    	"creator_id"=>$value["user_id"]
 						    ), 1);
 						    //credit to user
 						}
@@ -1614,7 +1754,8 @@ class project{
 			    ), 1);
 
 			    job::add(0, "project_payment_confirm", array(
-			    	"project_id"=>$project_id
+			    	"project_id"=>$project_id,
+					"creator_id"=>$user_id
 			    ), 1);
 			}
 			$this->status_manager->updateStatus($user_id, $project_id, $status);
@@ -1822,6 +1963,7 @@ class project{
 
 		//expired invitation
 		//SELECT a . * , b.invitation_closing_date FROM ( SELECT * FROM  `wp_project_invitation` WHERE STATUS =  "pending" )a LEFT JOIN wp_project b ON a.project_id = b.id WHERE b.invitation_closing_date < NOW() && b.invitation_closing_date != "0000-00-00 00:00:00"
+		/*
 		$query = "UPDATE `wp_project_invitation` SET status = %s WHERE id IN ( SELECT a.id FROM ( SELECT * FROM  `".$this->invitation_manager->getInvitationTable()."` WHERE STATUS = %s )a LEFT JOIN `".$this->tbl_project."` b ON a.project_id = b.id WHERE b.hide = 0 AND ( UNIX_TIMESTAMP( b.invitation_closing_date ) + 86400 ) < UNIX_TIMESTAMP() && b.invitation_closing_date != %s )";
 		$wpdb->query($wpdb->prepare($query, "expired", "pending", "0000-00-00 00:00:00"));
 
@@ -1855,5 +1997,6 @@ class project{
 				$wpdb->query($wpdb->prepare($query, "close", $project_id));
 			}
 		}
+		*/
 	}
 }
