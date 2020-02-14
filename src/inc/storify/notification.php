@@ -26,82 +26,98 @@ class notification{
 		return self::$instance;
 	}
 
-	private static function _test_add($project_id, $user_id, $group_id, $type, $message, $data){
+	/*
+	add notification query string
+	*/
+	public static function _query_add($input){
 		global $wpdb;
 
-		$query = "INSERT INTO `".self::$notification_table."` ( project_id, user_id, group_id, type, message, data ) VALUES ( %d, %d, %d, %s, %s, %s )";
-		$query_string = $wpdb->prepare( $query, $project_id, $user_id, $group_id, $type, $message, json_encode($data) );
+		self::getInstance(); // initialize
 
-		return array(
-			$query_string;
+		$default = array(
+			"project_id"=>0,
+			"user_id"=>0,
+			"group_id"=>0,
+			"type"=>"",
+			"message"=>"",
+			"data"=>array()
 		);
-	}
 
-	private static function _test_get($project_id, $user_id = 0, $group_id = 0, $onlynew = 0, $after = 0, $size = 30){
-
-	}
-
-
-	private static function _add($project_id, $user_id, $group_id, $type, $message, $data){
-		global $wpdb;
+		$a = array_merge(
+			$default,
+			$input
+		);
 
 		$query = "INSERT INTO `".self::$notification_table."` ( project_id, user_id, group_id, type, message, data ) VALUES ( %d, %d, %d, %s, %s, %s )";
-		$wpdb->query( $wpdb->prepare( $query, $project_id, $user_id, $group_id, $type, $message, json_encode($data) ) );
+		return $wpdb->prepare( $query, $a["project_id"], $a["user_id"], $a["group_id"], $a["type"], $a["message"], json_encode($a["data"]) );
+	}
+
+	private static function _add($input){
+		global $wpdb;
+
+		$wpdb->query( self::_query_add($input) );
 
 		$id = $wpdb->insert_id;
 
 		return $id;
 	}
 
-	private static function _get($project_id, $user_id = 0, $group_id = 0, $onlynew = 0, $after = 0, $size = 30){
+	public static function add($input){
+		return self::_add($input);
+	}
+
+	/*
+	get notification query string
+	*/
+	public static function _query_get($input){
 		global $wpdb;
 
-		if($user_id == 0){
+		self::getInstance(); // initialize
+
+		$default = array(
+			"project_id"=>0,
+			"user_id"=>0,
+			"group_id"=>0,
+			"onlynew"=>0,
+			"after"=>0,
+			"size"=>24
+		);
+
+		$a = array_merge(
+			$default,
+			$input
+		);
+		
+		if($a["user_id"] == 0){
 
 			// get notification for brand
 
-			if($onlynew){
+			if($a["onlynew"]){
 
-				if($after = 0){
+				if($a["after"] == 0){
 
-					$query = "SELECT id, project_id, user_id, group_id, type, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND group_id = %d AND viewed = %d AND ORDER BY tt DESC LIMIT %d";
-					$results = $wpdb->get_results( $wpdb->prepare( $query, $project_id, $group_id, 0, $size ), ARRAY_A );
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND group_id = %d AND viewed = %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["group_id"], 0, $a["size"] );
 
 				}else{
 
-					$query = "SELECT id, project_id, user_id, group_id, type, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND group_id = %d AND viewed = %d AND UNIX_TIMESTAMP(tt) < %d ORDER BY tt DESC LIMIT %d";
-					$results = $wpdb->get_results( $wpdb->prepare( $query, $project_id, $group_id, 0, $after, $size ), ARRAY_A );
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND group_id = %d AND viewed = %d AND UNIX_TIMESTAMP(tt) < %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["group_id"], 0, $a["after"], $a["size"] );
 
-				}
-
-				$nextAfter = $after;
-
-				if(sizeof($results)){
-					// get the last results timestamp
-
-					$nextAfter = $results[sizeof($results) - 1]["timestamp"];
 				}
 
 			}else{
 				
-				if($after = 0){
+				if($a["after"] == 0){
 
-					$query = "SELECT id, project_id, user_id, group_id, type, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND user_id = %d AND viewed = %d AND ORDER BY tt DESC LIMIT %d";
-					$results = $wpdb->get_results( $wpdb->prepare( $query, $project_id, $user_id, 0, $size ), ARRAY_A );
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND group_id = %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["group_id"], $a["size"] );
 
 				}else{
 
-					$query = "SELECT id, project_id, user_id, group_id, type, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND user_id = %d AND viewed = %d AND UNIX_TIMESTAMP(tt) < %d ORDER BY tt DESC LIMIT %d";
-					$results = $wpdb->get_results( $wpdb->prepare( $query, $project_id, $user_id, 0, $after, $size ), ARRAY_A );
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND group_id = %d AND UNIX_TIMESTAMP(tt) < %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["group_id"], $a["after"], $a["size"] );
 
-				}
-
-				$nextAfter = $after;
-
-				if(sizeof($results)){
-					// get the last results timestamp
-
-					$nextAfter = $results[sizeof($results) - 1]["timestamp"];
 				}
 
 			}
@@ -110,11 +126,82 @@ class notification{
 
 			// get notification for creator
 
-		}
+			if($a["onlynew"]){
 
+				if($a["after"] == 0){
+
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND user_id = %d AND viewed = %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["user_id"], 0, $a["size"] );
+
+				}else{
+
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND user_id = %d AND viewed = %d AND UNIX_TIMESTAMP(tt) < %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["user_id"], 0, $a["after"], $a["size"] );
+
+				}
+
+			}else{
+
+				if($a["after"] == 0){
+
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND user_id = %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["user_id"], $a["size"] );
+
+				}else{
+
+					$query = "SELECT id, project_id, user_id, group_id, type, message, data, UNIX_TIMESTAMP(tt) as `timestamp`, tt, viewed FROM `".self::$notification_table."` WHERE project_id = %d AND user_id = %d AND UNIX_TIMESTAMP(tt) < %d ORDER BY tt DESC LIMIT %d";
+					return $wpdb->prepare( $query, $a["project_id"], $a["user_id"], $a["after"], $a["size"] );
+
+				}
+
+			}
+		}		
 	}
 
+	private static function _get($input){
+		global $wpdb;
 
+		$query = self::_query_get($input);
+		$results = $wpdb->get_results($query, ARRAY_A);
+
+		foreach($results as $key=>$value){
+			$results[$key]["data"] = json_decode($value["data"], true);
+		}
+
+		return $results;
+	}
+
+	public static function get($input){
+		return self::_get($input);
+	}
+
+	public static function _query_view($input){
+		global $wpdb;
+
+		self::getInstance(); // initialize
+
+		$default = array(
+			"id"=>0,
+			"viewed"=>1
+		);
+
+		$a = array_merge(
+			$default,
+			$input
+		);
+
+		$query = "UPDATE `".self::$notification_table."` SET viewed = %d WHERE id = %d";
+		return $wpdb->prepare( $query, $a["viewed"], $a["id"] );
+	}
+
+	private static function _view($input){
+		global $wpdb;
+
+		$wpdb->query( self::_query_view($input) );
+	}
+
+	public static function view($input){
+		return self::_view($input);
+	}
 
 }
-*/
